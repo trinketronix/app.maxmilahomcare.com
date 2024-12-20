@@ -3,7 +3,7 @@
 namespace Homecare\Models;
 
 use Homecare\utils\HttpRequest;
-use Phalcon\Di;
+use Phalcon\Di\Di;
 
 class Users {
     private $cache;
@@ -42,7 +42,7 @@ class Users {
                 '/users',
                 [
                     'Content-Type' => 'application/json',
-                    'Authorization' => $token //el admin o manager
+                    'Authorization' => $token
                 ]
             );
             
