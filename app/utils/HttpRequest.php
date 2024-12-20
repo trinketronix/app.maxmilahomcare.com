@@ -143,73 +143,10 @@ class HttpRequest{
         if (curl_errno($ch)) {
             $error_msg = curl_error($ch);
             curl_close($ch);
-            throw new Exception("cURL error: " . $error_msg);
+            throw new Exception("Get request error: " . $error_msg);
         }
         // Close cURL handle
         curl_close($ch);
         return $response;
     }
 }
-
-// Example POST usage:
-//try
-//{
-//    $endpoint = "https://example.com/api/endpoint";
-//    $jsonBody = '{"key":"value"}';
-//    $headers = ["Authorization" => "Bearer YOUR_TOKEN"];
-//
-//    $result = makePostRequest($endpoint, $jsonBody, $headers);
-//    echo $result;
-//}
-//
-//catch
-//(Exception $e) {
-//    echo 'Error: ' . $e->getMessage();
-//}
-
-// Example PUT usage:
-//try
-//{
-//    $endpoint = "https://example.com/api/endpoint";
-//    $jsonBody = '{"key":"value"}';
-//    $headers = ["Authorization" => "Bearer YOUR_TOKEN"];
-//
-//    $result = makePutRequest($endpoint, $jsonBody, $headers);
-//    echo $result;
-//}
-//
-//catch
-//(Exception $e) {
-//    echo 'Error: ' . $e->getMessage();
-//}
-
-// Example DELETE usage:
-//try
-//{
-//    $endpoint = "https://example.com/api/endpoint";
-//    $jsonBody = ''; // DELETE usually doesn't have a body, but if needed...
-//    $headers = ["Authorization" => "Bearer YOUR_TOKEN"];
-//
-//    $result = makeDeleteRequest($endpoint, $jsonBody, $headers);
-//    echo $result;
-//}
-//
-//catch
-//(Exception $e) {
-//    echo 'Error: ' . $e->getMessage();
-//}
-
-// Example GET usage:
-//try
-//{
-//    $endpoint = "https://example.com/api/endpoint";
-//    $headers = ["Accept" => "application/json", "Authorization" => "Bearer YOUR_TOKEN"];
-//
-//    $result = makeGetRequest($endpoint, $headers);
-//    echo $result;
-//}
-//
-//catch
-//(Exception $e) {
-//    echo 'Error: ' . $e->getMessage();
-//}

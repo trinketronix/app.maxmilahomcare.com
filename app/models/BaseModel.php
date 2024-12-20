@@ -7,7 +7,6 @@ use JsonException;
 use Homecare\Constants\Auth;
 class BaseModel {
 
-
     /**
      * Get the decoded array from the token
      */
@@ -51,6 +50,9 @@ class BaseModel {
         }
     }
 
+    /**
+     * Get user id from token
+     */
     protected function getUserId(string $authorization): int {
         try {
             $auth = $this->decodeToken($authorization);
@@ -62,6 +64,9 @@ class BaseModel {
         }
     }
 
+    /**
+     * Get role from token
+     */
     protected function getRole(string $authorization): int {
         try {
             $auth = $this->decodeToken($authorization);
