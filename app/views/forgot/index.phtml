@@ -1,0 +1,22 @@
+<div class="row justify-content-center">
+    <div class="col-12">
+        <h2 class="text-center mb-4">Reset Password</h2>
+        
+        <form method="POST" action="/forgot">
+            <div class="mb-3">
+                <label for="username" class="form-label">Email</label>
+                <input type="email" class="form-control" id="username" name="username" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="new_password" class="form-label">New Password</label>
+                <input type="password" class="form-control" id="new_password" name="new_password" required>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Reset Password</button>
+                <a href="/login" class="btn btn-link">Back to Login</a>
+            </div>
+        </form>
+    </div>
+</div> 

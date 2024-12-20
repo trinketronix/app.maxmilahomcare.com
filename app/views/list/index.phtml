@@ -1,0 +1,19 @@
+<div class="row justify-content-center">
+    <div class="col-12">
+        <h2 class="text-center mb-4">Users List</h2>
+        
+        <div class="list-group mb-4">
+            <?php foreach ($users as $user): ?>
+            <div class="list-group-item">
+                <h5 class="mb-1"><?= $user->name ?></h5>
+                <p class="mb-1"><?= $user->username ?></p>
+                <small class="text-muted"><?= $user->phone ?></small>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="d-grid">
+            <a href="/main" class="btn btn-primary">Back to Menu</a>
+        </div>
+    </div>
+</div> 

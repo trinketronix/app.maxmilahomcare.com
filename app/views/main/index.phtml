@@ -1,0 +1,14 @@
+<div class="row justify-content-center">
+    <div class="col-12">
+        <h2 class="text-center mb-4">Menu</h2>
+        
+        <div class="d-grid gap-3">
+            <?php foreach ($menuItems as $item): ?>
+            <a href="<?= $item['url'] ?>" class="btn btn-primary btn-lg">
+                <i class="bi bi-<?= $item['icon'] ?>"></i>
+                <?= $item['text'] ?>
+            </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div> 
