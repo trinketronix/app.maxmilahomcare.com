@@ -1,7 +1,64 @@
-<div class="row justify-content-center">
-    <div class="col-12">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users List</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS for Pink Theme -->
+    <style>
+        body {
+            background-color: #f8e1f4; /* Light pink background */
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #d85b85; /* Pinkish color for header */
+        }
+        .list-group-item {
+            background-color: #fce6f5; /* Light pink background for each list item */
+            border: 1px solid #f8e1f4;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            padding: 15px;
+        }
+        .list-group-item:hover {
+            background-color: #f8d1e6; /* Slightly darker pink for hover effect */
+        }
+        .btn-primary {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        .btn-primary:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+        .form-control-static {
+            font-size: 1.1em;
+            color: #555;
+        }
+        .list-group-item h5 {
+            color: #d85b85; /* Pinkish color for user names */
+        }
+        .list-group-item p {
+            color: #555;
+        }
+        .list-group-item small {
+            color: #777; /* Muted color for phone numbers */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
         <h2 class="text-center mb-4">Users List</h2>
-        
+
         <div class="list-group mb-4">
             <?php foreach ($users as $user): ?>
             <div class="list-group-item">
@@ -16,4 +73,10 @@
             <a href="/main" class="btn btn-primary">Back to Menu</a>
         </div>
     </div>
-</div> 
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
