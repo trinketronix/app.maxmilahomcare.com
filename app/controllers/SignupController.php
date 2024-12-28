@@ -1,9 +1,16 @@
 <?php
 
-use Phalcon\Http\Response;
-use Phalcon\Http\Client\Request;
+//use Phalcon\Http\Response;
+//use Phalcon\Http\Client\Request;
 
-class SignupController extends ControllerBase
+namespace Homecare\Controllers;
+
+use Phalcon\Http\Response;
+use Phalcon\Http\Request;
+use Phalcon\Mvc\Controller;
+
+
+class SignupController extends Controller
 {
     public function indexAction()
     {
