@@ -44,6 +44,30 @@ $di->set('router', function() {
         'action'     => 'index'
     ]);
 
+
+ // Explicit route for '/login'
+ $router->add('/login', [
+    'namespace'  => 'Homecare\Controllers',
+    'controller' => 'login',
+    'action'     => 'index'
+]);
+
+
+ // Explicit route for '/forgot'
+ $router->add('/forgot', [
+    'namespace'  => 'Homecare\Controllers',
+    'controller' => 'forgot',
+    'action'     => 'index'
+]);
+
+
+ // Explicit route for '/signup'
+ $router->add('/signup', [
+    'namespace'  => 'Homecare\Controllers',
+    'controller' => 'signup',
+    'action'     => 'index'
+]);
+
     // Set the 404 not found page
     $router->notFound([
         'namespace'  => 'Homecare\Controllers',
@@ -60,6 +84,7 @@ $di->set('view', function () {
     $view->setViewsDir(APP_PATH . '/views/');
     return $view;
 });
+
 
 // Setup the URL component
 $di->set('url', function () {
@@ -121,5 +146,7 @@ try {
     $response = $application->handle($_SERVER['REQUEST_URI']);
     $response->send();
 } catch (\Exception $e) {
+//echo $config->application->controllersDir;
+echo APP_PATH;
     echo 'Exception: ', $e->getMessage();
 } 

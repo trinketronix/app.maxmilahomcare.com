@@ -1,9 +1,15 @@
 <?php
 
-use Phalcon\Http\Response;
-use Phalcon\Http\Client\Request;
+//use Phalcon\Http\Response;
+//use Phalcon\Http\Client\Request;
 
-class ForgotController extends ControllerBase
+namespace Homecare\Controllers;
+
+use Phalcon\Http\Response;
+use Phalcon\Http\Request;
+use Phalcon\Mvc\Controller;
+
+class ForgotController extends Controller
 {
     public function indexAction()
     {
