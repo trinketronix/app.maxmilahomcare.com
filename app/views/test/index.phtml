@@ -57,8 +57,7 @@
 </head>
 <body>
 <div class="container">
-    <h2 class="text-center mb-4">Users List</h2>
-
+    <h2 class="text-center mb-4">Managers List</h2>
     <div class="list-group mb-4">
         <?php foreach ($managers as $manager): ?>
             <div class="list-group-item">
@@ -68,12 +67,23 @@
             </div>
         <?php endforeach; ?>
     </div>
-
-    <div class="d-grid">
-        <a href="/main" class="btn btn-primary">Back to Menu</a>
+</div>
+<div class="container">
+    <h2 class="text-center mb-4">Managers List</h2>
+    <div class="list-group mb-4">
+        <?php foreach ($request as $r): ?>
+            <div class="list-group-item">
+                <h5 class="mb-1"><?= $r['status'] ?></h5>
+                <p class="mb-1"><?= $r['code'] ?></p>
+                <small class="text-muted"><?= $r['message'] ?></small>
+                <small class="text-muted"><?= $r['data'] ?></small>
+            </div>
+        <?php endforeach; ?>
     </div>
 </div>
-
+<div class="d-grid">
+    <a href="/main" class="btn btn-primary">Back to Menu</a>
+</div>
 <!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
