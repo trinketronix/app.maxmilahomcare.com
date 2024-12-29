@@ -7,12 +7,40 @@ use Phalcon\Mvc\Controller;
 
 class TestController extends Controller {
     public function indexAction(){
+        $managers = [
+            'username' => 'error'
+        ];
+        $token = 'error';
 
-        $response = HttpRequest::get('/managers',[
-            'Content-Type' => 'application/json',
-            'Authorization' => 'eyJpZCI6MSwidXNlcm5hbWUiOiJ0b2Rkc2FscGVuQGdtYWlsLmNvbSIsInJvbGUiOjAsImV4cGlyYXRpb24iOjE3MzU4ODQzMzkxMzJ9'
-        ]);
-        $managers = $response['data'];
-        $this->view->setVar("managers",$managers);
+        $jsonBody = json_encode(
+            [
+                "username" => "toddsalpen@gmail.com",
+                "password" => "Mju72wsx@#$&"
+            ],
+            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
+        );
+
+        $postTestResponse = HttpRequest::post('/login', $jsonBody);
+
+        $postStatus = $postTestResponse['status'];
+        $postCode = $postTestResponse['code'];
+        $postMessage = $postTestResponse['message'];
+        $postData = $postTestResponse['data'];
+
+        $token = $postData['token'];
+
+
+        if($token != null) {
+            // TEST GET METHOD
+            $getTestResponse = HttpRequest::get('/managers', [
+                'Content-Type' => 'application/json',
+                'Authorization' => $token
+            ]);
+            $managers = $getTestResponse['data'];
+        }
+
+
+        $this->view->setVar("token", $token);
+        $this->view->setVar("managers", $managers);
     }
 }
