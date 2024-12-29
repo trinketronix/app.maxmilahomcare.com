@@ -56,30 +56,29 @@
     </style>
 </head>
 <body>
-<!--<div class="container">-->
-<!--    <h2 class="text-center mb-4">Managers List</h2>-->
-<!--    <div class="list-group mb-4">-->
-<!--        --><?php //foreach ($managers as $manager): ?>
-<!--            <div class="list-group-item">-->
-<!--                <h5 class="mb-1">--><?php //= $manager['username'] ?><!--</h5>-->
-<!--                <p class="mb-1">--><?php //= $manager['role'] ?><!--</p>-->
-<!--                <small class="text-muted">--><?php //= $manager['status'] ?><!--</small>-->
-<!--            </div>-->
-<!--        --><?php //endforeach; ?>
-<!--    </div>-->
-<!--</div>-->
 <div class="container">
     <h2 class="text-center mb-4">Managers List</h2>
     <div class="list-group mb-4">
-<!--        --><?php //foreach ($request as $r): ?>
-<!--            <div class="list-group-item">-->
-<!--                <h5 class="mb-1">--><?php //= $r['status'] ?><!--</h5>-->
-<!--                <p class="mb-1">--><?php //= $r['code'] ?><!--</p>-->
-<!--                <small class="text-muted">--><?php //= $r['message'] ?><!--</small>-->
-<!--                <small class="text-muted">--><?php //= $r['data'] ?><!--</small>-->
-<!--            </div>-->
-<!--        --><?php //endforeach; ?>
-        <p><?php echo $data['token'] ?></p>
+        <?php foreach ($managers as $manager): ?>
+            <div class="list-group-item">
+                <h5 class="mb-1"><?= $manager['username'] ?></h5>
+                <p class="mb-1"><?= $manager['role'] ?></p>
+                <small class="text-muted"><?= $manager['status'] ?></small>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+<hr>
+<div class="container">
+    <h2 class="text-center mb-4">Caregivers List</h2>
+    <div class="list-group mb-4">
+        <?php foreach ($caregivers as $caregiver): ?>
+            <div class="list-group-item">
+                <h5 class="mb-1"><?= $caregiver['username'] ?></h5>
+                <p class="mb-1"><?= $caregiver['role'] ?></p>
+                <small class="text-muted"><?= $caregiver['status'] ?></small>
+            </div>
+        <?php endforeach; ?>
     </div>
 </div>
 <div class="d-grid">

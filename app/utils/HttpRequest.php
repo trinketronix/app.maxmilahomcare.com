@@ -18,7 +18,7 @@ class HttpRequest{
      * @throws Exception
      * POST Request function
      */
-    public static function post(string $endpoint, string $jsonBody, array $headers = []): string {
+    public static function post(string $endpoint, string $jsonBody, array $headers = []): array {
         $endpoint = self::BASE_URL . $endpoint;
         // Initialize cURL
         $ch = curl_init();
@@ -43,7 +43,7 @@ class HttpRequest{
         }
         // Close cURL handle
         curl_close($ch);
-        return $response;
+        return json_decode($response, true, 512, JSON_THROW_ON_ERROR);
     }
 
     /**
@@ -54,7 +54,7 @@ class HttpRequest{
      * @throws Exception
      * PUT Request
      */
-    public static function put(string $endpoint, string $jsonBody, array $headers = []): string {
+    public static function put(string $endpoint, string $jsonBody, array $headers = []): array {
         $endpoint = self::BASE_URL . $endpoint;
         // Initialize cURL
         $ch = curl_init();
@@ -79,7 +79,7 @@ class HttpRequest{
         }
         // Close cURL handle
         curl_close($ch);
-        return $response;
+        return json_decode($response, true, 512, JSON_THROW_ON_ERROR);
     }
 
     /**

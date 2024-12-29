@@ -8,6 +8,12 @@ use Phalcon\Mvc\Controller;
 class TestController extends Controller {
     public function indexAction(){
 
+        $managers = [
+            'username' => 'error'
+        ];
+
+        $token = 'error';
+
         $jsonBody = json_encode(
             [
                 "username" => "toddsalpen@gmail.com",
@@ -18,24 +24,28 @@ class TestController extends Controller {
 
         $post = HttpRequest::post('/login', $jsonBody);
 
-//        $postStatus = $postTestResponse['status'];
-//        $postCode = $postTestResponse['code'];
-//        $postMessage = $postTestResponse['message'];
-//        $postData = $postTestResponse['data'];
-//
-//        $token = $postData['token'];
         $response = json_decode($post, true, 512, JSON_THROW_ON_ERROR);
         $data = $response['data'];
+        $token = $data['token'];
 
-        $this->view->setVar("data", $data);
+        if($token != null) {
+            // Test Http Request Get managers
+            $getManaResponse = HttpRequest::get('/managers', [
+                'Content-Type' => 'application/json',
+                'Authorization' => $token
+            ]);
+            $managers = $getManaResponse['data'];
 
-//        if($token != null) {
-//            // TEST GET METHOD
-//            $getTestResponse = HttpRequest::get('/managers', [
-//                'Content-Type' => 'application/json',
-//                'Authorization' => $token
-//            ]);
-//            $managers = $getTestResponse['data'];
-//        }
+            // Test Http Request Get caregivers
+            $getCareResponse = HttpRequest::get('/caregivers', [
+                'Content-Type' => 'application/json',
+                'Authorization' => $token
+            ]);
+            $caregivers = $getCareResponse['data'];
+        }
+
+        $this->view->setVar("managers", $managers);
+        $this->view->setVar("caregivers", $caregivers);
+
     }
 }
