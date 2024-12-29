@@ -44,29 +44,33 @@ $di->set('router', function() {
         'action'     => 'index'
     ]);
 
+    // Explicit route for '/login'
+    $router->add('/login', [
+        'namespace'  => 'Homecare\Controllers',
+        'controller' => 'login',
+        'action'     => 'index'
+    ]);
 
- // Explicit route for '/login'
- $router->add('/login', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'login',
-    'action'     => 'index'
-]);
+    // Explicit route for '/forgot'
+    $router->add('/forgot', [
+        'namespace'  => 'Homecare\Controllers',
+        'controller' => 'forgot',
+        'action'     => 'index'
+    ]);
 
+    // Explicit route for '/signup'
+    $router->add('/signup', [
+        'namespace'  => 'Homecare\Controllers',
+        'controller' => 'signup',
+        'action'     => 'index'
+    ]);
 
- // Explicit route for '/forgot'
- $router->add('/forgot', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'forgot',
-    'action'     => 'index'
-]);
-
-
- // Explicit route for '/signup'
- $router->add('/signup', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'signup',
-    'action'     => 'index'
-]);
+    // Explicit route for '/test'
+    $router->add('/test', [
+        'namespace'  => 'Homecare\Controllers',
+        'controller' => 'test',
+        'action'     => 'index'
+    ]);
 
     // Set the 404 not found page
     $router->notFound([

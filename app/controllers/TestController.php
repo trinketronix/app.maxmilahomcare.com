@@ -7,8 +7,7 @@ use Phalcon\Http\Response;
 use Phalcon\Http\Request;
 use Phalcon\Mvc\Controller;
 
-class TestController extends Controller
-{
+class TestController extends Controller {
     public function indexAction()
     {
         $managers = HttpRequest::get('/managers',[
