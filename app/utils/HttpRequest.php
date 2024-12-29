@@ -126,7 +126,7 @@ class HttpRequest{
      * @throws Exception
      * GET Request
      */
-    public static function get(string $endpoint, array $headers = []): string {
+    public static function get(string $endpoint, array $headers = []): array {
         $endpoint = self::BASE_URL . $endpoint;
         // Initialize cURL
         $ch = curl_init();
@@ -138,7 +138,7 @@ class HttpRequest{
         foreach ($headers as $key => $value) { $headerArray[] = "$key: $value"; }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headerArray);
         // Execute GET request
-        $response = curl_exec($ch);
+        $json = curl_exec($ch);
         // Check if any error occurred
         if (curl_errno($ch)) {
             $error_msg = curl_error($ch);
@@ -147,6 +147,6 @@ class HttpRequest{
         }
         // Close cURL handle
         curl_close($ch);
-        return $response;
+        return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
     }
 }
