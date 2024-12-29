@@ -25,7 +25,7 @@ class TestController extends Controller {
 //
 //        $token = $postData['token'];
 
-        $this->view->setVar("post", $post);
+        $this->view->setVar("data", $post['data']);
 
 //        if($token != null) {
 //            // TEST GET METHOD
