@@ -24,8 +24,9 @@ class TestController extends Controller {
 //        $postData = $postTestResponse['data'];
 //
 //        $token = $postData['token'];
+        $data =  $post['data'];
 
-        $this->view->setVar("data", $post['data']);
+        $this->view->setVar("data", $data);
 
 //        if($token != null) {
 //            // TEST GET METHOD
@@ -35,8 +36,5 @@ class TestController extends Controller {
 //            ]);
 //            $managers = $getTestResponse['data'];
 //        }
-
-
-
     }
 }
