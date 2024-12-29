@@ -24,8 +24,7 @@ class TestController extends Controller {
 
         $post = HttpRequest::post('/login', $jsonBody);
 
-        $response = json_decode($post, true, 512, JSON_THROW_ON_ERROR);
-        $data = $response['data'];
+        $data = $post['data'];
         $token = $data['token'];
 
         if($token != null) {
