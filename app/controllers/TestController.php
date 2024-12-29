@@ -24,7 +24,8 @@ class TestController extends Controller {
 //        $postData = $postTestResponse['data'];
 //
 //        $token = $postData['token'];
-        $data =  $post['data'];
+        $response = json_decode($post, true, 512, JSON_THROW_ON_ERROR);
+        $data = $response['data'];
 
         $this->view->setVar("data", $data);
 
