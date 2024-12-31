@@ -21,10 +21,11 @@ class MainController extends BaseController {
         ];
 
         $token = $this->session->get('auth-token');
-        $username = (string) $this->getUsername($token); // object
+        $username = $this->getUsername($token); // object
         $userId = $this->getUserId($token); // int
         $userRole = $this->getRole($token); // int
         $isExpired = $this->isExpired($token); // bool
+
         $this->view->setVar("username", $username);
         $this->view->setVar("userid", $userId);
         $this->view->setVar("role", $userRole);
