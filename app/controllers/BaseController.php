@@ -1,13 +1,13 @@
 <?php
 
-namespace Homecare\Models;
+namespace Homecare\Controllers;
 
 use Exception;
 use JsonException;
 use Homecare\Constants\Auth;
-use Phalcon\Mvc\Model;
+use Phalcon\Mvc\Controller;
 
-class BaseModel extends Model {
+class BaseController extends Controller {
 
     /**
      * Get the decoded array from the token
@@ -33,8 +33,15 @@ class BaseModel extends Model {
     /**
      * check if the expiration inside the decoded token or authorization token is expired
      */
-    private function isExpired(array $auth): bool {
-        return $auth[Auth::EXPIRATION] < $this->getCurrentMilliseconds();
+    protected function isExpired(string $token): bool {
+        try {
+            $auth = $this->decodeToken($token);
+            if (!$auth) return true;
+            return $auth[Auth::EXPIRATION] < $this->getCurrentMilliseconds();
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return true;
+        }
     }
 
     /**
@@ -43,7 +50,7 @@ class BaseModel extends Model {
     protected function getUsername(string $token): ?object {
         try {
             $auth = $this->decodeToken($token);
-            if (!$auth || $this->isExpired($auth)) return null;
+            if (!$auth) return null;
             $user = $auth[Auth::USERNAME];
             return $user ? (object) $user : null;
         } catch (Exception $e) {
@@ -55,29 +62,28 @@ class BaseModel extends Model {
     /**
      * Get user id from token
      */
-    protected function getUserId(string $authorization): int {
+    protected function getUserId(string $token): int {
         try {
-            $auth = $this->decodeToken($authorization);
+            $auth = $this->decodeToken($token);
             if ($auth) return $auth[Auth::ID];
             else return -1;
-        } catch (JsonException $e) {
+        } catch (Exception $e) {
             error_log($e->getMessage());
-            return false;
+            return -1;
         }
     }
 
     /**
      * Get role from token
      */
-    protected function getRole(string $authorization): int {
+    protected function getRole(string $token): int {
         try {
-            $auth = $this->decodeToken($authorization);
+            $auth = $this->decodeToken($token);
             if ($auth) return $auth[Auth::ROLE];
             else return -1;
         } catch (Exception $e) {
             error_log($e->getMessage());
-            return false;
+            return -1;
         }
     }
-
 }

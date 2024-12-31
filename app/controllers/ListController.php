@@ -6,7 +6,7 @@ use Phalcon\Mvc\Controller;
 use Homecare\Models\Users;
 use Homecare\utils\HttpRequest;
 
-class ListController extends Controller
+class ListController extends BaseController
 {
     public function indexAction()
     {

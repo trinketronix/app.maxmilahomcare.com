@@ -4,10 +4,9 @@ namespace Homecare\Controllers;
 
 use Phalcon\Mvc\Controller;
 
-class LogoutController extends Controller
+class LogoutController extends BaseController
 {
-    public function indexAction()
-    {
+    public function indexAction() {
         // Clear session data (destroy the session)
         $this->session->remove('auth-token');
         $this->session->remove('username');
