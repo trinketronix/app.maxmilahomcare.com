@@ -3,6 +3,7 @@
 namespace Homecare\Controllers;
 
 use Phalcon\Mvc\Controller;
+use Homecare\utils\HttpRequest;
 
 class MainController extends Controller
 {
@@ -14,7 +15,7 @@ class MainController extends Controller
 
         $this->view->menuItems = [
             ['url' => '/details', 'text' => 'My Profile', 'icon' => 'person'],
-            ['url' => '/list', 'text' => 'User List', 'icon' => 'people'],
+            ['url' => '/signup', 'text' => 'Create User', 'icon' => 'people'],
             ['url' => '/logout', 'text' => 'Logout', 'icon' => 'box-arrow-right']
         ];
     }

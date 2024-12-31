@@ -12,6 +12,7 @@ use Phalcon\Cache\Adapter\Stream as CacheStream;
 use Phalcon\Storage\SerializerFactory;
 use Phalcon\Mvc\Router;
 
+
 define('BASE_PATH', dirname(__DIR__));
 define('APP_PATH', BASE_PATH . '/app');
 define('CACHE_PATH', BASE_PATH . '/cache');
@@ -51,6 +52,13 @@ $di->set('router', function() {
         'action'     => 'index'
     ]);
 
+    // Explicit route for '/login'
+    $router->add('/list', [
+        'namespace'  => 'Homecare\Controllers',
+        'controller' => 'list',
+        'action'     => 'index'
+    ]);
+
     // Explicit route for '/forgot'
     $router->add('/forgot', [
         'namespace'  => 'Homecare\Controllers',
@@ -65,12 +73,37 @@ $di->set('router', function() {
         'action'     => 'index'
     ]);
 
+    // Explicit route for '/main'
+    $router->add('/main', [
+        'namespace'  => 'Homecare\Controllers',
+        'controller' => 'main',
+        'action'     => 'index'
+    ]);
+    
     // Explicit route for '/test'
     $router->add('/test', [
         'namespace'  => 'Homecare\Controllers',
         'controller' => 'test',
         'action'     => 'index'
     ]);
+
+// Explicit route for '/details'
+$router->add('/details', [
+    'namespace'  => 'Homecare\Controllers',
+    'controller' => 'details',
+    'action'     => 'index'
+]);
+
+
+// Explicit route for '/details'
+$router->add('/logout', [
+    'namespace'  => 'Homecare\Controllers',
+    'controller' => 'logout',
+    'action'     => 'index'
+]);
+
+
+
 
     // Set the 404 not found page
     $router->notFound([

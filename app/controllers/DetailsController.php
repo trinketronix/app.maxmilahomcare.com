@@ -10,7 +10,7 @@ class DetailsController extends Controller
     public function indexAction()
     {
         if (!$this->session->has('auth-token')) {
-            return $this->response->redirect('login');
+            return $this->response->redirect('signup');
         }
 
         $username = $this->session->get('username');
@@ -32,7 +32,7 @@ class DetailsController extends Controller
         
         if (!$userDetails) {
             $this->flash->error('Unable to fetch user details');
-            return $this->response->redirect('main');
+            return $this->response->redirect('forgot');
         }
 
         $this->view->user = $userDetails;
