@@ -9,7 +9,7 @@ use Phalcon\Http\Response;
 use Phalcon\Http\Request;
 use Phalcon\Mvc\Controller;
 
-class ForgotController extends Controller
+class ForgotController extends BaseController
 {
     public function indexAction()
     {

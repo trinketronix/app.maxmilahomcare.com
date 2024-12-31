@@ -2,10 +2,9 @@
 
 namespace Homecare\Controllers;
 
-use Phalcon\Mvc\Controller;
 use Homecare\Models\Users;
 
-class DetailsController extends Controller
+class DetailsController extends BaseController
 {
     public function indexAction()
     {

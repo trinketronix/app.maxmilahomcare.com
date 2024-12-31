@@ -5,7 +5,7 @@ namespace Homecare\Controllers;
 use Homecare\Utils\HttpRequest;
 use Phalcon\Mvc\Controller;
 
-class TestController extends Controller {
+class TestController extends BaseController {
     public function indexAction(){
 
         $managers = [

@@ -5,8 +5,8 @@ namespace Homecare\Controllers;
 use Phalcon\Mvc\Controller;
 use Homecare\utils\HttpRequest;
 
-class MainController extends Controller
-{
+class MainController extends BaseController {
+
     public function indexAction()
     {
         if (!$this->session->has('auth-token')) {
@@ -19,5 +19,15 @@ class MainController extends Controller
             ['url' => '/logout', 'text' => 'Logout', 'icon' => 'box-arrow-right'],
             ['url' => '/test', 'text' => 'Test', 'icon' => 'settings']
         ];
+
+        $token = $this->session->get('auth-token');
+        $username = (string) $this->getUsername($token); // object
+        $userId = $this->getUserId($token); // int
+        $userRole = $this->getRole($token); // int
+        $isExpired = $this->isExpired($token); // bool
+        $this->view->setVar("username", $username);
+        $this->view->setVar("userid", $userId);
+        $this->view->setVar("role", $userRole);
+        $this->view->setVar("isexpired", $isExpired);
     }
 } 
