@@ -36,7 +36,6 @@ class BaseController extends Controller {
     protected function isExpired(string $token): bool {
         try {
             $auth = $this->decodeToken($token);
-            if (!$auth) return true;
             return $auth[Auth::EXPIRATION] < $this->getCurrentMilliseconds();
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -47,15 +46,13 @@ class BaseController extends Controller {
     /**
      * Get signed user from token
      */
-    protected function getUsername(string $token): ?object {
+    protected function getUsername(string $token): string {
         try {
             $auth = $this->decodeToken($token);
-            if (!$auth) return null;
-            $user = $auth[Auth::USERNAME];
-            return $user ? (object) $user : null;
+            return $auth[Auth::USERNAME];
         } catch (Exception $e) {
             error_log($e->getMessage());
-            return null;
+            return $e->getMessage();
         }
     }
 
@@ -65,8 +62,7 @@ class BaseController extends Controller {
     protected function getUserId(string $token): int {
         try {
             $auth = $this->decodeToken($token);
-            if ($auth) return $auth[Auth::ID];
-            else return -1;
+            return $auth[Auth::ID];
         } catch (Exception $e) {
             error_log($e->getMessage());
             return -1;
@@ -79,8 +75,7 @@ class BaseController extends Controller {
     protected function getRole(string $token): int {
         try {
             $auth = $this->decodeToken($token);
-            if ($auth) return $auth[Auth::ROLE];
-            else return -1;
+            return $auth[Auth::ROLE];
         } catch (Exception $e) {
             error_log($e->getMessage());
             return -1;
