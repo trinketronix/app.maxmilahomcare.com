@@ -16,7 +16,8 @@ class MainController extends Controller
         $this->view->menuItems = [
             ['url' => '/details', 'text' => 'My Profile', 'icon' => 'person'],
             ['url' => '/signup', 'text' => 'Create User', 'icon' => 'people'],
-            ['url' => '/logout', 'text' => 'Logout', 'icon' => 'box-arrow-right']
+            ['url' => '/logout', 'text' => 'Logout', 'icon' => 'box-arrow-right'],
+            ['url' => '/test', 'text' => 'Test', 'icon' => 'settings']
         ];
     }
 } 
