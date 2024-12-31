@@ -4,6 +4,7 @@ namespace Homecare\Controllers;
 
 use Phalcon\Mvc\Controller;
 use Homecare\Models\Users;
+use Homecare\utils\HttpRequest;
 
 class ListController extends Controller
 {

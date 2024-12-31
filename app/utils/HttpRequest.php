@@ -7,8 +7,8 @@ use Exception;
 
 class HttpRequest{
 
-    private const string BASE_URL = "https://api.maxmilahomecare.com";
-    private const string CONTENT_TYPE = 'Content-Type: application/json';
+    private const BASE_URL= "https://api.maxmilahomecare.com";
+    private const CONTENT_TYPE = 'Content-Type: application/json';
 
     /**
      * @param string $endpoint as `/users`, `/login`, `caregivers`
