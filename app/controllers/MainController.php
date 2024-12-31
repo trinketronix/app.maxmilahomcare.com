@@ -25,10 +25,11 @@ class MainController extends BaseController {
         $userId = $this->getUserId($token); // int
         $userRole = $this->getRole($token); // int
         $isExpired = $this->isExpired($token); // bool
+        $expiration = $isExpired ? "is expired" : "is not expired";
 
         $this->view->setVar("username", $username);
         $this->view->setVar("userid", $userId);
         $this->view->setVar("role", $userRole);
-        $this->view->setVar("isexpired", $isExpired);
+        $this->view->setVar("expiration", $expiration);
     }
 } 
