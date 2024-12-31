@@ -31,8 +31,8 @@ class DetailsController extends Controller
         $userDetails = $users->getUser($username, $token);
         
         if (!$userDetails) {
-            $this->flash->error('Unable to fetch user details');
-            return $this->response->redirect('forgot');
+            //$this->flash->error('Unable to fetch user details');
+            return $this->response->redirect('main');
         }
 
         $this->view->user = $userDetails;
