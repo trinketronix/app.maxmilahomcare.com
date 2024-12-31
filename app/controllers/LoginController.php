@@ -29,8 +29,9 @@ class LoginController extends Controller
                 $post = HttpRequest::post('/login', $jsonBody);
     
                 if (empty($post['data']['token'])) {
+                    //$this->flashSession->error('Login failed. Invalid username or password.');
                     // Handle case when the login fails or token is missing
-                    $this->flashSession->error('Login failed. Invalid username or password.');
+                    $this->flashSession->error($post['message']);
                 }
     
                 $data = $post['data'];
