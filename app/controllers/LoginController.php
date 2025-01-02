@@ -29,8 +29,6 @@ class LoginController extends BaseController {
                 $loginRequest = HttpRequest::post('/login', $jsonBody);
 
                 if (empty($loginRequest['data']['token'])) {
-                    //$this->flashSession->error('Login failed. Invalid username or password.');
-                    // Handle case when the login fails or token is missing
                     $this->flashSession->error($loginRequest['message']);
                 }
 
@@ -42,7 +40,7 @@ class LoginController extends BaseController {
                 $this->session->set('username', $username);
 
                 // Redirect to the 'main' page
-                $this->response->redirect('main');//forgot
+                $this->response->redirect('main');
 
             } catch (Exception $e) {
                 // Handle errors in the API requests
