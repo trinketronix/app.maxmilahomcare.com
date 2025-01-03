@@ -12,7 +12,12 @@ class BaseController extends Controller {
     /**
      * Get the decoded array from the token
      */
-    protected function decodeToken(string $token): ?array {
+    protected function decodeToken(?string $token): ?array {
+        if ($token === null) {
+            error_log("Token is null.");
+            return null; // Token is null, handle gracefully
+        }
+        
         $decoded = base64_decode($token, true);
         if ($decoded === false) return null; // Invalid Base64
         try {
@@ -31,11 +36,19 @@ class BaseController extends Controller {
     }
 
     /**
-     * check if the expiration inside the decoded token or authorization token is expired
+     * Check if the expiration inside the decoded token or authorization token is expired
      */
-    protected function isExpired(string $token): bool {
+    protected function isExpired(?string $token): bool {
+        if ($token === null) {
+            error_log("Token is null.");
+            return true; // If token is null, consider it expired
+        }
+
         try {
             $auth = $this->decodeToken($token);
+            if ($auth === null) {
+                return true; // If decoding fails, consider token expired
+            }
             return $auth[Auth::EXPIRATION] < $this->getCurrentMilliseconds();
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -46,22 +59,38 @@ class BaseController extends Controller {
     /**
      * Get signed user from token
      */
-    protected function getUsername(string $token): string {
+    protected function getUsername(?string $token): string {
+        if ($token === null) {
+            error_log("Token is null.");
+            return "Unknown"; // Handle null token case
+        }
+
         try {
             $auth = $this->decodeToken($token);
+            if ($auth === null) {
+                return "Unknown"; // If decoding fails, return a fallback value
+            }
             return $auth[Auth::USERNAME];
         } catch (Exception $e) {
             error_log($e->getMessage());
-            return $e->getMessage();
+            return "Error: " . $e->getMessage();
         }
     }
 
     /**
      * Get user id from token
      */
-    protected function getUserId(string $token): int {
+    protected function getUserId(?string $token): int {
+        if ($token === null) {
+            error_log("Token is null.");
+            return -1; // Return a default value if token is null
+        }
+
         try {
             $auth = $this->decodeToken($token);
+            if ($auth === null) {
+                return -1; // If decoding fails, return a fallback value
+            }
             return $auth[Auth::ID];
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -72,9 +101,17 @@ class BaseController extends Controller {
     /**
      * Get role from token
      */
-    protected function getRole(string $token): int {
+    protected function getRole(?string $token): int {
+        if ($token === null) {
+            error_log("Token is null.");
+            return -1; // Return a default value if token is null
+        }
+
         try {
             $auth = $this->decodeToken($token);
+            if ($auth === null) {
+                return -1; // If decoding fails, return a fallback value
+            }
             return $auth[Auth::ROLE];
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -82,3 +119,4 @@ class BaseController extends Controller {
         }
     }
 }
+?>
