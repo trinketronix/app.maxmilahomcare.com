@@ -40,7 +40,8 @@ class LoginController extends BaseController {
                 $this->session->set('username', $username);
 
                 // Redirect to the 'main' page
-                $this->response->redirect('main');
+                if ($token != null)
+                    $this->response->redirect('main');
 
             } catch (Exception $e) {
                 // Handle errors in the API requests
