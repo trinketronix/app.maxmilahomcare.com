@@ -95,13 +95,20 @@ $router->add('/details', [
 ]);
 
 
-// Explicit route for '/details'
+// Explicit route for '/logout'
 $router->add('/logout', [
     'namespace'  => 'Homecare\Controllers',
     'controller' => 'logout',
     'action'     => 'index'
 ]);
 
+
+// Explicit route for '/activate'
+$router->add('/activate', [
+    'namespace'  => 'Homecare\Controllers',
+    'controller' => 'activate',
+    'action'     => 'index'
+]);
 
 
 

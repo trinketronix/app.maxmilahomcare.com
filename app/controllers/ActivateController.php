@@ -11,7 +11,7 @@ use Phalcon\Http\Request;
 use Phalcon\Mvc\Controller;
 use Homecare\Utils\HttpRequest;
 
-class ForgotController extends BaseController
+class ActivateController extends BaseController
 {
 //    public function indexAction()
 //    {
@@ -47,27 +47,29 @@ class ForgotController extends BaseController
 
         if ($this->request->isPost()) {
             $username = $this->request->getPost('username');
-            $password = $this->request->getPost('new_password');
+            //$password = $this->request->getPost('new_password');
           //  $token = null;
             // Prepare the JSON body for the login request
             $jsonBody = json_encode(
                 [
-                    "username" => $username,
-                    "password" => $password
+                    "username" => $username
+                    //,
+              //      "password" => $password
                 ],
                 JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
             );
 
             try {
-                $forgotRequest = HttpRequest::put('/change-password', $jsonBody);
-                //file_put_contents('response_log.txt', print_r($forgotRequest, true));
+                $activateRequest = HttpRequest::put('/activate', $jsonBody);
+                //file_put_contents('put_log.txt', print_r($activateRequest, true));
 
-                if (empty($forgotRequest['data'])) {
-                    $this->flashSession->error($forgotRequest['message']);
+                if (empty($activateRequest['data'])) {
+                    $this->flashSession->error($activateRequest['message']);
                 }
 
-                $data = $forgotRequest['data'];
-                
+                $data = $activateRequest['data'];
+                //file_put_contents('put2_log.txt', print_r($activateRequest, true));
+  
                 //$token = $data['token'];
 
                 // Set session data
@@ -80,7 +82,7 @@ class ForgotController extends BaseController
 
             } catch (Exception $e) {
                 // Handle errors in the API requests
-                $this->flashSession->error('An error occurred during the password reset: ' . $e->getMessage());
+                $this->flashSession->error('An error occurred during the activation: ' . $e->getMessage());
                 return $this->dispatcher->forward([
                     'controller' => 'main',
                     'action' => 'index'

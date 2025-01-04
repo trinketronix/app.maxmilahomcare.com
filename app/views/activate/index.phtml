@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password</title>
+    <title>Activate User</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS for Pink Theme -->
@@ -56,7 +56,7 @@
 </head>
 <body>
     <div class="container">
-        <h2 class="text-center mb-4">Reset Password</h2>
+        <h2 class="text-center mb-4">Activate User</h2>
 
         <form method="POST" action="/forgot">
             <div class="mb-3">
@@ -64,13 +64,9 @@
                 <input type="email" class="form-control" id="username" name="username" required>
             </div>
 
-            <div class="mb-3">
-                <label for="new_password" class="form-label">New Password</label>
-                <input type="password" class="form-control" id="new_password" name="new_password" required>
-            </div>
-
+           
             <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary">Reset Password</button>
+                <button type="submit" class="btn btn-primary">Activate</button>
                 <button type="button" class="btn btn-link" onclick="window.location.href='/login';">Back to Login</button>
                 <button type="button" class="btn btn-link" onclick="window.location.href='/logout';">Logout</button>
             </div>
