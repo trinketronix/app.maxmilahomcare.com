@@ -13,8 +13,8 @@ use Homecare\Utils\HttpRequest;
 
 class ActivateController extends BaseController
 {
-//    public function indexAction()
-//    {
+    public function indexAction()
+    {
 //        if ($this->request->isPost()) {
 //            $username = $this->request->getPost('username');
 //            $newPassword = $this->request->getPost('new_password');
@@ -43,51 +43,45 @@ class ActivateController extends BaseController
 
 
 
-    public function indexAction() {
+if ($this->request->isPost()) {
+    $username = $this->request->getPost('username');
+    // Prepare the JSON body for the login request
+    $jsonBody = json_encode(
+        [
+            "username" => $username
+ 
+        ],
+        JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
+    );
 
-        if ($this->request->isPost()) {
-            $username = $this->request->getPost('username');
-            //$password = $this->request->getPost('new_password');
-          //  $token = null;
-            // Prepare the JSON body for the login request
-            $jsonBody = json_encode(
-                [
-                    "username" => $username
-                    //,
-              //      "password" => $password
-                ],
-                JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
-            );
+    try {
+        $activateRequest = HttpRequest::put('/activate', $jsonBody);
+        file_put_contents('response_log.txt', print_r($activateRequest, true));
 
-            try {
-                $activateRequest = HttpRequest::put('/activate', $jsonBody);
-                //file_put_contents('put_log.txt', print_r($activateRequest, true));
-
-                if (empty($activateRequest['data'])) {
-                    $this->flashSession->error($activateRequest['message']);
-                }
-
-                $data = $activateRequest['data'];
-                //file_put_contents('put2_log.txt', print_r($activateRequest, true));
-  
-                //$token = $data['token'];
-
-                // Set session data
-                //$this->session->set('auth-token', $token);
-                //$this->session->set('username', $username);
-
-                // Redirect to the 'main' page
-                //if ($token != null)
-                    $this->response->redirect('main');
-
-            } catch (Exception $e) {
-                // Handle errors in the API requests
-                $this->flashSession->error('An error occurred during the activation: ' . $e->getMessage());
-                return $this->dispatcher->forward([
-                    'controller' => 'main',
-                    'action' => 'index'
-                ]);
-            }
+        if (empty($activateRequest['data'])) {
+            $this->flashSession->error($activateRequest['message']);
         }
+
+        $data = $activateRequest['data'];
+        
+        //$token = $data['token'];
+
+        // Set session data
+        //$this->session->set('auth-token', $token);
+        //$this->session->set('username', $username);
+
+        // Redirect to the 'main' page
+        //if ($token != null)
+            $this->response->redirect('main');
+
+    } catch (Exception $e) {
+        // Handle errors in the API requests
+        $this->flashSession->error('An error occurred during the activation: ' . $e->getMessage());
+        return $this->dispatcher->forward([
+            'controller' => 'main',
+            'action' => 'index'
+        ]);
     }
 }
+}    
+}    
