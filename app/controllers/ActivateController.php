@@ -56,14 +56,14 @@ if ($this->request->isPost()) {
 
     try {
         $activateRequest = HttpRequest::put('/activate', $jsonBody);
-        file_put_contents('response_log.txt', print_r($activateRequest, true));
+        //file_put_contents('response_log.txt', print_r($jsonBody, true));
 
         if (empty($activateRequest['data'])) {
             $this->flashSession->error($activateRequest['message']);
         }
 
         $data = $activateRequest['data'];
-        
+        //file_put_contents('response_log2.txt', print_r($data, true));
         //$token = $data['token'];
 
         // Set session data
@@ -77,6 +77,7 @@ if ($this->request->isPost()) {
     } catch (Exception $e) {
         // Handle errors in the API requests
         $this->flashSession->error('An error occurred during the activation: ' . $e->getMessage());
+        //file_put_contents('response_log3.txt', print_r($e->getMessage(), true));
         return $this->dispatcher->forward([
             'controller' => 'main',
             'action' => 'index'
