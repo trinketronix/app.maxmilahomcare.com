@@ -45,17 +45,23 @@ class ActivateController extends BaseController
 
 if ($this->request->isPost()) {
     $username = $this->request->getPost('username');
-    // Prepare the JSON body for the login request
-    $jsonBody = json_encode(
-        [
-            "username" => $username
- 
-        ],
-        JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
-    );
 
+    
     try {
-        $activateRequest = HttpRequest::put('/activate', $jsonBody);
+
+        // Prepare the JSON body for the login request
+        $jsonBody = json_encode(
+            [
+                "username" => $username
+     
+            ],
+            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
+        );
+        //Headers array
+        $token=$this->session->get('auth-token');
+        $headers=["Authorization" =>$token];
+
+        $activateRequest = HttpRequest::put('/activate', $jsonBody, $headers);
         //file_put_contents('response_log.txt', print_r($jsonBody, true));
 
         if (empty($activateRequest['data'])) {
