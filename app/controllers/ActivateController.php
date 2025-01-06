@@ -62,14 +62,14 @@ if ($this->request->isPost()) {
         $headers=["Authorization" =>$token];
 
         $activateRequest = HttpRequest::put('/activate', $jsonBody, $headers);
-        //file_put_contents('response_log.txt', print_r($jsonBody, true));
+       // file_put_contents('response_log.txt', print_r($jsonBody, true));
 
         if (empty($activateRequest['data'])) {
             $this->flashSession->error($activateRequest['message']);
         }
 
         $data = $activateRequest['data'];
-        //file_put_contents('response_log2.txt', print_r($data, true));
+       // file_put_contents('response_log2.txt', print_r($data, true));
         //$token = $data['token'];
 
         // Set session data
