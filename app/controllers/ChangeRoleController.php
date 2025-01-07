@@ -11,7 +11,7 @@ use Phalcon\Http\Request;
 use Phalcon\Mvc\Controller;
 use Homecare\Utils\HttpRequest;
 
-class ActivateController extends BaseController
+class ChangeroleController extends BaseController
 {
     public function indexAction()
     {
@@ -20,14 +20,15 @@ class ActivateController extends BaseController
 
 if ($this->request->isPost()) {
     $username = $this->request->getPost('username');
-
+    $role = 1;
     
     try {
 
         // Prepare the JSON body for the login request
         $jsonBody = json_encode(
             [
-                "username" => $username
+                "username" => $username,
+                "role"=>$role
      
             ],
             JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
@@ -36,28 +37,22 @@ if ($this->request->isPost()) {
         $token=$this->session->get('auth-token');
         $headers=["Authorization" =>$token];
 
-        $activateRequest = HttpRequest::put('/activate', $jsonBody, $headers);
-       // file_put_contents('response_log.txt', print_r($jsonBody, true));
+        $changeroleRequest = HttpRequest::put('/change-role', $jsonBody, $headers);
+       //file_put_contents('response_log.txt', print_r($jsonBody, true));
 
-        if (empty($activateRequest['data'])) {
-            $this->flashSession->error($activateRequest['message']);
+        if (empty($changeroleRequest['data'])) {
+            $this->flashSession->error($changeroleRequest['message']);
         }
 
-        $data = $activateRequest['data'];
-       // file_put_contents('response_log2.txt', print_r($data, true));
-     
-
-        // Set session data
-        //$this->session->set('auth-token', $token);
-        //$this->session->set('username', $username);
-
+        $data = $changeroleRequest['data'];
+       //file_put_contents('response_log2.txt', print_r($data, true));
         // Redirect to the 'main' page
         //if ($token != null)
             $this->response->redirect('main');
 
     } catch (Exception $e) {
         // Handle errors in the API requests
-        $this->flashSession->error('An error occurred during the activation: ' . $e->getMessage());
+        $this->flashSession->error('An error occurred during the role change: ' . $e->getMessage());
         //file_put_contents('response_log3.txt', print_r($e->getMessage(), true));
         return $this->dispatcher->forward([
             'controller' => 'main',

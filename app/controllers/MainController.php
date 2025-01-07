@@ -17,6 +17,7 @@ class MainController extends BaseController {
             ['url' => '/details', 'text' => 'My Profile', 'icon' => 'person'],
             ['url' => '/signup', 'text' => 'Create User', 'icon' => 'people'],
             ['url' => '/activate', 'text' => 'Activate User', 'icon' => 'heart'],
+            ['url' => '/changerole', 'text' => 'Change Role', 'icon' => 'diamond'],
             ['url' => '/test', 'text' => 'List Users', 'icon' => 'settings'],
             ['url' => '/logout', 'text' => 'Logout', 'icon' => 'box-arrow-right'],
             
