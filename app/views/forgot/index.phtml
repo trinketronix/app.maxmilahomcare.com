@@ -73,6 +73,7 @@
                 <button type="submit" class="btn btn-primary">Reset Password</button>
                 <button type="button" class="btn btn-link" onclick="window.location.href='/login';">Back to Login</button>
                 <button type="button" class="btn btn-link" onclick="window.location.href='/logout';">Logout</button>
+                <center style="color:red;"> <?php echo $this->flashSession->output(); ?></center>
             </div>
         </form>
     </div>

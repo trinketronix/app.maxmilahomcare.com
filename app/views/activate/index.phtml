@@ -67,6 +67,7 @@
            
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary">Activate</button>
+                <center style="color:red;"> <?php echo $this->flashSession->output(); ?></center>
                 <button type="button" class="btn btn-link" onclick="window.location.href='/login';">Back to Login</button>
                 <button type="button" class="btn btn-link" onclick="window.location.href='/logout';">Logout</button>
             </div>
