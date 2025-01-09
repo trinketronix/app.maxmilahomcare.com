@@ -76,15 +76,15 @@ class ForgotController extends BaseController
 
                 // Redirect to the 'main' page
                 //if ($token != null)
-                    $this->response->redirect('main');
+       //             $this->response->redirect('main');
 
             } catch (Exception $e) {
                 // Handle errors in the API requests
                 $this->flashSession->error('An error occurred during the password reset: ' . $e->getMessage());
-                return $this->dispatcher->forward([
-                    'controller' => 'main',
-                    'action' => 'index'
-                ]);
+         //       return $this->dispatcher->forward([
+         //           'controller' => 'main',
+         //           'action' => 'index'
+         //       ]);
             }
         }
     }

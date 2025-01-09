@@ -76,15 +76,15 @@ try {
 
     // Redirect to the 'main' page
     $this->flashSession->success('User created successfully');
-    $this->response->redirect('main');
+    //$this->response->redirect('main');
 
 } catch (Exception $e) {
     // Handle errors in the API requests
     $this->flashSession->error('An error occurred during signup: ' . $e->getMessage());
-    return $this->dispatcher->forward([
-        'controller' => 'main',
-        'action' => 'index'
-    ]);
+    //return $this->dispatcher->forward([
+    //    'controller' => 'main',
+    //    'action' => 'index'
+    //]);
 }
 
 }
