@@ -114,7 +114,7 @@ $router->add('/activate', [
 // Explicit route for '/change-role'
 $router->add('/changerole', [
     'namespace'  => 'Homecare\Controllers',
-    'controller' => 'changeRole',
+    'controller' => 'changerole',
     'action'     => 'index'
 ]);
 

@@ -4,14 +4,14 @@
 //use Phalcon\Http\Client\Request;
 
 namespace Homecare\Controllers;
-
+  
 use Exception;
 use Phalcon\Http\Response;
 use Phalcon\Http\Request;
 use Phalcon\Mvc\Controller;
 use Homecare\Utils\HttpRequest;
 
-class ChangeRoleController extends BaseController
+class ChangeroleController extends BaseController
 {
     public function indexAction()
     {
