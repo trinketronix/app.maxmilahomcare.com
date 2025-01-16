@@ -56,15 +56,17 @@
 </head>
 <body>
     <div class="container">
-        <h2 class="text-center mb-4">Activate User</h2>
-
+    <div class="mb-3">
+              
         <form method="POST" action="/activate">
-            <div class="mb-3">
-                <label for="username" class="form-label">Email</label>
-                <input type="email" class="form-control" id="username" name="username" required>
+        <label for="username" class="form-label">Select User</label>
+               <select class="form-control" id="username" name="username" required>
+                 <?php foreach ($users as $user): ?>
+                     <option value="<?php echo $user['username']; ?>"><?php echo $user['username']; ?></option> 
+                    <?php endforeach; ?>
+                </select>
             </div>
-
-           
+   
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary">Activate</button>
                 <center style="color:red;"> <?php echo $this->flashSession->output(); ?></center>
