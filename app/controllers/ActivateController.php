@@ -16,6 +16,23 @@ class ActivateController extends BaseController
     public function indexAction()
     {
 
+        $username=$this->session->get('username');
+        
+        //Headers array
+        $token=$this->session->get('auth-token');
+        $headers=["Authorization" =>$token];
+       
+        $getUserResponse = HttpRequest::get('/not-activated', [
+                'Content-Type' => 'application/json',
+                'Authorization' => $token
+            ]);
+            $users = $getUserResponse['data'];
+
+       
+        $this->view->setVar("users", $users);
+    //    file_put_contents('response4_log.txt', print_r($users, true));
+
+
 
 
 if ($this->request->isPost()) {
@@ -27,42 +44,24 @@ if ($this->request->isPost()) {
         // Prepare the JSON body for the login request
         $jsonBody = json_encode(
             [
-                "username" => $username
+                "username" =>$username 
+       
      
             ],
             JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
         );
-        //Headers array
-        $token=$this->session->get('auth-token');
-        $headers=["Authorization" =>$token];
-
+       
         $activateRequest = HttpRequest::put('/activate', $jsonBody, $headers);
-       // file_put_contents('response_log.txt', print_r($jsonBody, true));
+        //file_put_contents('response_log.txt', print_r($jsonBody, true));
 
         if (empty($activateRequest['data'])) {
             $this->flashSession->error($activateRequest['message']);
-        }
+        } //else  $this->flashSession->{'Sucess!!'}; 
 
-        $data = $activateRequest['data'];
-       // file_put_contents('response_log2.txt', print_r($data, true));
-     
-
-        // Set session data
-        //$this->session->set('auth-token', $token);
-        //$this->session->set('username', $username);
-
-        // Redirect to the 'main' page
-        //if ($token != null)
-  //          $this->response->redirect('main');
 
     } catch (Exception $e) {
         // Handle errors in the API requests
         $this->flashSession->error('An error occurred during the activation: ' . $e->getMessage());
-        //file_put_contents('response_log3.txt', print_r($e->getMessage(), true));
-//        return $this->dispatcher->forward([
-//            'controller' => 'main',
-//            'action' => 'index'
-//        ]);
     }
 }
 }    
