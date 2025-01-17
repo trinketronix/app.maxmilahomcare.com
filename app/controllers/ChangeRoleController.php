@@ -4,7 +4,7 @@
 //use Phalcon\Http\Client\Request;
 
 namespace Homecare\Controllers;
-  
+
 use Exception;
 use Phalcon\Http\Response;
 use Phalcon\Http\Request;
@@ -52,7 +52,7 @@ if ($this->request->isPost()) {
         );
        
         $activateRequest = HttpRequest::put('/change-role', $jsonBody, $headers);
-        //file_put_contents('response_log.txt', print_r($jsonBody, true));
+        //file_put_contents('response_log.txt', print_r($activateRequest, true));
 
         if (empty($activateRequest['data'])) {
             $this->flashSession->error($activateRequest['message']);
