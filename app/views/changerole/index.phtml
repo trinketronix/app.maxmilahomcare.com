@@ -64,9 +64,9 @@
         <h2 class="text-center mb-4">Double click in the user name to change its role</h2>
          
         
-            <div class="d-grid gap-2">
+        <div class="d-grid gap-2">
                 <?php foreach ($users as $user): ?>
-                    <button type="submit" name="username" value="<?php echo $user['username']; ?>" class="btn btn-primary">
+                    <button type="submit" name="username" value="<?php echo $user['username']; ?>" class="btn btn-secondary btn-user">
                         <?php echo $user['username']; ?>
                     </button>
                 <?php endforeach; ?>
