@@ -61,7 +61,7 @@ if ($this->request->isPost()) {
 
     } catch (Exception $e) {
         // Handle errors in the API requests
-        $this->flashSession->error('An error occurred during the role changing: ' . $e->getMessage());
+        $this->flashSession->error('An error occurred during the role changing:  ' . $e->getMessage());
     }
 }
 }        
