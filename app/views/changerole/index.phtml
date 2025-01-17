@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Change role</title>
+    <title>Change User Role</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS for Pink Theme -->
@@ -56,15 +56,17 @@
 </head>
 <body>
     <div class="container">
-        <h2 class="text-center mb-4">Change Role User</h2>
-
+    <div class="mb-3">
+              
         <form method="POST" action="/changerole">
-            <div class="mb-3">
-                <label for="username" class="form-label">Email</label>
-                <input type="email" class="form-control" id="username" name="username" required>
+        <label for="username" class="form-label">Select User</label>
+               <select class="form-control" id="username" name="username" required>
+                 <?php foreach ($users as $user): ?>
+                     <option value="<?php echo $user['username']; ?>"><?php echo $user['username']; ?></option> 
+                    <?php endforeach; ?>
+                </select>
             </div>
-
-           
+   
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary">Change Role</button>
                 <center style="color:red;"> <?php echo $this->flashSession->output(); ?></center>
