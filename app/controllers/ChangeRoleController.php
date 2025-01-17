@@ -27,7 +27,6 @@ class ChangeroleController extends BaseController
                 'Authorization' => $token
             ]);
             $users = $getUserResponse['data'];
-
        
         $this->view->setVar("users", $users);
     //    file_put_contents('response4_log.txt', print_r($users, true));
