@@ -27,10 +27,11 @@ class ActivateController extends BaseController
                 'Authorization' => $token
             ]);
             $users = $getUserResponse['data'];
-
-       
+            file_put_contents('response_log.txt', print_r( ['data'], true));
+            //echo 'data';
+           // file_put_contents('response3_log.txt', print_r( $getUserResponse['data'], true));
         $this->view->setVar("users", $users);
-    //    file_put_contents('response4_log.txt', print_r($users, true));
+       //file_put_contents('response4_log.txt', print_r($users, true));
 
 
 
@@ -51,8 +52,8 @@ if ($this->request->isPost()) {
             JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
         );
        
-        $activateRequest = HttpRequest::put('/activate', $jsonBody, $headers);
-        //file_put_contents('response_log.txt', print_r($jsonBody, true));
+        $activateRequest = HttpRequest::put('/activate-account', $jsonBody, $headers);
+       // file_put_contents('response_log.txt', print_r($jsonBody, true));
 
         if (empty($activateRequest['data'])) {
             $this->flashSession->error($activateRequest['message']);

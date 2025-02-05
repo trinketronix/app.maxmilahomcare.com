@@ -119,6 +119,14 @@ $router->add('/changerole', [
 ]);
 
 
+// Explicit route for '/users'
+$router->add('/users', [
+    'namespace'  => 'Homecare\Controllers',
+    'controller' => 'users',
+    'action'     => 'index'
+]);
+
+
     // Set the 404 not found page
     $router->notFound([
         'namespace'  => 'Homecare\Controllers',
