@@ -15,10 +15,12 @@ class MainController extends BaseController {
 
         $this->view->menuItems = [
             ['url' => '/details', 'text' => 'My Profile', 'icon' => 'person'],
-            ['url' => '/signup', 'text' => 'Create User', 'icon' => 'people'],
-            ['url' => '/activate', 'text' => 'Activate User', 'icon' => 'heart'],
+            ['url' => '/signup', 'text' => 'Create Account', 'icon' => 'people'],
+            ['url' => '/activate', 'text' => 'Activate Account', 'icon' => 'heart'],
+            ['url' => '/user', 'text' => 'Update user', 'icon' => 'emoji-smile'],
             ['url' => '/changerole', 'text' => 'Change Role', 'icon' => 'diamond'],
-            ['url' => '/test', 'text' => 'List Users', 'icon' => 'settings'],
+            ['url' => '/test', 'text' => 'List Accounts', 'icon' => 'settings'],
+            ['url' => '/users', 'text' => 'List Users', 'icon' => 'universal-access'],
             ['url' => '/logout', 'text' => 'Logout', 'icon' => 'box-arrow-right'],
             
         ];
