@@ -5,7 +5,7 @@ namespace Homecare\Controllers;
 use Phalcon\Mvc\Controller;
 use Homecare\utils\HttpRequest;
 
-class MainController extends BaseController {
+class CaregiverController extends BaseController {
 
     public function indexAction()
     {
@@ -13,20 +13,10 @@ class MainController extends BaseController {
             return $this->response->redirect('login');
         }
 
-       
-                
-
         $this->view->menuItems = [
             ['url' => '/details', 'text' => 'My Profile', 'icon' => 'person'],
             ['url' => '/visit', 'text' => 'Visit', 'icon' => 'car-front-fill'],
-            ['url' => '/signup', 'text' => 'Create Account', 'icon' => 'people'],
-            ['url' => '/activate', 'text' => 'Activate Account', 'icon' => 'heart'],
-            ['url' => '/userupdate', 'text' => 'Update user', 'icon' => 'emoji-smile'],
-            ['url' => '/changerole', 'text' => 'Change Role', 'icon' => 'diamond'],
-            ['url' => '/test', 'text' => 'List Accounts', 'icon' => 'settings'],
-            ['url' => '/users', 'text' => 'List Users', 'icon' => 'universal-access'],
             ['url' => '/logout', 'text' => 'Logout', 'icon' => 'box-arrow-right'],
-            
         ];
 
         $token = $this->session->get('auth-token');
@@ -41,5 +31,4 @@ class MainController extends BaseController {
         $this->view->setVar("role", $userRole);
         $this->view->setVar("expiration", $expiration);
     }
- 
 } 
