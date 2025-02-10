@@ -141,7 +141,15 @@ $router->add('/userupdate', [
     'action'     => 'index'
 ]);
 
-    // Set the 404 not found page
+
+$router->add('/caregiver', [
+    'namespace'  => 'Homecare\Controllers',
+    'controller' => 'caregiver',
+    'action'     => 'index'
+]);
+
+
+// Set the 404 not found page
     $router->notFound([
         'namespace'  => 'Homecare\Controllers',
         'controller' => 'login',

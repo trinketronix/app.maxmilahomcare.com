@@ -38,10 +38,14 @@ class LoginController extends BaseController {
                 // Set session data
                 $this->session->set('auth-token', $token);
                 $this->session->set('username', $username);
-
+                $role=$this->getRole($token);
                 // Redirect to the 'main' page
                 if ($token != null)
-                    $this->response->redirect('main');
+                    if ( $role<2)
+                        $this->response->redirect('main');
+                    else
+                        $this->response->redirect('caregiver');
+            
 
             } catch (Exception $e) {
                 // Handle errors in the API requests
