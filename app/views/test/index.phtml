@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Managers List</title>
+    <title>Accounts List</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS for Pink Theme -->
@@ -57,30 +57,18 @@
 </head>
 <body>
 <div class="container">
-    <h2 class="text-center mb-4">Managers List</h2>
+    <h2 class="text-center mb-4">Accounts List</h2>
     <div class="list-group mb-4">
         <?php foreach ($managers as $manager): ?>
             <div class="list-group-item">
-                <h5 class="mb-1"><?= $manager['username'] ?></h5>
-                <p class="mb-1"><?= $manager['role'] ?></p>
-                <small class="text-muted"><?= $manager['status'] ?></small>
+                <h5 class="mb-1"><?= $manager['id'] ?></h5>
+                <p class="mb-1"><?= $manager['username'] ?></p>
+                <small class="text-muted"><?= $manager['role'] ?></small>
             </div>
         <?php endforeach; ?>
     </div>
 </div>
 <hr>
-<div class="container">
-    <h2 class="text-center mb-4">Caregivers List</h2>
-    <div class="list-group mb-4">
-        <?php foreach ($caregivers as $caregiver): ?>
-            <div class="list-group-item">
-                <h5 class="mb-1"><?= $caregiver['username'] ?></h5>
-                <p class="mb-1"><?= $caregiver['role'] ?></p>
-                <small class="text-muted"><?= $caregiver['status'] ?></small>
-            </div>
-        <?php endforeach; ?>
-    </div>
-</div>
 <div class="d-grid">
     <a href="/main" class="btn btn-primary">Back to Menu</a>
 </div>

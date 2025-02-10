@@ -17,26 +17,48 @@ class ChangeroleController extends BaseController
     {
 
         $username=$this->session->get('username');
-        $role = 1;
+        
+       // $role = $this->session->get('role');;
         //Headers array
         $token=$this->session->get('auth-token');
+        $role=$this->getRole($token);
         $headers=["Authorization" =>$token];
        
-        $getUserResponse = HttpRequest::get('/caregivers', [
-                'Content-Type' => 'application/json',
-                'Authorization' => $token
-            ]);
-            $users = $getUserResponse['data'];
-       
-        $this->view->setVar("users", $users);
-    //    file_put_contents('response4_log.txt', print_r($users, true));
+//        $getUserResponse = HttpRequest::get('/caregivers', [
+//                'Content-Type' => 'application/json',
+//                'Authorization' => $token
+//            ]);
+
+      $managers = [
+            'username' => 'error'
+        ];
+        $token = 'error';
+        $token = $this->session->get('auth-token');
+        $headers=["Authorization" =>$token];
+        if($token != null) {
+            // Test Http Request Get managers
+            $getManaResponse = HttpRequest::get('/accounts',$headers);
+            //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
+            //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
+            $managersjson = $getManaResponse['data'];
+            //file_put_contents('response2_log.txt', print_r($managersjson, true));  
+            $array = $getManaResponse['data'];
+            $accounts = $getManaResponse['data']['accounts'];
+            //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
+            //file_put_contents('response3_log.txt', print_r($accounts , true));  
+
+        }
+        $this->view->setVar("users", $accounts);
+        
+        //file_put_contents('response4_log.txt', print_r($accounts, true));
 
 
 
 
 if ($this->request->isPost()) {
     $username = $this->request->getPost('username');
-
+    $role=1;
+    //file_put_contents('response_log5.txt', print_r($username, true));
     
     try {
 
@@ -52,7 +74,7 @@ if ($this->request->isPost()) {
        
         $activateRequest = HttpRequest::put('/change-role', $jsonBody, $headers);
         //file_put_contents('response_log.txt', print_r($activateRequest, true));
-
+        $this->flashSession->success('Role Changed');
         if (empty($activateRequest['data'])) {
             $this->flashSession->error($activateRequest['message']);
         } //else  $this->flashSession->{'Sucess!!'}; 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Managers List</title>
+    <title>Users List</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS for Pink Theme -->
@@ -61,9 +61,9 @@
     <div class="list-group mb-4">
         <?php foreach ($managers as $manager): ?>
             <div class="list-group-item">
-                <p class="mb-1"><?= $manager['id'] ?></p>
-                <p class="mb-1"><?= $manager['lastname'] ?></p>
+                <h5 class="mb-1"><?= $manager['username'] ?></h5>
                 <p class="mb-1"><?= $manager['firstname'] ?></p>
+                <small class="text-muted"><?= $manager['lastname'] ?></small>
             </div>
         <?php endforeach; ?>
     </div>
