@@ -1,45 +1,34 @@
 <?php
 
 namespace Homecare\Controllers;
-
-use Homecare\Models\Users;
-
-class DetailsController extends BaseController
-{
-    public function indexAction()
-    {
-        if (!$this->session->has('auth-token')) {
-            return $this->response->redirect('signup');
-        }
-
-        $username = $this->session->get('username');
-        
-        // Get cache service
-        $cache = $this->di->get('viewCache');
-        $cacheKey = 'user-details-' . $username;
-
-        // Try to get cached content
-        $cachedContent = $cache->get($cacheKey);
-        if ($cachedContent !== null) {
-            return $cachedContent;
-        }
-
-        $users = new Users();
+use Homecare\Utils\HttpRequest;
+use Phalcon\Mvc\Controller;
+class DetailsController extends BaseController {
+    public function indexAction(){
+        $managers = [
+            'username' => 'error'
+        ];
+        $token = 'error';
         $token = $this->session->get('auth-token');
-        
-        $userDetails = $users->getUser($username, $token);
-        
-        if (!$userDetails) {
-            //$this->flash->error('Unable to fetch user details');
-            return $this->response->redirect('main');
+        $headers=["Authorization" =>$token];
+        $token=$this->session->get('auth-token');
+        $id=$this->getUserId($token);
+        $headers=["Authorization" =>$token];
+        if($token != null) {
+            // Test Http Request Get managers
+            $getManaResponse = HttpRequest::get('/accounts',$headers);
+            //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
+            //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
+            $managersjson = $getManaResponse['data'];
+            //file_put_contents('response2_log.txt', print_r($managersjson, true));  
+            $array = $getManaResponse['data'];
+            $accounts = $getManaResponse['data']['accounts'];
+            //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
+            //file_put_contents('response3_log.txt', print_r($accounts , true));  
+
         }
+        $this->view->setVar("managers", $accounts);
+        $this->view->setVar("myid", $id);
 
-        $this->view->user = $userDetails;
-
-        // Cache the rendered view
-        $content = $this->view->getRender('details', 'index');
-        $cache->set($cacheKey, $content, 7200);
-
-        return $content;
     }
-} 
+}

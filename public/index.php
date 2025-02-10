@@ -127,6 +127,20 @@ $router->add('/users', [
 ]);
 
 
+// Explicit route for '/visit'
+$router->add('/visit', [
+    'namespace'  => 'Homecare\Controllers',
+    'controller' => 'visit',
+    'action'     => 'index'
+]);
+
+// Explicit route for '/user'
+$router->add('/userupdate', [
+    'namespace'  => 'Homecare\Controllers',
+    'controller' => 'userupdate',
+    'action'     => 'index'
+]);
+
     // Set the 404 not found page
     $router->notFound([
         'namespace'  => 'Homecare\Controllers',

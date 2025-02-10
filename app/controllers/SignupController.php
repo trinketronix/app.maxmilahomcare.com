@@ -20,7 +20,7 @@ class SignupController extends BaseController
         if ($this->request->isPost()) {
             $username = $this->request->getPost('username');
             $password = $this->request->getPost('password');
-            $password = $this->request->getPost('password');
+       
 
 $jsonBody = json_encode(
     [
