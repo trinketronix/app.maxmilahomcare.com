@@ -128,9 +128,9 @@ $router->add('/users', [
 
 
 // Explicit route for '/visit'
-$router->add('/visit', [
+$router->add('/patients', [
     'namespace'  => 'Homecare\Controllers',
-    'controller' => 'visit',
+    'controller' => 'patients',
     'action'     => 'index'
 ]);
 

@@ -15,7 +15,7 @@ class CaregiverController extends BaseController {
 
         $this->view->menuItems = [
             ['url' => '/details', 'text' => 'My Profile', 'icon' => 'person'],
-            ['url' => '/visit', 'text' => 'Visit', 'icon' => 'car-front-fill'],
+            ['url' => '/patients', 'text' => 'Patients', 'icon' => 'car-front-fill'],
             ['url' => '/logout', 'text' => 'Logout', 'icon' => 'box-arrow-right'],
         ];
 

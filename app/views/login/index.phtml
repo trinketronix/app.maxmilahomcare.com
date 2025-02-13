@@ -6,69 +6,100 @@
     <title>Login</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Custom CSS for Pink Theme -->
     <style>
         body {
-            background-color: #f8e1f4; /* Light pink background */
+            background-color: #f8e1f4;
         }
-        .container {
-            max-width: 500px;
-            margin-top: 50px;
-            background-color: #fff;
+        .login-form {
+            width: 340px;
+            margin: 30px auto;
+        }
+        .login-form form {        
+            margin-bottom: 15px;
+            background: #ffffff;
+            box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
-        h2 {
-            color: #d85b85; /* Pinkish color for header */
+        .login-form h2 {
+            margin: 0 0 15px;
         }
-        .btn-primary {
-            background-color: #d85b85;
-            border-color: #d85b85;
+        .form-control, .btn {
+            min-height: 38px;
+            border-radius: 4px;
         }
-        .btn-primary:hover {
-            background-color: #c44d6a;
-            border-color: #c44d6a;
+        .input-group-text .fa {
+            font-size: 18px;
         }
-        .btn-link {
-            color: #e74c3c; /* Red color for links turned into buttons */
+        .btn {        
+            font-size: 15px;
+            font-weight: 500;
         }
-        .btn-link:hover {
-            color: #c0392b; /* Darker red for hover */
+        .bottom-action {
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .form-label {
-            color: #333;
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo-container img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: white;
+            padding: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2 class="text-center mb-4">Login</h2>
-
-        <form method="POST" action="/login">
-       <div class="mb-3">
-               <center><img src="logo.png"></center>
-                <label for="username" class="form-label">Email</label>
-                <input type="email" class="form-control" id="username" name="username" required>
+    <div class="login-form">
+        <div class="logo-container">
+            <!-- Using a placeholder image. Replace the src with your actual logo -->
+        
+        </div>
+        <form action="/login" method="post">
+        <img src="logo.png" alt="System Logo">    
+        <!--<h2 class="text-center mb-4">Sign In</h2>-->   
+            <div class="form-group mb-3">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <i class="fas fa-user"></i>
+                        </span>
+                    </div>                    
+                    <input type="text" class="form-control" name="username" placeholder="Username" required>
+                </div>
+            </div>
+            <div class="form-group mb-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                    </div>                    
+                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                </div>
+            </div>        
+            <div class="form-group mb-4">
+                <!-- Change the button class to btn-danger to make it red -->
+                <button type="submit" class="btn btn-danger w-100">Log in</button>
+                <center style="color:red;"> <?php echo $this->flashSession->output(); ?></center>
             </div>
 
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-
-            <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary">Login</button>
-             <!--   <button type="button" class="btn btn-link" onclick="window.location.href='/forgot';">Forgot Password?</button>
-                  <button type="button" class="btn btn-link" onclick="window.location.href='/signup';">Create Account</button> -->
-              <center style="color:red;"> <?php echo $this->flashSession->output(); ?></center>
-            </div>
         </form>
     </div>
 
     <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

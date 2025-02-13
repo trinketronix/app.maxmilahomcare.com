@@ -18,7 +18,7 @@ class MainController extends BaseController {
 
         $this->view->menuItems = [
             ['url' => '/details', 'text' => 'My Profile', 'icon' => 'person'],
-            ['url' => '/visit', 'text' => 'Visit', 'icon' => 'car-front-fill'],
+            ['url' => '/patients', 'text' => 'Patients', 'icon' => 'car-front-fill'],
             ['url' => '/signup', 'text' => 'Create Account', 'icon' => 'people'],
             ['url' => '/activate', 'text' => 'Activate Account', 'icon' => 'heart'],
             ['url' => '/userupdate', 'text' => 'Update user', 'icon' => 'emoji-smile'],
