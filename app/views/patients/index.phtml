@@ -127,8 +127,9 @@
                         <i class="bi bi-telephone"></i> <!-- Call icon -->
                     </button>
                 </div>
-                <div class="manager-column">
-                    <button class="register-btn">Check in</button>
+                <div a href="/main" class="manager-column">
+                <a href="/visit" button class="register-btn">Check-in</a>
+                 <!--   <button class="register-btn">Check in</a></button>-->
                 </div>
                 <div class="manager-column">
                     Patient name: <?= $manager['lastname'].' '.$manager['firstname'] ?>
@@ -136,6 +137,6 @@
             </div>
         <?php endforeach; ?>
     </div>
-
+   
 </body>
 </html>

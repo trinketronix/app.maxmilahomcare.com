@@ -17,7 +17,7 @@ class ActivateController extends BaseController
     {
 
       
-        $username=$this->session->get('username');
+        $username= $this->session->get('username');
         
        // $role = $this->session->get('role');;
         //Headers array

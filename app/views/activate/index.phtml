@@ -58,21 +58,32 @@
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <form method="POST" action="/activate">
-        <h2 class="text-center mb-4">Double click in the user name to activate it</h2>
-         
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<form method="POST" action="/activate">
+<div class="container">
+    <h2 class="text-center mb-4">Double click the user to activate it</h2>
+    <?php 
+       if (isset($_COOKIE['activateid'])) {
+        // Retrieve and display the cookie value
+        $managerId = $_COOKIE['activateid'];}
+    ?>
         
-            <div class="d-grid gap-2">
-                <?php foreach ($users as $user): ?>
-                    <button type="submit" name="username" value="<?php echo $user['username']; ?>" class="btn btn-secondary btn-user">
+
+    <div class="d-grid gap-2">
+        <?php foreach ($users as $user): ?>
+            <!-- Only show the user whose id matches the managerId -->
+            <?php if ($managerId == $user['id']): ?>
+                <button type="submit" name="username" value="<?php echo $user['username']; ?>" class="btn btn-secondary btn-user">
                         <?php echo $user['username']; ?>
                     </button>
-                <?php endforeach; ?>
-            </div>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </div>
 
-            <div class="d-grid gap-2 mt-3">
+    <div class="d-grid gap-2 mt-3">
                 <button type="submit" class="btn btn-primary">Activate</button>
                 <center style="color:red;"> <?php echo $this->flashSession->output(); ?></center>
                 <button type="button" class="btn btn-link" onclick="window.location.href='/main';">Back to Main Page</button>
@@ -80,10 +91,5 @@
             </div>
         </form>
     </div>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

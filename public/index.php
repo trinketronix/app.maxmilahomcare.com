@@ -148,6 +148,11 @@ $router->add('/caregiver', [
     'action'     => 'index'
 ]);
 
+$router->add('/visit', [
+    'namespace'  => 'Homecare\Controllers',
+    'controller' => 'visit',
+    'action'     => 'index'
+]);
 
 // Set the 404 not found page
     $router->notFound([
