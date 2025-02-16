@@ -1,18 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+<html>
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users List</title>
+    <title>My Profile</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Custom CSS for Pink Theme -->
+<head>
+    <title>Users List</title>
     <style>
         body {
             background-color: #f8e1f4; /* Light pink background */
         }
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin-top: 50px;
             background-color: #fff;
             padding: 30px;
@@ -21,7 +24,40 @@
         }
         h2 {
             color: #d85b85; /* Pinkish color for header */
+            font-size: 2.5em;
         }
+        .form-label {
+            color: #333;
+        }
+        .form-control {
+            border-radius: 10px;
+            box-shadow: none;
+        }
+        .btn-primary {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        .btn-primary:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+        .btn-link {
+            color: #e74c3c; /* Red color for "Already have an account" link */
+        }
+        .btn-link:hover {
+            color: #c0392b; /* Darker red on hover */
+        }
+        .d-grid {
+            gap: 15px;
+        }
+        textarea.form-control {
+            border-radius: 10px;
+            box-shadow: none;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 5px rgba(231, 76, 60, 0.7); /* Red focus effect */
+        }
+
         .list-group-item {
             background-color: #fce6f5; /* Light pink background for each list item */
             border: 1px solid #f8e1f4;
@@ -32,49 +68,84 @@
         .list-group-item:hover {
             background-color: #f8d1e6; /* Slightly darker pink for hover effect */
         }
-        .btn-primary {
-            background-color: #e74c3c;
-            border-color: #e74c3c;
-        }
-        .btn-primary:hover {
-            background-color: #c0392b;
-            border-color: #c0392b;
-        }
         .form-control-static {
             font-size: 1.1em;
-            color: #555;
+            color: #000;
         }
         .list-group-item h5 {
             color: #d85b85; /* Pinkish color for user names */
         }
         .list-group-item p {
-            color: #555;
+            color: #000;
         }
         .list-group-item small {
             color: #777; /* Muted color for phone numbers */
         }
+
+        .manager-row {
+            display: flex;
+            align-items: center;
+            border: 1px solid red;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fce6f5; /* Light pink background for each list item */
+            border-radius: 10px;
+            cursor: pointer; /* Makes the row clickable */
+        }
+        .manager-column {
+            margin-right: 20px;
+        }
+        .register-btn {
+            padding: 5px 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .register-btn:hover {
+            background-color: red;
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <h2 class="text-center mb-4">Users List</h2>
-    <div class="list-group mb-4">
+
+<!--<h2 class="text-center mb-4">Users List</h2>-->
+<center><a href="/signup" class="btn btn-primary">Create Account</a> <a href="/main" class="btn btn-primary">Back to Menu</a></center>
+     
+    <div id="managers-list">
         <?php foreach ($managers as $manager): ?>
-            <div class="list-group-item">
-                <h5 class="mb-1"><?= $manager['username'] ?></h5>
-                <p class="mb-1"><?= $manager['firstname'] ?></p>
-                <small class="text-muted"><?= $manager['lastname'] ?></small>
+            <div class="manager-row" data-id="<?= $manager['id'] ?>" onclick="setManagerIdAndRedirect(this)">
+                <div class="manager-column">
+                    <a href="/activate" class="register-btn">Activate Account</a>
+                </div>
+               
+                <div class="manager-column">
+                    <a href="/userupdate" class="register-btn">Update User</a>
+                </div>
+               
+                <div class="manager-column">
+                    <a href="/changerole" class="register-btn">Change role</a>
+                </div>
+                <div class="manager-column">
+                   <strong> User: </strong><?= $manager['id'].' '.$manager['username'].' '.$manager['lastname'].' '.$manager['firstname'] ?>
+                </div>
             </div>
         <?php endforeach; ?>
     </div>
-</div>
-<hr>
-<div class="d-grid">
-    <a href="/main" class="btn btn-primary">Back to Menu</a>
-</div>
-<!-- Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+    function setManagerIdAndRedirect(row) {
+        var managerId = row.getAttribute("data-id"); // Get the manager's ID from the row's data-id attribute
+            let date = new Date();
+            date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 30 days from now
+            let expires = "expires=" + date.toUTCString();
+            document.cookie = "activateid="+managerId+"; " + expires + "; path=/";
+            window.location.href = "/activate"; // Or any target URL where you want to pass the session variable
+    }
+</script>
+
+        }
+    </script>
 </body>
 </html>
+

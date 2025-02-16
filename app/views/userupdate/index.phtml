@@ -91,26 +91,19 @@
     </style>
 </head>
 <body>
-<!--<div class="list-group mb-4">
-        <?php foreach ($managers as $manager): ?>
-            <div class="list-group-item">
-                <p class="mb-1"><?= $manager['id'] ?></p>
-                <p class="mb-1"><?= $manager['lastname'] ?></p>
-                <p class="mb-1"><?= $manager['firstname'] ?></p>
-            </div>
-        <?php endforeach; ?>
-    </div>-->
+
 
 
 
     <div class="container">
         <h2 class="text-center mb-4">Update User</h2>
-
-        <form method="POST" action="/userupdate">
-            <div class="mb-1">
-                <label for="username" style="color:red;" class="form-label">User email to update:</label>
-                <input type="email" class="form-control" id="username" name="username" required>
-            </div>
+        <?php 
+       if (isset($_COOKIE['activateid'])) {
+        // Retrieve and display the cookie value
+        $managerId = $_COOKIE['activateid'];}
+    ?> 
+        <form method="POST" action="/userupdate/"<?php echo $managerId; ?>>
+           
 
             <div class="mb-3">
                 <label for="lastname" class="form-label">Last Name</label>

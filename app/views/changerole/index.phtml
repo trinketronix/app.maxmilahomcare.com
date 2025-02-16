@@ -62,13 +62,19 @@
     <div class="container">
         <form method="POST" action="/changerole">
         <h2 class="text-center mb-4">Double click in the user name to change its role</h2>
-         
+        <?php 
+       if (isset($_COOKIE['activateid'])) {
+        // Retrieve and display the cookie value
+        $managerId = $_COOKIE['activateid'];}
+        ?>  
         
         <div class="d-grid gap-2">
                 <?php foreach ($users as $user): ?>
+                    <?php if ($managerId == $user['id']): ?>
                     <button type="submit" name="username" value="<?php echo $user['username']; ?>" class="btn btn-secondary btn-user">
                         <?php echo $user['username']; ?>
                     </button>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             </div>
 
