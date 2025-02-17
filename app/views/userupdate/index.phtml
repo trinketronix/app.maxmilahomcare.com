@@ -102,8 +102,9 @@
         // Retrieve and display the cookie value
         $managerId = $_COOKIE['activateid'];}
     ?> 
-        <form method="POST" action="/userupdate/"<?php echo $managerId; ?>>
-           
+        <form method="POST" action="/userupdate" ?>
+     
+        <input type="hidden" name="hiddenField" class="form-control" id="hiddenField" value="<?php echo $managerId; ?>">
 
             <div class="mb-3">
                 <label for="lastname" class="form-label">Last Name</label>

@@ -126,6 +126,14 @@ $router->add('/users', [
     'action'     => 'index'
 ]);
 
+// Explicit route for '/users'
+$router->add('/user', [
+    'namespace'  => 'Homecare\Controllers',
+    'controller' => 'user',
+    'action'     => 'index'
+]);
+
+
 
 // Explicit route for '/visit'
 $router->add('/patients', [

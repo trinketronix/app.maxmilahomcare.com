@@ -1,9 +1,4 @@
 <?php
-
-//use Phalcon\Http\Response;
-//use Phalcon\Http\Client\Request;
-
-
 namespace Homecare\Controllers;
 
 use Exception;
@@ -22,24 +17,14 @@ class UserupdateController extends BaseController
 $managers = [
     'username' => 'error'
 ];
-
 $token = 'error';
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get the manager ID from the form submission
+    $uid = $_POST['hiddenField'];}
 $token = $this->session->get('auth-token');
-//if($token != null) {
-    
-//    $getManaResponse = HttpRequest::get('/users', [
-//        'Content-Type' => 'application/json',
-//        'Authorization' => $token
-//    ]);
-//    $managers = $getManaResponse['data'];
+$headers=["Authorization" =>$token];
 
- 
-//}
-
-//$this->view->setVar("managers", $managers);
-
-//fin
         if ($this->request->isPost()) {
             $lastname = $this->request->getPost('lastname');
             $firstname = $this->request->getPost('firstname');
@@ -49,7 +34,6 @@ $token = $this->session->get('auth-token');
             $address = $this->request->getPost('address');
             $city = $this->request->getPost('city');
             $languages = $this->request->getPost('languages');
-            $user= 2;  
            
 $jsonBody = json_encode(
     [
@@ -70,21 +54,18 @@ $jsonBody = json_encode(
         $headers=["Authorization" =>$token];
        
 try {
-    $signupRequest = HttpRequest::put('/user/'.$user, $jsonBody,$headers);
-
-//     file_put_contents('response_log.txt', print_r($jsonBody, true));   
-//     file_put_contents('response_log2.txt', print_r($signupRequest, true));
+   // $getManaResponse = HttpRequest::get('/accounts',$headers);
+    $signupRequest = HttpRequest::put('/user/'.$uid, $jsonBody,$headers);
     $this->flashSession->error($signupRequest['message']);
    // }
     $data = $signupRequest['data'];
     // Redirect to the 'main' page
     $this->flashSession->success('User updated successfully');
-    //$this->response->redirect('main');
+    
 
 } catch (Exception $e) {
     // Handle errors in the API requests
     $this->flashSession->error('An error occurred during update: ' . $e->getMessage());
-    file_put_contents('response_log2.txt', print_r('errorzaso', true));
 }
 
 }
