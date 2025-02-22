@@ -24,7 +24,7 @@ class MainController extends BaseController {
         //    ['url' => '/userupdate', 'text' => 'Update user', 'icon' => 'emoji-smile'],
         //    ['url' => '/changerole', 'text' => 'Change Role', 'icon' => 'diamond'],
         //    ['url' => '/test', 'text' => 'List Accounts', 'icon' => 'settings'],
-            ['url' => '/users', 'text' => 'List Users', 'icon' => 'universal-access'],
+            ['url' => '/users', 'text' => 'Users', 'icon' => 'universal-access'],
             ['url' => '/logout', 'text' => 'Logout', 'icon' => 'box-arrow-right'],
             
         ];
