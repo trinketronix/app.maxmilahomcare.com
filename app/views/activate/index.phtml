@@ -10,6 +10,7 @@
     <style>
         body {
             background-color: #f8e1f4; /* Light pink background */
+            font-family: 'Roboto', sans-serif; /* Font for body */
         }
         .container {
             max-width: 600px;
@@ -21,6 +22,9 @@
         }
         h2 {
             color: #d85b85; /* Pinkish color for header */
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            margin-bottom: 30px;
         }
         .form-label {
             color: #333;
@@ -35,6 +39,7 @@
         }
         .btn-link {
             color: #e74c3c; /* Red color for links turned into buttons */
+            font-size: 1.1em;
         }
         .btn-link:hover {
             color: #c0392b; /* Darker red for hover */
@@ -42,6 +47,7 @@
         .form-control {
             border-radius: 10px;
             box-shadow: none;
+            padding: 10px;
         }
         .card {
             border: none;
@@ -56,40 +62,35 @@
             width: 100%;
             margin-bottom: 5px;
         }
+        .flash-message {
+            text-align: center;
+            color: red;
+            font-size: 1.2em;
+        }
     </style>
 </head>
 
 <body>
+    <div class="container">
+        <h2>Activate User</h2>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<form method="POST" action="/activate">
-<div class="container">
-    <h2 class="text-center mb-4">Double click the user to activate it</h2>
-    <?php 
-       if (isset($_COOKIE['activateid'])) {
-        // Retrieve and display the cookie value
-        $managerId = $_COOKIE['activateid'];}
-    ?>
-        
+        <!-- Flash Message Display -->
+        <div class="flash-message">
+            <?php echo "<script>alert(username);</script>"; ?>
+            <center style="color:red;"><?php echo $this->flashSession->output(); ?></center>
+        </div>
 
-    <div class="d-grid gap-2">
-        <?php foreach ($users as $user): ?>
-            <!-- Only show the user whose id matches the managerId -->
-            <?php if ($managerId == $user['id']): ?>
-                <button type="submit" name="username" value="<?php echo $user['username']; ?>" class="btn btn-secondary btn-user">
-                        <?php echo $user['username']; ?>
-                    </button>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </div>
+        <form method="POST" action="/activate">
+            <div class="d-grid gap-2 mt-3">
+                <!-- Back to Previous Page Button -->
+                <button type="button" class="btn btn-link" onclick="window.history.back();">Back to Previous Page</button>
 
-    <div class="d-grid gap-2 mt-3">
-                <button type="submit" class="btn btn-primary">Activate</button>
-                <center style="color:red;"> <?php echo $this->flashSession->output(); ?></center>
-                <button type="button" class="btn btn-link" onclick="window.location.href='/main';">Back to Main Page</button>
+                <!-- Logout Button -->
                 <button type="button" class="btn btn-link" onclick="window.location.href='/logout';">Logout</button>
             </div>
         </form>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </body>
 </html>

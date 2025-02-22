@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uers</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Custom CSS for Pink Theme -->
+<head>
+    <title>Users List</title>
+    <style>
+        body {
+            background-color: #f8e1f4; /* Light pink background */
+            font-family: 'Roboto', sans-serif; /* Default font */
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin-top: 50px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-family: 'Poppins', sans-serif;
+            color: #d85b85; /* Pinkish color for header */
+            font-size: 2.5em;
+            font-weight: 500;
+            text-align: center;
+        }
+        .form-label {
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+            font-weight: 500;
+        }
+        .form-control {
+            font-family: 'Roboto', sans-serif;
+            border-radius: 10px;
+            box-shadow: none;
+        }
+        .btn-primary {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+            font-family: 'Poppins', sans-serif;
+        }
+        .btn-primary:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+        .btn-link {
+            color: #e74c3c; /* Red color for "Already have an account" link */
+            font-family: 'Roboto', sans-serif;
+        }
+        .btn-link:hover {
+            color: #c0392b; /* Darker red on hover */
+        }
+        .d-grid {
+            gap: 15px;
+        }
+        textarea.form-control {
+            font-family: 'Roboto', sans-serif;
+            border-radius: 10px;
+            box-shadow: none;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 5px rgba(231, 76, 60, 0.7); /* Red focus effect */
+        }
+
+        .list-group-item {
+            background-color: #fce6f5; /* Light pink background for each list item */
+            border: 1px solid #f8e1f4;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            padding: 15px;
+            font-family: 'Roboto', sans-serif;
+        }
+        .list-group-item:hover {
+            background-color: #f8d1e6; /* Slightly darker pink for hover effect */
+        }
+        .form-control-static {
+            font-size: 1.1em;
+            color: #000;
+        }
+        .list-group-item h5 {
+            color: #d85b85; /* Pinkish color for user names */
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+        }
+        .list-group-item p {
+            font-family: 'Roboto', sans-serif;
+            color: #000;
+        }
+        .list-group-item small {
+            color: #777; /* Muted color for phone numbers */
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .manager-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fce6f5; /* Light pink background for each list item */
+            border-radius: 10px;
+            cursor: pointer; /* Makes the row clickable */
+        }
+        .register-btn {
+            padding: 5px 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+        }
+        .register-btn:hover {
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+
+<!--<h2 class="text-center mb-4">Users List</h2>-->
+<center><a href="/signup" class="btn btn-primary">Create Account</a> <a href="/main" class="btn btn-primary">Back to Menu</a></center>
+     
+    <div id="managers-list">
+        <?php foreach ($managers as $manager): ?>
+            <div class="manager-row" data-id="<?= $manager['id'] ?>" onclick="setManagerIdAndRedirect(this)">
+                <div><strong>User:</strong> <?= $manager['username'].' '.$manager['lastname'].' '.$manager['firstname'] ?></div>    
+                <div><a href="/activate" class="register-btn">Activate Account</a></div>
+                <div><a href="/userupdate" class="register-btn">Update User</a></div>
+                <div><a href="/changerole" class="register-btn">Change role</a></div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+    <script>
+    function setManagerIdAndRedirect(row) {
+        var managerId = row.getAttribute("data-id"); // Get the manager's ID from the row's data-id attribute
+            let date = new Date();
+            date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 30 days from now
+            let expires = "expires=" + date.toUTCString();
+            document.cookie = "activateid="+managerId+"; " + expires + "; path=/";
+            window.location.href = "/activate"; // Or any target URL where you want to pass the session variable
+    }
+</script>
+
+</body>
+</html>
