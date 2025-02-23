@@ -105,12 +105,19 @@
         .register-btn:hover {
             background-color: red;
         }
+        .btn-danger:hover {
+        background-color: darkred;
+        color: white;
+    }
     </style>
 </head>
 <body>
 
 <h2 class="text-center mb-4">Patients List</h2>
-<center><a href="/main" class="btn btn-primary">Back to Menu</a></center>
+<center>        <!-- Back to Previous Page Button -->
+                <button type="button" class="btn btn-danger" onclick="window.history.back();" style="background-color: red; border: none; transition: background-color 0.3s;"><i class="bi bi-arrow-left-circle"></i>Back to Previous Page</button>
+</center>
+
      
 
     <div id="managers-list">

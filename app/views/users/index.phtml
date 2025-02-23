@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Custom CSS for Pink Theme -->
     <style>
         body {
@@ -66,14 +68,22 @@
             font-weight: bold;
             color: #d85b85;
         }
+        .btn-danger:hover {
+        background-color: darkred;
+        color: white;
+    }
+
     </style>
 </head>
 <body>
-    <center>
-        <a href="/signup" class="btn btn-primary">Create Account</a>
-        <a href="/main" class="btn btn-primary">Back to Menu</a>
-    </center>
-
+<center>
+    <a href="/main" class="btn btn-danger" style="background-color: red; border: none; transition: background-color 0.3s;">
+        <i class="bi bi-arrow-left-circle"></i> Back to Menu
+    </a>
+    <a href="/signup" class="btn btn-danger" style="background-color: red; border: none; transition: background-color 0.3s;">
+        Create Account
+    </a>
+</center>
     <div class="container">
         <div id="managers-list" class="row">
             <?php foreach ($managers as $manager): ?>
@@ -108,7 +118,7 @@
             var username = row.getAttribute("data-username"); // Get the manager's username
             document.cookie = "username=" + username + "; " + expires + "; path=/";
             
-            alert(username);
+          //  alert(username);
 
             // Redirect to the "activate" page
             window.location.href = "/activate"; // This will navigate the user to the "activate" page

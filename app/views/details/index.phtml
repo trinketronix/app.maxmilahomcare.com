@@ -53,6 +53,10 @@
         .list-group-item small {
             color: #777; /* Muted color for phone numbers */
         }
+        .btn-danger:hover {
+        background-color: darkred;
+        color: white;
+    }
     </style>
 </head>
 <body>
@@ -78,13 +82,12 @@
        
     </div>
     <?php endforeach; ?>
-   <?php echo $liga;
-    echo "hola";
-    ?> 
 <!--</div>-->
 <hr>
 <div class="d-grid">
-    <a href="/<?php echo $liga; ?>"   class="btn btn-primary">Back to Menu</a>   
+<!--    <a href="/<?php echo $liga; ?>"   class="btn btn-primary">Back to Menu</a>   -->
+<button type="button" class="btn btn-danger" onclick="window.history.back();" style="background-color: red; border: none; transition: background-color 0.3s;"><i class="bi bi-arrow-left-circle"></i>Back to Previous Page</button>
+
 </div>
 <!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
