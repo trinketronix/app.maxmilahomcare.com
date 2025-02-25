@@ -1,0 +1,81 @@
+Array
+(
+    [status] => success
+    [code] => 200
+    [data] => Array
+        (
+            [message] => User updated successfully
+            [user] => Array
+                (
+                    [id] => 2
+                    [lastname] => Francisca
+                    [firstname] => La Del Barrio
+                    [middlename] => Two Feet
+                    [birthdate] => 2025-02-05
+                    [ssn] => 
+                    [code] => GLO-1048
+                    [phone] => 248-679-2601
+                    [phone2] => 
+                    [email] => edmundo.chavez@gmail.com
+                    [email2] => 
+                    [languages] => Spanish
+                    [description] => Front End Development
+                    [address] => Conocido
+                    [city] => Ciudad Madero
+                    [state] => MI
+                    [zipcode] => 48185
+                    [photo] => /user/photo/default.jpg
+                    [deleted] => 0
+                    [created_at] => 2025-02-13 22:36:38
+                    [updated_at] => 2025-02-24 17:32:39
+                )
+
+            [updates] => Array
+                (
+                    [lastname] => Array
+                        (
+                            [from] => Bisogno
+                            [to] => Francisca
+                        )
+
+                    [firstname] => Array
+                        (
+                            [from] => La Del Barrio
+                            [to] => La Del Barrio
+                        )
+
+                    [middlename] => Array
+                        (
+                            [from] => Two Feet
+                            [to] => Two Feet
+                        )
+
+                    [birthdate] => Array
+                        (
+                            [from] => 2025-02-06
+                            [to] => 2025-02-05
+                        )
+
+                    [languages] => Array
+                        (
+                            [from] => Spanish
+                            [to] => Spanish
+                        )
+
+                    [address] => Array
+                        (
+                            [from] => Conocido
+                            [to] => Conocido
+                        )
+
+                    [city] => Array
+                        (
+                            [from] => Ciudad Madero
+                            [to] => Ciudad Madero
+                        )
+
+                )
+
+        )
+
+)

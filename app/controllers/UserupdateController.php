@@ -12,8 +12,34 @@ class UserupdateController extends BaseController
 {
     public function indexAction()
     {
+//inicio modificación
+//public function indexAction()
+//{
+    // Assuming managerId is set from a cookie
+    $managerId = $_COOKIE['activateid'];
 
-//inicio
+    // API call to fetch user data based on the managerId
+    $token = $this->session->get('auth-token');
+    $headers = ["Authorization" => $token];
+
+    try {
+        //HttpRequest::get('/accounts',$headers);
+        // Make API call to fetch the user details
+        $getUserResponse = HttpRequest::get('/user/2', $headers);
+        if (isset($getUserResponse['data'])) {
+            // Pass the user data to the Volt template
+            $this->view->user = $getUserResponse['data'];
+        } else {
+            $this->flashSession->error('Unable to fetch user data');
+        }
+    } catch (Exception $e) {
+        $this->flashSession->error('Error fetching user data: ' . $e->getMessage());
+    }
+//}
+$this->view->setVar("user", $getUserResponse['data']);
+
+//fin modificacion
+        //inicio
 $managers = [
     'username' => 'error'
 ];
@@ -21,10 +47,17 @@ $token = 'error';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get the manager ID from the form submission
-    $uid = $_POST['hiddenField'];}
+    $uid = $_GET['hiddenField'];}
+     
+        if (isset($_COOKIE['activateid'])) {
+            $uid = $_COOKIE['activateid'];
+//        $managerId=2;
+        }
+        $uid = $this->request->getPost('zipcode');
+        $uid = $this->request->getPost('hiddenField');
 $token = $this->session->get('auth-token');
 $headers=["Authorization" =>$token];
-
+$cadena='/user/'.$uid;
         if ($this->request->isPost()) {
             $lastname = $this->request->getPost('lastname');
             $firstname = $this->request->getPost('firstname');
@@ -55,8 +88,17 @@ $jsonBody = json_encode(
        
 try {
    // $getManaResponse = HttpRequest::get('/accounts',$headers);
-    $signupRequest = HttpRequest::put('/user/'.$uid, $jsonBody,$headers);
-    $this->flashSession->error($signupRequest['message']);
+   //$getUserResponse = HttpRequest::get('/user/2', $headers); 
+  // $signupRequest = HttpRequest::put('/user/2', $jsonBody,$headers);
+  $signupRequest = HttpRequest::put($cadena, $jsonBody,$headers);
+  file_put_contents('response_log.txt', print_r($signupRequest, true));  
+  file_put_contents('response_log2.txt', print_r($cadena, true));
+  file_put_contents('response_log3.txt', print_r($jsonBody, true));
+  file_put_contents('response_log4.txt', print_r($headers, true));
+
+            //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
+            
+  $this->flashSession->error($signupRequest['message']);
    // }
     $data = $signupRequest['data'];
     // Redirect to the 'main' page

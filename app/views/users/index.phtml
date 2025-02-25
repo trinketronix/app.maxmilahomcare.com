@@ -93,10 +93,12 @@
                     </div>
                     <div>
                         <!-- Ensure this link works properly and passes the correct reference to the function -->
-                        <a href="#" class="btn" onclick="setManagerIdAndRedirect(this)">Activate User</a>
+                        <a href="#" class="btn" onclick="setManagerIdAndRedirect(this)">Activate</a>
                     </div>
-                    <div><a href="/userupdate" class="btn">Update User</a></div>
-                    <div><a href="/changerole" class="btn">Change role</a></div>
+                    <div><a href="#" class="btn" onclick="setManagerIdAndUpdate(this)">Update</a>
+                    </div>
+                    <div><a href="#" class="btn" onclick="setManagerIdAndRole(this)">Role</a>
+                    </div>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -122,6 +124,46 @@
 
             // Redirect to the "activate" page
             window.location.href = "/activate"; // This will navigate the user to the "activate" page
+        }
+
+        function setManagerIdAndUpdate(button) {
+            // Get the row (or element) that contains the manager's data (assuming it's parent or nearest parent)
+            var row = button.closest('.manager-row'); // Adjusted to look for .manager-row instead of <tr>
+            var managerId = row.getAttribute("data-id"); // Get the manager's ID from the row's data-id attribute
+            console.log("Manager ID:", managerId); // Debugging line to check if it's defined
+            
+            let date = new Date();
+            date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 day from now
+            let expires = "expires=" + date.toUTCString();
+            document.cookie = "activateid=" + managerId + "; " + expires + "; path=/";
+            
+            var username = row.getAttribute("data-username"); // Get the manager's username
+            document.cookie = "username=" + username + "; " + expires + "; path=/";
+            
+          //  alert(username);
+
+            // Redirect to the "activate" page
+            window.location.href = "/userupdate"; // This will navigate the user to the "activate" page
+        }
+
+        function setManagerIdAndRole(button) {
+            // Get the row (or element) that contains the manager's data (assuming it's parent or nearest parent)
+            var row = button.closest('.manager-row'); // Adjusted to look for .manager-row instead of <tr>
+            var managerId = row.getAttribute("data-id"); // Get the manager's ID from the row's data-id attribute
+            console.log("Manager ID:", managerId); // Debugging line to check if it's defined
+            
+            let date = new Date();
+            date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 day from now
+            let expires = "expires=" + date.toUTCString();
+            document.cookie = "activateid=" + managerId + "; " + expires + "; path=/";
+            
+            var username = row.getAttribute("data-username"); // Get the manager's username
+            document.cookie = "username=" + username + "; " + expires + "; path=/";
+            
+          //  alert(username);
+
+            // Redirect to the "activate" page
+            window.location.href = "/changerole"; // This will navigate the user to the "activate" page
         }
     </script>
 </body>

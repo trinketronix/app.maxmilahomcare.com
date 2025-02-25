@@ -1,0 +1,1 @@
+{"lastname":"Francisca","firstname":"La Del Barrio","middlename":"Two Feet","birthdate":"2025-02-05","service_provider_code":"kkk","address":"Conocido","city":"Ciudad Madero","languages":"Spanish"}

@@ -1,0 +1,4 @@
+Array
+(
+    [Authorization] => eyJpZCI6MiwidXNlcm5hbWUiOiJlZG11bmRvLmNoYXZlekBnbWFpbC5jb20iLCJyb2xlIjoxLCJleHBpcmF0aW9uIjoxNzQwODc1NzY3MTA4fQ==
+)
