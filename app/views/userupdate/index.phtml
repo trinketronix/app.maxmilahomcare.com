@@ -4,172 +4,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update User</title>
-    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS for Pink Theme -->
     <style>
-        body {
+body {
             background-color: #f8e1f4; /* Light pink background */
+            font-family: 'Roboto', sans-serif; /* Default font */
+            color: #333;
         }
         .container {
-            max-width: 600px;
+            max-width: 1200px;
             margin-top: 50px;
-            background-color: #fff;
             padding: 30px;
+            background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         h2 {
+            font-family: 'Poppins', sans-serif;
             color: #d85b85; /* Pinkish color for header */
             font-size: 2.5em;
+            font-weight: 500;
+            text-align: center;
         }
-        .form-label {
-            color: #333;
-        }
-        .form-control {
+        .manager-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr; /* 4 columns */
+            gap: 20px;
+            background-color: #fce6f5; /* Light pink background for each row */
             border-radius: 10px;
-            box-shadow: none;
-        }
-        .btn-primary {
-            background-color: #e74c3c;
-            border-color: #e74c3c;
-        }
-        .btn-primary:hover {
-            background-color: #c0392b;
-            border-color: #c0392b;
-        }
-        .btn-link {
-            color: #e74c3c; /* Red color for "Already have an account" link */
-        }
-        .btn-link:hover {
-            color: #c0392b; /* Darker red on hover */
-        }
-        .d-grid {
-            gap: 15px;
-        }
-        textarea.form-control {
-            border-radius: 10px;
-            box-shadow: none;
-        }
-        .form-control:focus {
-            box-shadow: 0 0 5px rgba(231, 76, 60, 0.7); /* Red focus effect */
-        }
-
-        .list-group-item {
-            background-color: #fce6f5; /* Light pink background for each list item */
-            border: 1px solid #f8e1f4;
-            border-radius: 10px;
-            margin-bottom: 10px;
             padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        .list-group-item:hover {
-            background-color: #f8d1e6; /* Slightly darker pink for hover effect */
+        .manager-row div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Roboto', sans-serif;
         }
-        .btn-primary {
+        .manager-row a {
+            padding: 10px 20px;
             background-color: #e74c3c;
-            border-color: #e74c3c;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            text-decoration: none;
+            cursor: pointer;
         }
-        .btn-primary:hover {
+        .manager-row a:hover {
             background-color: #c0392b;
-            border-color: #c0392b;
         }
-        .form-control-static {
+        .manager-row .user-info {
             font-size: 1.1em;
-            color: #000;
+            font-weight: bold;
+            color: #d85b85;
         }
-        .list-group-item h5 {
-            color: #d85b85; /* Pinkish color for user names */
-        }
-        .list-group-item p {
-            color: #000;
-        }
-        .list-group-item small {
-            color: #777; /* Muted color for phone numbers */
-        }
-    
-        
+        .btn-danger:hover {
+        background-color: darkred;
+        color: white;
+    }
     </style>
 </head>
 <body>
 
-
-
-
     <div class="container">
         <h2 class="text-center mb-4">Update User</h2>
+
         <?php 
-       if (isset($_COOKIE['activateid'])) {
-        // Retrieve and display the cookie value
-        $managerId = $_COOKIE['activateid'];}
-    ?> 
-        <form method="POST" action="/userupdate" ?>
-     
-        <input type="hidden" name="hiddenField" class="form-control" id="hiddenField" value="<?php echo $managerId; ?>">
+        if (isset($_COOKIE['activateid'])) {
+            $managerId = $_COOKIE['activateid'];
+        //    $managerId=2;
+        }
+        //$managerId=2;
+        ?>
+         
+        
+       
+        <form method="POST" action="/userupdate">
+          
+            <input type="hidden" name="hiddenField" class="form-control" id="hiddenField" value="<?= $managerId ?? ''; ?>">
 
             <div class="mb-3">
-                <label for="lastname" class="form-label">Last Name</label>
-                <input type="text" class="form-control" id="lastname" name="lastname" required>
+            <label for="firstname" class="form-label">Last Name</label>
+             <input type="text" class="form-control" id="lastname" name="lastname"   value="<?= $user['lastname'] ?? ''; ?>" required>
+           
             </div>
-
-
+            
             <div class="mb-3">
                 <label for="firstname" class="form-label">First Name</label>
-                <input type="text" class="form-control" id="firstname" name="firstname" required>
+                <input type="text" class="form-control" id="firstname" name="firstname" value="<?= $user['firstname'] ?? ''; ?>" required>
             </div>
-
 
             <div class="mb-3">
                 <label for="middlename" class="form-label">Middle Name</label>
-                <input type="text" class="form-control" id="middlename" name="middlename" required>
+                <input type="text" class="form-control" id="middlename" name="middlename" value="<?= $user['middlename'] ?? ''; ?>" required>
             </div>
-
 
             <div class="mb-3">
                 <label for="birthdate" class="form-label">Birth Date</label>
-                <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+                <input type="date" class="form-control" id="birthdate" name="birthdate" value="<?= $user['birthdate'] ?? ''; ?>" required>
             </div>
-
-
 
             <div class="mb-3">
                 <label for="service_provider_code" class="form-label">Service Provider Code</label>
-                <input type="text" class="form-control" id="service_provider_code" name="service_provider_code" required>
+                <input type="text" class="form-control" id="service_provider_code" name="service_provider_code" value="<?= $user['service_provider_code'] ?? ''; ?>" required>
             </div>
 
             <div class="mb-3">
                 <label for="address" class="form-label">Address</label>
-                <input type="text" class="form-control" id="address" name="address" required>
+                <input type="text" class="form-control" id="address" name="address" value="<?= $user['address'] ?? ''; ?>" required>
             </div>
 
             <div class="mb-3">
                 <label for="city" class="form-label">City</label>
-                <input type="text" class="form-control" id="city" name="city" required>
+                <input type="text" class="form-control" id="city" name="city" value="<?= $user['city'] ?? ''; ?>" required>
             </div>
 
             <div class="mb-3">
                 <label for="zipcode" class="form-label">Zip Code</label>
-                <input type="text" class="form-control" id="zipcode" name="zipcode" required>
+                <input type="text" class="form-control" id="zipcode" name="zipcode" value="<?= $user['zipcode'] ?? ''; ?>" required>
             </div>
 
             <div class="mb-3">
                 <label for="languages" class="form-label">Languages</label>
-                <input type="text" class="form-control" id="languages" name="languages" required>
+                <input type="text" class="form-control" id="languages" name="languages" value="<?= $user['languages'] ?? ''; ?>" required>
             </div>
 
-
-
             <div class="d-grid gap-2">
-            <a href="/main" class="btn btn-primary">Back to Menu</a>
-
+                <a href="/main" class="btn btn-primary">Back to Menu</a>
                 <button type="submit" class="btn btn-primary">Update User</button>
-                <center style="color:red;"> <?php echo $this->flashSession->output(); ?></center>
-                              <br>  <a href="/login" class="btn btn-link">Already have an account? Login</a>
+                <center style="color:red;"> <?= $this->flashSession->output() ?> </center>
+                <br> 
+                <a href="/login" class="btn btn-link">Already have an account? Login</a>
                 <a href="/logout" class="btn btn-link">Do you want to Logout? Logout</a>
             </div>
         </form>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
