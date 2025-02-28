@@ -95,11 +95,11 @@
                         <?= $manager['lastname'].' '.$manager['firstname'].' '.$manager['phone'] ?>
                     </div>
 
-                    <div class="manager-column">
-                        <button class="register-btn">
-                            <i class="bi bi-telephone"></i> <!-- Call icon -->
-                        </button>
-                    </div>
+                    <a href="tel:"<?= $manager['lastname'].' '.$manager['firstname'].' '.$manager['phone'] ?>>
+                    <button class="register-btn">
+                     <i class="bi bi-telephone"></i> <!-- Call icon -->
+                    </button>
+                    </a>
 
                     <div>
                         <a href="#" class="btn" onclick="setManagerIdAndRedirect(this)">Activate</a>

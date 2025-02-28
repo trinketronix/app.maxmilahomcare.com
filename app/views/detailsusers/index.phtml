@@ -62,8 +62,11 @@
     </style>
 </head>
 <body>
+
+
 <div class="container">
     <div class="list-group mb-4">
+    <form action="/changerole" method="POST" id="myForm">
         <?php foreach ($managers as $manager): ?>
             <?php if ($manager['id'] == $myid): ?>
                 <div class="list-group-item" data-id="<?= $manager['id'] ?>">
@@ -77,19 +80,23 @@
                     <p class="mb-1"><?= $manager['city'] ?></p>
                     <p class="mb-1"><?= $manager['languages'] ?></p>
                     <p class="mb-1"><?= $manager['id'] ?></p>
+                    <input type="hidden" name="hiddenusername" class="form-control" id="hiddenusername" value="<?=$manager['username'] ?? ''; ?>">
                 </div>
             <?php endif; ?>    
         <?php endforeach; ?>
+        <button type="submit" class="btn btn-primary" onclick="window.location.href = '/change-role'">Role</button>
+</form>
     </div>
 
     <hr>
 
     <div class="d-grid">
-        <button type="button" class="btn btn-danger" onclick="window.history.back();" style="background-color: red; border: none; transition: background-color 0.3s;">
+        <button type="button" class="btn btn-danger" onclick="window.history.back();" 
+        style="background-color: red; border: none; transition: background-color 0.3s;">
             <i class="bi bi-arrow-left-circle"></i> Back to Previous Page
         </button>
         <button type="button" class="btn btn-primary" onclick="setManagerIdAndUpdate()">Update</button>
-        <button type="button" class="btn btn-primary" onclick="setManagerIdAndRole()">Role</button>
+      <!--  <button type="button" class="btn btn-primary" onclick="setManagerIdAndRole()">Role</button>-->
     </div>
 </div>
 
@@ -112,6 +119,7 @@
     function setManagerIdAndRole() {
         var managerId = getManagerId();
         if (managerId) {
+            
             let date = new Date();
             date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 day from now
             let expires = "expires=" + date.toUTCString();
@@ -121,7 +129,8 @@
         } else {
             console.error("Manager ID not found!");
         }
-        sessionStorage.setItem('username', username);
+        //sessionStorage.setItem('username', username);
+        //document.getElementById("myForm").submit();
     }
 
     function getManagerId() {

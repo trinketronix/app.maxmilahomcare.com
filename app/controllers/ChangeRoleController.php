@@ -18,53 +18,7 @@ class ChangeroleController extends BaseController
     public function indexAction()
     {
 
-         
-//        $username = $_GET['username'];
-       // $username = $this->request->getPost('username');
-       $username = isset($_SESSION['usirname']) ? $_SESSION['usirname'] : null;
-      // $username = isset($_POST['username']) ? $_POST['username'] : null;
-
-    $role=1;
-    //file_put_contents('response_log5.txt', print_r($username, true));
-    $token=$this->session->get('auth-token');
-    $role=$this->getRole($token);
-    $headers=["Authorization" =>$token];
-
-    file_put_contents('resp.txt', print_r($username, true));
-//if ($this->request->isPost()) {
-//    $username = $this->request->getPost('username');
-//$username = isset($_COOKIE['username']) ? $_COOKIE['username'] : null;
-//$message = "wrong answer";
-//echo "<script type='text/javascript'>alert('$username');</script>";   
-$role=0;
-file_put_contents('resp2.txt', print_r($username, true));
-    try {
-
-        // Prepare the JSON body for the login request
-        $jsonBody = json_encode(
-            [
-                "username" =>$username, 
-                "role"=>$role
-     
-            ],
-            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
-        );
        
-        $activateRequest = HttpRequest::put('/change-role', $jsonBody, $headers);
-        file_put_contents('responsi_log.txt', print_r($jsonBody, true));
-        $this->flashSession->success('Role Changed');
-        if (empty($activateRequest['data'])) {
-            $this->flashSession->error($activateRequest['message']);
-        } //else  $this->flashSession->{'Sucess!!'}; 
-
-
-    } catch (Exception $e) {
-        // Handle errors in the API requests
-        $this->flashSession->error('An error occurred during the role changing process:  ' . $e->getMessage());
-        file_put_contents('responsi2_log.txt', print_r($username, true));
-
-    }
-    //}
     
 
 if ($this->request->isPost()) {
@@ -74,8 +28,8 @@ if ($this->request->isPost()) {
     $token=$this->session->get('auth-token');
     $role=$this->getRole($token);
     $headers=["Authorization" =>$token];
-
-    file_put_contents('resp.txt', print_r($username, true));
+    $username = $this->request->getPost('hiddenusername');
+    //file_put_contents('resp.txt', print_r($username, true));
 //if ($this->request->isPost()) {
 //    $username = $this->request->getPost('username');
 //$username = isset($_COOKIE['username']) ? $_COOKIE['username'] : null;
