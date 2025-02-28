@@ -67,7 +67,7 @@
         <?php foreach ($managers as $manager): ?>
             <?php if ($manager['id'] == $myid): ?>
                 <div class="list-group-item" data-id="<?= $manager['id'] ?>">
-                    <h4 class="mb-1">Profile</h4>
+                    <h4 class="mb-1">My Profile</h4>
                     <h5 class="mb-1"><?= $manager['username'] ?></h5>
                     <p class="mb-1"><?= $manager['firstname'] ?></p>
                     <p class="mb-1"><?= $manager['lastname'] ?></p>
@@ -76,7 +76,6 @@
                     <p class="mb-1"><?= $manager['address'] ?></p>
                     <p class="mb-1"><?= $manager['city'] ?></p>
                     <p class="mb-1"><?= $manager['languages'] ?></p>
-                   <?php $_SESSION['usirname'] = $_POST['username']; ?>
                 </div>
             <?php endif; ?>    
         <?php endforeach; ?>
@@ -131,10 +130,6 @@
         }
         return null;
     }
-
-    
-    
-
 </script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

@@ -6,7 +6,7 @@
     <title>Update User</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-body {
+        body {
             background-color: #f8e1f4; /* Light pink background */
             font-family: 'Roboto', sans-serif; /* Default font */
             color: #333;
@@ -51,19 +51,35 @@ body {
             font-family: 'Poppins', sans-serif;
             text-decoration: none;
             cursor: pointer;
+            transition: background-color 0.3s ease; /* Smooth transition */
         }
         .manager-row a:hover {
-            background-color: #c0392b;
+            background-color: #c0392b; /* Darker red for hover effect */
         }
         .manager-row .user-info {
             font-size: 1.1em;
             font-weight: bold;
             color: #d85b85;
         }
-        .btn-danger:hover {
-        background-color: darkred;
-        color: white;
-    }
+        .btn-danger, .btn-primary {
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .btn-danger:hover, .btn-primary:hover {
+            background-color: #c0392b; /* Darker red for hover effect */
+            color: white;
+        }
+        .btn-link {
+            color: #e74c3c;
+            text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+        }
+        .btn-link:hover {
+            color: #c0392b;
+        }
     </style>
 </head>
 <body>
@@ -74,23 +90,17 @@ body {
         <?php 
         if (isset($_COOKIE['activateid'])) {
             $managerId = $_COOKIE['activateid'];
-        //    $managerId=2;
         }
-        //$managerId=2;
         ?>
-         
-        
-       
+
         <form method="POST" action="/userupdate">
-          
             <input type="hidden" name="hiddenField" class="form-control" id="hiddenField" value="<?= $managerId ?? ''; ?>">
 
             <div class="mb-3">
-            <label for="firstname" class="form-label">Last Name</label>
-             <input type="text" class="form-control" id="lastname" name="lastname"   value="<?= $user['lastname'] ?? ''; ?>" required>
-           
+                <label for="firstname" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="lastname" name="lastname" value="<?= $user['lastname'] ?? ''; ?>" required>
             </div>
-            
+
             <div class="mb-3">
                 <label for="firstname" class="form-label">First Name</label>
                 <input type="text" class="form-control" id="firstname" name="firstname" value="<?= $user['firstname'] ?? ''; ?>" required>
@@ -108,7 +118,7 @@ body {
 
             <div class="mb-3">
                 <label for="service_provider_code" class="form-label">Service Provider Code</label>
-                <input type="text" class="form-control" id="service_provider_code" name="service_provider_code" value="<?= $user['service_provider_code'] ?? ''; ?>" required>
+                <input type="text" class="form-control" id="service_provider_code" name="service_provider_code" value="<?= $user['code'] ?? ''; ?>" required>
             </div>
 
             <div class="mb-3">
@@ -132,10 +142,10 @@ body {
             </div>
 
             <div class="d-grid gap-2">
-                <a href="/main" class="btn btn-primary">Back to Menu</a>
+                <a href="/main" class="btn btn-link">Back to Menu</a>
                 <button type="submit" class="btn btn-primary">Update User</button>
                 <center style="color:red;"> <?= $this->flashSession->output() ?> </center>
-                <br> 
+                <br>
                 <a href="/login" class="btn btn-link">Already have an account? Login</a>
                 <a href="/logout" class="btn btn-link">Do you want to Logout? Logout</a>
             </div>

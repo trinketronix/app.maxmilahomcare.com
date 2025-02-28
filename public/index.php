@@ -94,6 +94,14 @@ $router->add('/details', [
     'action'     => 'index'
 ]);
 
+// Explicit route for '/detailsusers'
+$router->add('/detailsusers', [
+    'namespace'  => 'Homecare\Controllers',
+    'controller' => 'detailsusers',
+    'action'     => 'index'
+]);
+
+
 
 // Explicit route for '/logout'
 $router->add('/logout', [
