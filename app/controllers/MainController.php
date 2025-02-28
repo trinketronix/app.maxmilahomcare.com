@@ -17,7 +17,7 @@ class MainController extends BaseController {
                 
 
         $this->view->menuItems = [
-            ['url' => '/details', 'text' => 'My Profile', 'icon' => 'person'],
+            ['url' => '/details', 'text' => 'Profile', 'icon' => 'person'],
             ['url' => '/patients', 'text' => 'Patients', 'icon' => 'car-front-fill'],
         //    ['url' => '/signup', 'text' => 'Create Account', 'icon' => 'people'],
         //    ['url' => '/activate', 'text' => 'Activate Account', 'icon' => 'heart'],
@@ -35,9 +35,12 @@ class MainController extends BaseController {
         $userRole = $this->getRole($token); // int
         $isExpired = $this->isExpired($token); // bool
         $expiration = $isExpired ? "is expired" : "is not expired";
+//        $firstname=$this->getFirstName($token);
 
         $this->view->setVar("username", $username);
         $this->view->setVar("userid", $userId);
+//        $this->view->setVar("firstname", $firstname);
+        //$this->view->setVar("usuario[lastname]", $lastname);
         $this->view->setVar("role", $userRole);
         $this->view->setVar("expiration", $expiration);
     }

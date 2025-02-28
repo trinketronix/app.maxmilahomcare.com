@@ -76,7 +76,7 @@
                     <p class="mb-1"><?= $manager['address'] ?></p>
                     <p class="mb-1"><?= $manager['city'] ?></p>
                     <p class="mb-1"><?= $manager['languages'] ?></p>
-                   <?php $_SESSION['usirname'] = $_POST['username']; ?>
+                    <p class="mb-1"><?= $manager['id'] ?></p>
                 </div>
             <?php endif; ?>    
         <?php endforeach; ?>
@@ -121,6 +121,7 @@
         } else {
             console.error("Manager ID not found!");
         }
+        sessionStorage.setItem('username', username);
     }
 
     function getManagerId() {
@@ -131,10 +132,6 @@
         }
         return null;
     }
-
-    
-    
-
 </script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

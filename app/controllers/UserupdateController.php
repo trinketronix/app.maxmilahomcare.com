@@ -25,7 +25,7 @@ class UserupdateController extends BaseController
     try {
         //HttpRequest::get('/accounts',$headers);
         // Make API call to fetch the user details
-        $getUserResponse = HttpRequest::get('/user/2', $headers);
+        $getUserResponse = HttpRequest::get('/user/'.$managerId, $headers);
         if (isset($getUserResponse['data'])) {
             // Pass the user data to the Volt template
             $this->view->user = $getUserResponse['data'];
@@ -53,17 +53,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $uid = $_COOKIE['activateid'];
 //        $managerId=2;
         }
-        $uid = $this->request->getPost('zipcode');
+   //     $uid = $this->request->getPost('zipcode');
         $uid = $this->request->getPost('hiddenField');
-$token = $this->session->get('auth-token');
-$headers=["Authorization" =>$token];
-$cadena='/user/'.$uid;
+        $token = $this->session->get('auth-token');
+        $headers=["Authorization" =>$token];
+        $cadena='/user/'.$uid;
         if ($this->request->isPost()) {
             $lastname = $this->request->getPost('lastname');
             $firstname = $this->request->getPost('firstname');
             $middlename = $this->request->getPost('middlename');
             $birthdate = $this->request->getPost('birthdate');
-            $service_provider_code = $this->request->getPost('service_provider_code');
+            $service_provider_code = $this->request->getPost('code');
             $address = $this->request->getPost('address');
             $city = $this->request->getPost('city');
             $languages = $this->request->getPost('languages');
@@ -91,10 +91,6 @@ try {
    //$getUserResponse = HttpRequest::get('/user/2', $headers); 
   // $signupRequest = HttpRequest::put('/user/2', $jsonBody,$headers);
   $signupRequest = HttpRequest::put($cadena, $jsonBody,$headers);
-  file_put_contents('response_log.txt', print_r($signupRequest, true));  
-  file_put_contents('response_log2.txt', print_r($cadena, true));
-  file_put_contents('response_log3.txt', print_r($jsonBody, true));
-  file_put_contents('response_log4.txt', print_r($headers, true));
 
             //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
             
