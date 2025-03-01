@@ -2,7 +2,7 @@
 <html>
 <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile</title>
+    <title>Patients</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons CSS -->
@@ -123,24 +123,26 @@
     <div id="managers-list">
         <?php foreach ($managers as $manager): ?>
             <div class="manager-row">
-                
                 <div class="manager-column">
                     <button class="register-btn">
                         <i class="bi bi-geo-alt"></i> <!-- Direction icon -->
                     </button>
                 </div>
                 <div class="manager-column">
+                <a href="tel:"<?= $manager['phone'] ?>>
                     <button class="register-btn">
-                        <i class="bi bi-telephone"></i> <!-- Call icon -->
+                     <i class="bi bi-telephone"></i> <!-- Call icon -->
                     </button>
+                    </a>
                 </div>
+                <div class="user-info">
+                        <?= $manager['lastname'].' '.$manager['firstname'].' '.$manager['phone'] .'     '?>
+                    </div>
                 <div a href="/main" class="manager-column">
                 <a href="/visit" button class="register-btn">Check-in</a>
                  <!--   <button class="register-btn">Check in</a></button>-->
                 </div>
-                <div class="manager-column">
-                    Patient name: <?= $manager['lastname'].' '.$manager['firstname'] ?>
-                </div>
+                
             </div>
         <?php endforeach; ?>
     </div>
