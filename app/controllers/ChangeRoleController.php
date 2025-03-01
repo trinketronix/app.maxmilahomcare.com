@@ -49,7 +49,7 @@ if ($this->request->isPost()) {
         );
        
         $activateRequest = HttpRequest::put('/change-role', $jsonBody, $headers);
-        file_put_contents('responsi_log.txt', print_r($username, true));
+        //file_put_contents('responsi_log.txt', print_r($username, true));
         $this->flashSession->success('Role Changed');
         if (empty($activateRequest['data'])) {
             $this->flashSession->error($activateRequest['message']);
@@ -59,7 +59,7 @@ if ($this->request->isPost()) {
     } catch (Exception $e) {
         // Handle errors in the API requests
         $this->flashSession->error('An error occurred during the role changing process:  ' . $e->getMessage());
-        file_put_contents('responsi2_log.txt', print_r($username, true));
+        //file_put_contents('responsi2_log.txt', print_r($username, true));
 
     }
 }
