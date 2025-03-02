@@ -124,10 +124,12 @@
         <?php foreach ($managers as $manager): ?>
             <div class="manager-row">
                 <div class="manager-column">
-                    <button class="register-btn">
-                        <i class="bi bi-geo-alt"></i> <!-- Direction icon -->
-                    </button>
+                <button class="register-btn" onclick="window.open('https://www.google.com/maps?q=<?php echo $manager['latitude']; ?>,<?php echo $manager['longitude']; ?>')">
+                  <i class="bi bi-geo-alt"></i> <!-- Direction icon -->
+                View Location
+                </button>
                 </div>
+               
                 <div class="manager-column">
                 <a href="tel:"<?= $manager['phone'] ?>>
                     <button class="register-btn">
