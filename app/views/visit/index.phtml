@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update User</title>
+    <title>Visit</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS for Pink Theme -->
@@ -85,20 +85,23 @@
     <div class="container">
         <h2 class="text-center mb-4">Visit</h2>
 
-        <form method="POST" action="/userupdate">
- 
-           
-
+        <form method="POST" action="/visit">
+                    <!-- Check-in Date and Hour -->
             <div class="mb-3">
-                <label for="hour" class="form-label">Hour</label>
-                <input type="time" class="form-control" id="hour" name="hour" required>
+                <label for="checkin" class="form-label">Check-in (Date and Hour)</label>
+                <input type="datetime-local" class="form-control" id="start_time" name="start_time" required>
             </div>
 
-     
+            <!-- Check-out Date and Hour -->
+            <div class="mb-3">
+                <label for="checkout" class="form-label">Check-out (Date and Hour)</label>
+                <input type="datetime-local" class="form-control" id="end_time" name="end_time" required>
+            </div>
 
+            <!-- Comment Field -->
             <div class="mb-3">
                 <label for="comment" class="form-label">Comment</label>
-                <textarea class="form-control" id="comment" name="comment" rows="3" placeholder="Add any comment here"></textarea>
+                <textarea class="form-control" id="note" name="note" rows="3" placeholder="Add any comment here"></textarea>
             </div>
 
             <div class="d-grid gap-2">

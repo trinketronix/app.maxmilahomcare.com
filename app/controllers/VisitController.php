@@ -17,6 +17,8 @@ class VisitController extends BaseController
     public function indexAction()
     {
 
+        $uid = $_GET['hiddenField']; 
+
 //inicio
 $managers = [
     'username' => 'error'
@@ -40,27 +42,19 @@ $token = $this->session->get('auth-token');
 
 //fin
         if ($this->request->isPost()) {
-            $lastname = $this->request->getPost('lastname');
-            $firstname = $this->request->getPost('firstname');
-            $middlename = $this->request->getPost('middlename');
-            $birthdate = $this->request->getPost('birthdate');
-            $service_provider_code = $this->request->getPost('code');
-            $address = $this->request->getPost('address');
-            $city = $this->request->getPost('city');
-            $languages = $this->request->getPost('languages');
-            $user= 2;  
+            $start_time = $this->request->getPost('start_time');
+            $end_time = $this->request->getPost('end_time');
+            $note = $this->request->getPost('note');
+            $uid= 1;  
            
 $jsonBody = json_encode(
     [
        
-        "lastname" =>$lastname,
-        "firstname" =>$firstname,
-        "middlename" =>$middlename,
-        "birthdate" =>$birthdate,
-        "service_provider_code"=> $service_provider_code,
-        "address" => $address,
-        "city" => $city,
-        "languages" => $languages
+        "patient_id" =>$uid,
+        "start_time" =>$start_time,
+        "end_time" =>$end_time,
+        "note" =>$note
+        
     ],
     JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
 );
@@ -69,21 +63,21 @@ $jsonBody = json_encode(
         $headers=["Authorization" =>$token];
        
 try {
-    $signupRequest = HttpRequest::put('/users/'.$user, $jsonBody,$headers);
+    $signupRequest = HttpRequest::post('/visit/', $jsonBody,$headers);
 
-  //   file_put_contents('response_log.txt', print_r($jsonBody, true));   
-  //   file_put_contents('response_log2.txt', print_r($signupRequest, true));
+     //file_put_contents('response_log.txt', print_r($jsonBody, true));   
+     //file_put_contents('response_log2.txt', print_r($signupRequest, true));
     $this->flashSession->error($signupRequest['message']);
    // }
     $data = $signupRequest['data'];
     // Redirect to the 'main' page
-    $this->flashSession->success('User updated successfully');
+    $this->flashSession->success('Visit registered successfully');
     //$this->response->redirect('main');
 
 } catch (Exception $e) {
     // Handle errors in the API requests
-    $this->flashSession->error('An error occurred during update: ' . $e->getMessage());
-   // file_put_contents('response_log2.txt', print_r('errorzaso', true));
+    $this->flashSession->error('An error occurred during the visit registration: ' . $e->getMessage());
+    //file_put_contents('response_log2.txt', print_r('errorzaso', true));
 }
 
 }
