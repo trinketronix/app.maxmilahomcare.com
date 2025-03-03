@@ -139,7 +139,9 @@
                 </div>
                 <div class="user-info">
                         <?= $manager['lastname'].' '.$manager['firstname'].' '.$manager['phone'] .'     '?>
+                        <input type="hidden" name="hiddenidpatient" class="form-control" id="hiddenidpatient" value="<?=$manager['id'] ?? ''; ?>">
                     </div>
+
                 <div a href="/main" class="manager-column">
                 <a href="/visit" button class="register-btn">Check-in</a>
                  <!--   <button class="register-btn">Check in</a></button>-->
