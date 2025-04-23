@@ -31,7 +31,7 @@ $jsonBody = json_encode(
 );
 
 try {
-    $signupRequest = HttpRequest::post('/user', $jsonBody);
+    $signupRequest = HttpRequest::post(Endpoint::REGISTER, $jsonBody);
     if (empty($signupRequest['data'])) {
         $this->flashSession->error($signupRequest['message']);
     }

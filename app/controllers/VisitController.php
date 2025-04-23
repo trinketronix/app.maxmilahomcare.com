@@ -63,7 +63,7 @@ $jsonBody = json_encode(
         $headers=["Authorization" =>$token];
        
 try {
-    $signupRequest = HttpRequest::post('/visit/', $jsonBody,$headers);
+    $signupRequest = HttpRequest::post(Endpoint::VISIT, $jsonBody,$headers);
 
      //file_put_contents('response_log.txt', print_r($jsonBody, true));   
      //file_put_contents('response_log2.txt', print_r($signupRequest, true));

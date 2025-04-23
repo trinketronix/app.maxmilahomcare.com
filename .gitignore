@@ -10,3 +10,7 @@
 
 # Ignore .ftpquota file
 .ftpquota
+
+.htaccess_prod
+.htaccess_test
+.htaccess_local
