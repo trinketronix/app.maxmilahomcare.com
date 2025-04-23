@@ -6,9 +6,30 @@ namespace Homecare\utils;
 use Exception;
 
 class HttpRequest{
+   
 
-    private const BASE_URL= "https://api.maxmilahomecare.com";
+
     private const CONTENT_TYPE = 'Content-Type: application/json';
+    private const ENDPOINTS = [
+        'register'=>'/auth/register',
+        'login'=>'/auth/login',
+        'activateAccount'=>'/auth/activate/account',
+        'renewToken'=>'/auth/renewtoken',
+        'changeRole'=>'/auth/changerole',
+        'changePassword'=>'/auth/changepassword',
+        'updateUser'=>'/user',
+        'updatePhoto'=>'/user/update/photo',
+        'uploadPhoto'=>'/user/upload/photo'
+    ];
+    
+    
+    public static function getEndPoint(string $name): string {
+        return getBaseUrl().ENDPOINTS[$name];
+    }
+
+    public static function getBaseUrl(): string {
+        return getenv('BASE_URL_API') ?: 'https://api-test.maxmilahomecare.com';
+    }
 
     /**
      * @param string $endpoint as `/users`, `/login`, `caregivers`
@@ -18,12 +39,11 @@ class HttpRequest{
      * @throws Exception
      * POST Request function
      */
-    public static function post(string $endpoint, string $jsonBody, array $headers = []): array {
-        $endpoint = self::BASE_URL . $endpoint;
+    public static function post(string $endpointName, string $jsonBody, array $headers = []): array {
         // Initialize cURL
         $ch = curl_init();
         // Set options for the cURL transfer
-        curl_setopt($ch, CURLOPT_URL, $endpoint);
+        curl_setopt($ch, CURLOPT_URL, getEndPoint($endpointName));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         // Set the POST data
@@ -54,12 +74,11 @@ class HttpRequest{
      * @throws Exception
      * PUT Request
      */
-    public static function put(string $endpoint, string $jsonBody, array $headers = []): array {
-        $endpoint = self::BASE_URL . $endpoint;
+    public static function put(string $endpointName, string $jsonBody, array $headers = []): array {
         // Initialize cURL
         $ch = curl_init();
         // Set options for the cURL transfer
-        curl_setopt($ch, CURLOPT_URL, $endpoint);
+        curl_setopt($ch, CURLOPT_URL, getEndPoint($endpointName));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT"); // Specify PUT method
         // Set the POST data (even though it's a PUT request, we use POSTFIELDS for the body)
@@ -90,12 +109,12 @@ class HttpRequest{
      * @throws Exception
      * DELETE Request
      */
-    public static function delete(string $endpoint, string $jsonBody = '', array $headers = []): string {
-        $endpoint = self::BASE_URL . $endpoint;
+    public static function delete(string $endpointName, string $jsonBody = '', array $headers = []): string {
+       
         // Initialize cURL
         $ch = curl_init();
         // Set options for the cURL transfer
-        curl_setopt($ch, CURLOPT_URL, $endpoint);
+        curl_setopt($ch, CURLOPT_URL, getEndPoint($endpointName));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE"); // Specify DELETE method
         // Set the body if provided (though DELETE requests typically don't send a body)
@@ -126,12 +145,11 @@ class HttpRequest{
      * @throws Exception
      * GET Request
      */
-    public static function get(string $endpoint, array $headers = []): array {
-        $endpoint = self::BASE_URL . $endpoint;
+    public static function get(string $endpointName, array $headers = []): array {
         // Initialize cURL
         $ch = curl_init();
         // Set options for the cURL transfer
-        curl_setopt($ch, CURLOPT_URL, $endpoint);
+        curl_setopt($ch, CURLOPT_URL,getEndPoint($endpointName));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         // Set custom headers
         $headerArray = [];

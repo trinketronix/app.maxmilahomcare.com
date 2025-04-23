@@ -26,7 +26,7 @@ class LoginController extends BaseController {
             );
 
             try {
-                $loginRequest = HttpRequest::post('/login', $jsonBody);
+                $loginRequest = HttpRequest::post(Endpoint::LOGIN, $jsonBody);
 
                 if (empty($loginRequest['data']['token'])) {
                     $this->flashSession->error($loginRequest['message']);
