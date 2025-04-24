@@ -1,0 +1,20 @@
+name: Deploy Maxmilahomecare Application (production)
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the latest source code
+        uses: actions/checkout@v3
+      - name: Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_MAXMILA_SERVER }}
+          username: ${{ secrets.FTP_MAXMILA_USERNAME }}
+          password: ${{ secrets.FTP_MAXMILA_PASSWORD }}
+          protocol: ftps
