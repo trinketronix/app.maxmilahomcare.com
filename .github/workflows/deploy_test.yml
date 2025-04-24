@@ -14,7 +14,21 @@ jobs:
       - name: Sync files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: ${{ secrets.FTP_MAXMILA_SERVER }}
-          username: ${{ secrets.FTP_MAXMILA_USERNAME }}
-          password: ${{ secrets.FTP_MAXMILA_PASSWORD }}
+          server: ${{ secrets.FTP_MAX_SERVER }}
+          username: ${{ secrets.FTP_APP_USERNAME_TEST }}
+          password: ${{ secrets.FTP_APP_PASSWORD_TEST }}
           protocol: ftps
+          timeout: 90000
+          log-level: verbose
+          dangerous-clean-slate: false
+          exclude: |
+            */.git
+            */.git/**
+            */test/*
+            test/**
+            .gitignore
+            http-client.env.json
+            LICENSE
+            README.md
+          state-name: .ftp-deploy-sync-state.json    # Keep track of sync state
+          server-dir: /          # Specify your root directory if needed
