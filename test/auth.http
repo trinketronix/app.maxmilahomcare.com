@@ -1,0 +1,58 @@
+###
+# @name Create or Register Account
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+###
+# @name Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+###
+# @name Activate Account By The System
+PUT {{baseUrl}}/auth/activate/account
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "id": 1
+}
+
+###
+# @name Renew Token
+PUT {{baseUrl}}/auth/renew/token
+Content-Type: application/json
+Authorization: {{token}}
+
+###
+# @name Change Role
+PUT {{baseUrl}}/auth/change/role
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "id": 1,
+  "role": 2
+}
+
+###
+# @name Change Password from System
+PUT {{baseUrl}}/auth/change/password
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+

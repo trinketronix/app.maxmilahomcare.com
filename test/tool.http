@@ -1,0 +1,4 @@
+###
+# @name Get list of tools
+GET {{baseUrl}}/tools
+Content-Type: application/json

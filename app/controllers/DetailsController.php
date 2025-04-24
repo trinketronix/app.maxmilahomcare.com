@@ -1,8 +1,8 @@
 <?php
 
 namespace Homecare\Controllers;
-use Homecare\Utils\HttpRequest;
-use Phalcon\Mvc\Controller;
+
+use Homecare\{Utils\HttpRequest, Utils\Endpoint};
 class DetailsController extends BaseController {
     public function indexAction(){
         $managers = [
@@ -17,8 +17,8 @@ class DetailsController extends BaseController {
         if($token != null) {
             // Test Http Request Get managers
             $getManaResponse = HttpRequest::get('/accounts',$headers);
-            //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
-            //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
+            file_put_contents('response_log.txt', print_r($getManaResponse, true));
+            file_put_contents('response_log.txt', print_r($getManaResponse, true));
             $managersjson = $getManaResponse['data'];
             //file_put_contents('response2_log.txt', print_r($managersjson, true));  
             $array = $getManaResponse['data'];

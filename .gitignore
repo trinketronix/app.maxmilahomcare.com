@@ -14,3 +14,4 @@
 .htaccess_prod
 .htaccess_test
 .htaccess_local
+public/response_log.txt

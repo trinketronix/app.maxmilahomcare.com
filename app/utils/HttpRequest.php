@@ -4,9 +4,9 @@ namespace Homecare\utils;
 
 
 use Exception;
-
+use Homecare\Utils\Endpoint;
 class HttpRequest{
-   
+
 
 
     private const CONTENT_TYPE = 'Content-Type: application/json';
@@ -21,15 +21,16 @@ class HttpRequest{
         'updatePhoto'=>'/user/update/photo',
         'uploadPhoto'=>'/user/upload/photo'
     ];
-    
-    
-    public static function getEndPoint(string $name): string {
-        return getBaseUrl().ENDPOINTS[$name];
-    }
 
     public static function getBaseUrl(): string {
         return getenv('BASE_URL_API') ?: 'https://api-test.maxmilahomecare.com';
     }
+
+    public static function getEndPoint(string $name): string
+    {
+        return self::getBaseUrl() . self::ENDPOINTS[$name];
+    }
+
 
     /**
      * @param string $endpoint as `/users`, `/login`, `caregivers`
@@ -43,7 +44,7 @@ class HttpRequest{
         // Initialize cURL
         $ch = curl_init();
         // Set options for the cURL transfer
-        curl_setopt($ch, CURLOPT_URL, getEndPoint($endpointName));
+        curl_setopt($ch, CURLOPT_URL, self::getEndPoint($endpointName));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         // Set the POST data
@@ -78,7 +79,7 @@ class HttpRequest{
         // Initialize cURL
         $ch = curl_init();
         // Set options for the cURL transfer
-        curl_setopt($ch, CURLOPT_URL, getEndPoint($endpointName));
+        curl_setopt($ch, CURLOPT_URL, self::getEndPoint($endpointName));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT"); // Specify PUT method
         // Set the POST data (even though it's a PUT request, we use POSTFIELDS for the body)
@@ -114,7 +115,7 @@ class HttpRequest{
         // Initialize cURL
         $ch = curl_init();
         // Set options for the cURL transfer
-        curl_setopt($ch, CURLOPT_URL, getEndPoint($endpointName));
+        curl_setopt($ch, CURLOPT_URL, self::getEndPoint($endpointName));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE"); // Specify DELETE method
         // Set the body if provided (though DELETE requests typically don't send a body)
@@ -149,7 +150,7 @@ class HttpRequest{
         // Initialize cURL
         $ch = curl_init();
         // Set options for the cURL transfer
-        curl_setopt($ch, CURLOPT_URL,getEndPoint($endpointName));
+        curl_setopt($ch, CURLOPT_URL, self::getEndPoint($endpointName));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         // Set custom headers
         $headerArray = [];
