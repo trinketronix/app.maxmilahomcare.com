@@ -28,8 +28,7 @@ $loader->setNamespaces([
     'Homecare\Models' => APP_PATH . '/models/',
     // Namespace for controller classes
     'Homecare\Controllers' => APP_PATH . '/controllers/',
-]);
-$loader->register();
+])->register();
 
 // Create a DI
 $di = new FactoryDefault();
