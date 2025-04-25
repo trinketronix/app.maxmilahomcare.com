@@ -7,6 +7,7 @@ use Phalcon\Http\Response;
 use Phalcon\Http\Request;
 use Phalcon\Mvc\Controller;
 use Homecare\Utils\HttpRequest;
+use Homecare\Utils\Endpoint;
 
 class LoginController extends BaseController {
 

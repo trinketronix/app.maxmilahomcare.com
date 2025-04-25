@@ -14,3 +14,4 @@
 .htaccess_prod
 .htaccess_test
 .htaccess_local
+http-client.env.json
