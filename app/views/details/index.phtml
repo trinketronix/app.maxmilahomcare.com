@@ -98,7 +98,7 @@
         var managerId = getManagerId();
         if (managerId) {
             let date = new Date();
-            date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 day from now
+            date.setTime(date.getTime() + (24 * 60 * 60 * 1000)); // 1 day from now
             let expires = "expires=" + date.toUTCString();
             document.cookie = "activateid=" + managerId + "; " + expires + "; path=/";
 
@@ -112,7 +112,7 @@
         var managerId = getManagerId();
         if (managerId) {
             let date = new Date();
-            date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 day from now
+            date.setTime(date.getTime() + (24 * 60 * 60 * 1000)); // 1 day from now
             let expires = "expires=" + date.toUTCString();
             document.cookie = "activateid=" + managerId + "; " + expires + "; path=/";
 
