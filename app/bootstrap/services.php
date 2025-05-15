@@ -29,15 +29,17 @@ if (isset($di)) {
         $view = new View();
         $view->setViewsDir(APP_PATH . '/views/');
 
-        // You could add view engines here if needed, for example:
+        // Register multiple template engines
         $view->registerEngines([
-            '.phtml' => 'Phalcon\Mvc\View\Engine\Php',
-            '.volt' => function ($view, $di) {
+            '.phtml' => \Phalcon\Mvc\View\Engine\Php::class,
+            '.volt' => function ($view) {
+            // We only need $view as parameter and use $di from closure
+                $di = \Phalcon\Di\Di::getDefault();
                 $volt = new \Phalcon\Mvc\View\Engine\Volt($view, $di);
                 $volt->setOptions([
                     'compiledPath' => CACHE_PATH . '/volt/',
                     'compiledSeparator' => '_',
-                    'compileAlways' => getenv('APP_ENV'),
+                    'compileAlways' => getenv('APP_ENV')?:'dev',
                 ]);
                 return $volt;
             }
