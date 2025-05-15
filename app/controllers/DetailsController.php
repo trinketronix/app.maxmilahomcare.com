@@ -34,14 +34,9 @@ class DetailsController extends BaseController {
             // Ensure 'account' endpoint is defined in HttpRequest::ENDPOINTS
             $response = HttpRequest::get(Endpoint::ACCOUNT, $headers, ['id' => $id]);
 
+            $account = $response['data'];
             // Check if data exists and has the right structure
-            if (isset($response['data'])) {
-                // Set the account data for the view
-                $this->view->account = $response['data'];
-//
-//                // For compatibility with the view
-//                $this->view->user = $response['data'];
-            } else {
+            if (!isset($account)) {
                 // No data in response
                 error_log("No data in API response for user ID: " . $id);
                 $this->flashSession->error('Could not load user data. Please try again later.');
@@ -51,8 +46,12 @@ class DetailsController extends BaseController {
             $role = $this->getRole($token);
             $liga = ($role < 2) ? 'main' : 'caregiver';
 
-            $this->view->id = $id;
-            $this->view->liga = $liga;
+
+            $this->view->setVars([
+                'account' => $account,
+                'liga' => $liga,
+                'role' => $role,
+                ]);
 
         } catch (\Exception $e) {
             // Log and display error
