@@ -1,6 +1,6 @@
 <?php
 
-namespace Homecare\utils;
+namespace Homecare\Utils;
 class Endpoint {
     public const REGISTER ='register';
     public const LOGIN ='login';
