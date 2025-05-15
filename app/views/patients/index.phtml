@@ -1,155 +1,150 @@
 <!DOCTYPE html>
-<html>
-<meta charset="UTF-8">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patients</title>
+    <title><?= $pageTitle ?? 'Patients List' ?></title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom CSS for Pink Theme -->
-<head>
-    <title>Patients List</title>
+    <!-- Custom CSS -->
+    <link href="/css/theme.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f8e1f4; /* Light pink background */
-        }
-        .container {
-            max-width: 600px;
-            margin-top: 50px;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            color: #d85b85; /* Pinkish color for header */
-            font-size: 2.5em;
-        }
-        .form-label {
-            color: #333;
-        }
-        .form-control {
-            border-radius: 10px;
-            box-shadow: none;
-        }
-        .btn-primary {
-            background-color: #e74c3c;
-            border-color: #e74c3c;
-        }
-        .btn-primary:hover {
-            background-color: #c0392b;
-            border-color: #c0392b;
-        }
-        .btn-link {
-            color: #e74c3c; /* Red color for "Already have an account" link */
-        }
-        .btn-link:hover {
-            color: #c0392b; /* Darker red on hover */
-        }
-        .d-grid {
-            gap: 15px;
-        }
-        textarea.form-control {
-            border-radius: 10px;
-            box-shadow: none;
-        }
-        .form-control:focus {
-            box-shadow: 0 0 5px rgba(231, 76, 60, 0.7); /* Red focus effect */
-        }
-
-        .list-group-item {
-            background-color: #fce6f5; /* Light pink background for each list item */
-            border: 1px solid #f8e1f4;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            padding: 15px;
-        }
-        .list-group-item:hover {
-            background-color: #f8d1e6; /* Slightly darker pink for hover effect */
-        }
-        .form-control-static {
-            font-size: 1.1em;
-            color: #000;
-        }
-        .list-group-item h5 {
-            color: #d85b85; /* Pinkish color for user names */
-        }
-        .list-group-item p {
-            color: #000;
-        }
-        .list-group-item small {
-            color: #777; /* Muted color for phone numbers */
-        }
-
+        /* Page-specific styles */
         .manager-row {
             display: flex;
             align-items: center;
-            border: 1px solid red;
-            padding: 10px;
-            margin-bottom: 10px;
-            background-color: #fce6f5; /* Light pink background for each list item */
+            justify-content: space-between;
+            border: 1px solid #e74c3c;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #fce6f5;
             border-radius: 10px;
-            
+            flex-wrap: wrap;
         }
+
         .manager-column {
-            margin-right: 20px;
+            margin: 5px;
+            display: flex;
+            align-items: center;
         }
-        .register-btn {
-            padding: 5px 10px;
-            background-color: red;
-            color: white;
-            border: none;
-            cursor: pointer;
+
+        .user-info {
+            flex-grow: 1;
+            margin: 0 10px;
+            font-weight: bold;
+            color: #333;
         }
-        .register-btn:hover {
-            background-color: red;
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
         }
-        .btn-danger:hover {
-        background-color: darkred;
-        color: white;
-    }
+
+        .patient-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .manager-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .user-info {
+                margin: 10px 0;
+                width: 100%;
+            }
+
+            .action-buttons {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
     </style>
 </head>
 <body>
+<div class="container">
+    <h2 class="text-center mb-4"><?= $pageTitle ?? 'Patients List' ?></h2>
 
-<h2 class="text-center mb-4">Patients List</h2>
-<center>        <!-- Back to Previous Page Button -->
-                <button type="button" class="btn btn-danger" onclick="window.history.back();" style="background-color: red; border: none; transition: background-color 0.3s;"><i class="bi bi-arrow-left-circle"></i>Back to Previous Page</button>
-</center>
+    <!-- Flash Messages -->
+    <div class="flash-messages">
+        <?= $this->flashSession->output() ?>
+    </div>
 
-     
+    <!-- Back Button -->
+    <div class="text-center mb-4">
+        <button type="button" class="btn btn-danger" onclick="window.history.back();">
+            <i class="bi bi-arrow-left-circle"></i> Back
+        </button>
+    </div>
 
-    <div id="managers-list">
-        <?php foreach ($managers as $manager): ?>
-            <div class="manager-row">
-                <div class="manager-column">
-                <button class="register-btn" onclick="window.open('https://www.google.com/maps?q=<?php echo $manager['latitude']; ?>,<?php echo $manager['longitude']; ?>')">
-                  <i class="bi bi-geo-alt"></i> <!-- Direction icon -->
-                View Location
-                </button>
+    <!-- No Patients Message -->
+    <?php if (empty($patients)): ?>
+        <div class="alert alert-info text-center">
+            No patients found.
+        </div>
+    <?php endif; ?>
+
+    <!-- Patients List -->
+    <div class="patient-container">
+        <?php foreach ($patients as $index => $patient): ?>
+            <div class="manager-row" data-patient-id="<?= $patient['id'] ?? '' ?>">
+                <!-- Patient Info -->
+                <div class="user-info">
+                    <div><?= htmlspecialchars($patient['lastname'] ?? '') ?> <?= htmlspecialchars($patient['firstname'] ?? '') ?></div>
+                    <div class="text-muted"><?= htmlspecialchars($patient['phone'] ?? '') ?></div>
                 </div>
-               
-                <div class="manager-column">
-                <a href="tel:"<?= $manager['phone'] ?>>
-                    <button class="register-btn">
-                     <i class="bi bi-telephone"></i> <!-- Call icon -->
-                    </button>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <!-- Location Button -->
+                    <?php if (isset($patient['latitude']) && isset($patient['longitude'])): ?>
+                        <button class="btn btn-sm btn-danger" onclick="viewLocation(<?= $patient['latitude'] ?>, <?= $patient['longitude'] ?>)">
+                            <i class="bi bi-geo-alt"></i> Location
+                        </button>
+                    <?php endif; ?>
+
+                    <!-- Call Button -->
+                    <?php if (!empty($patient['phone'])): ?>
+                        <a href="tel:<?= htmlspecialchars($patient['phone']) ?>" class="btn btn-sm btn-danger">
+                            <i class="bi bi-telephone"></i> Call
+                        </a>
+                    <?php endif; ?>
+
+                    <!-- Check-in Button -->
+                    <a href="/patients/visit/<?= $patient['id'] ?? '' ?>" class="btn btn-sm btn-danger">
+                        <i class="bi bi-calendar-check"></i> Check-in
+                    </a>
+
+                    <!-- View Details Button -->
+                    <a href="/patients/view/<?= $patient['id'] ?? '' ?>" class="btn btn-sm btn-danger">
+                        <i class="bi bi-eye"></i> Details
                     </a>
                 </div>
-                <div class="user-info">
-                        <?= $manager['lastname'].' '.$manager['firstname'].' '.$manager['phone'] .'     '?>
-                        <input type="hidden" name="hiddenidpatient" class="form-control" id="hiddenidpatient" value="<?=$manager['id'] ?? ''; ?>">
-                    </div>
-
-                <div a href="/main" class="manager-column">
-                <a href="/visit" button class="register-btn">Check-in</a>
-                 <!--   <button class="register-btn">Check in</a></button>-->
-                </div>
-                
             </div>
         <?php endforeach; ?>
     </div>
-   
+</div>
+
+<!-- JavaScript -->
+<script>
+    // Function to open Google Maps with patient location
+    function viewLocation(latitude, longitude) {
+        if (latitude && longitude) {
+            window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
+        } else {
+            alert('Location information is not available for this patient.');
+        }
+    }
+
+    // Enable all tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize any components that need JavaScript here
+    });
+</script>
 </body>
 </html>

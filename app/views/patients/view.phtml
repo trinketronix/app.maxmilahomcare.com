@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $pageTitle ?? 'Patient Details' ?></title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/theme.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center mb-4">
+        <i class="bi bi-person-badge"></i>
+        <?= htmlspecialchars($patient['firstname'] ?? '') ?> <?= htmlspecialchars($patient['lastname'] ?? '') ?>
+    </h2>
+
+    <!-- Flash Messages -->
+    <div class="flash-messages">
+        <?= $this->flashSession->output() ?>
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center mb-4">
+        <button type="button" class="btn btn-danger" onclick="window.location.href='/patients'">
+            <i class="bi bi-arrow-left-circle"></i> Back to Patients
+        </button>
+    </div>
+
+    <!-- Patient Details Card -->
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">Personal Information</h3>
+        </div>
+        <div class="card-body" style="background-color: #fce6f5;">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="font-weight-bold">Name:</label>
+                    <p><?= htmlspecialchars($patient['firstname'] ?? 'N/A') ?> <?= htmlspecialchars($patient['lastname'] ?? '') ?></p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="font-weight-bold">Phone:</label>
+                    <p><?= htmlspecialchars($patient['phone'] ?? 'N/A') ?></p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="font-weight-bold">Address:</label>
+                    <p><?= htmlspecialchars($patient['address'] ?? 'N/A') ?></p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="font-weight-bold">City:</label>
+                    <p><?= htmlspecialchars($patient['city'] ?? 'N/A') ?></p>
+                </div>
+                <?php if (isset($patient['latitude']) && isset($patient['longitude'])): ?>
+                    <div class="col-md-12 mb-3">
+                        <label class="font-weight-bold">Location:</label>
+                        <div id="map-container" style="height: 300px; border-radius: 10px; margin-top: 10px;">
+                            <img src="https://maps.googleapis.com/maps/api/staticmap?center=<?= $patient['latitude'] ?>,<?= $patient['longitude'] ?>&zoom=14&size=600x300&markers=color:red%7C<?= $patient['latitude'] ?>,<?= $patient['longitude'] ?>&key=YOUR_API_KEY"
+                                 alt="Patient location map"
+                                 style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-2">
+            <a href="tel:<?= htmlspecialchars($patient['phone'] ?? '') ?>" class="btn btn-danger btn-block">
+                <i class="bi bi-telephone"></i> Call Patient
+            </a>
+        </div>
+        <div class="col-md-4 mb-2">
+            <a href="/patients/visit/<?= $patient['id'] ?? '' ?>" class="btn btn-danger btn-block">
+                <i class="bi bi-calendar-check"></i> Register Visit
+            </a>
+        </div>
+        <div class="col-md-4 mb-2">
+            <?php if (isset($patient['latitude']) && isset($patient['longitude'])): ?>
+                <button class="btn btn-danger btn-block" onclick="viewLocation(<?= $patient['latitude'] ?>, <?= $patient['longitude'] ?>)">
+                    <i class="bi bi-geo-alt"></i> View on Maps
+                </button>
+            <?php else: ?>
+                <button class="btn btn-danger btn-block disabled">
+                    <i class="bi bi-geo-alt"></i> No Location
+                </button>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Visit History -->
+    <?php if (isset($patientVisits) && !empty($patientVisits)): ?>
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h3 class="mb-0">Visit History</h3>
+            </div>
+            <div class="card-body" style="background-color: #fce6f5;">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Notes</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($patientVisits as $visit): ?>
+                            <tr>
+                                <td><?= date('M d, Y', strtotime($visit['start_time'])) ?></td>
+                                <td><?= date('h:i A', strtotime($visit['start_time'])) ?></td>
+                                <td><?= date('h:i A', strtotime($visit['end_time'])) ?></td>
+                                <td><?= htmlspecialchars($visit['note'] ?? 'No notes') ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
+
+<!-- JavaScript -->
+<script>
+    // Function to open Google Maps with patient location
+    function viewLocation(latitude, longitude) {
+        if (latitude && longitude) {
+            window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
+        } else {
+            alert('Location information is not available for this patient.');
+        }
+    }
+</script>
+</body>
+</html>
