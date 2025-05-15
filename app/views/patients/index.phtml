@@ -102,7 +102,7 @@
                 <!-- Action Buttons -->
                 <div class="action-buttons">
                     <!-- Location Button -->
-                    <?php if (isset($patient['addresses']['latitude']) && isset($patient['addresses']['longitude'])): ?>
+                    <?php if (isset($patient['addresses'][0]['latitude']) && isset($patient['addresses'][0]['longitude'])): ?>
                         <button class="btn btn-sm btn-danger" onclick="viewLocation(<?= $patient['latitude'] ?>, <?= $patient['longitude'] ?>)">
                             <i class="bi bi-geo-alt"></i> Location
                         </button>
