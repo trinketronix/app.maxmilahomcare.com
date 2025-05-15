@@ -9,22 +9,23 @@ class DetailsController extends BaseController {
         $managers = [
             'username' => 'error'
         ];
-        $token = 'error';
+        //$token = 'error';
         $token = $this->session->get('auth-token');
         $headers=["Authorization" =>$token];
-        $token=$this->session->get('auth-token');
+        //$token=$this->session->get('auth-token');
         $id=$this->getUserId($token);
-        $headers=["Authorization" =>$token];
+        //$headers=["Authorization" =>$token];
         if($token != null) {
             // Test Http Request Get managers
             $getManaResponse = HttpRequest::get('/accounts',$headers);
             //file_put_contents('response_log.txt', print_r($getManaResponse, true));
             //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
-            $managersjson = $getManaResponse['data'];
+            //$managersjson = $getManaResponse['data'];
             //file_put_contents('response2_log.txt', print_r($managersjson, true));
-            $array = $getManaResponse['data'];
-            $accounts = $getManaResponse['data']['accounts'];
-            //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
+            //$array = $getManaResponse['data'];
+            $accounts = $getManaResponse['data']['users'];
+            error_log("Ya llegué ".implode(",",$accounts));
+            //file_put_contents('response_log.txt', print_r($getManaResponse, true));
             //file_put_contents('response3_log.txt', print_r($accounts , true));  
             $this->session->set('auth-token', $token);
             $role=$this->getRole($token);
@@ -36,9 +37,12 @@ class DetailsController extends BaseController {
                     $liga='caregiver';
 
         }
-        $this->view->setVar("managers", $accounts);
+/*        $this->view->setVar("managers", $accounts);
         $this->view->setVar("myid", $id);
         $this->view->setVar("liga",$liga);
-
+*/
+        $this->view->managers = $accounts;
+        $this->view->myid = $id;
+        $this->view->liga = $liga;
     }
 }
