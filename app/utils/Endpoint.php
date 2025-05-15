@@ -16,7 +16,7 @@ class Endpoint {
     public const USER ='accounts';
     public const ACCOUNT ='account';
     public const ACCOUNTS ='accounts';
-    public const PATIENT ='account';
-    public const PATIENTS ='accounts';
+    public const PATIENT ='patient';
+    public const PATIENTS ='patients';
 
 }

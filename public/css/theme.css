@@ -1,0 +1,132 @@
+/* theme.css - Common styles for Homecare application */
+
+/* Base styles */
+body {
+    background-color: #f8e1f4; /* Light pink background */
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    color: #d85b85; /* Pinkish color for headers */
+}
+
+h2 {
+    font-size: 2.2em;
+    margin-bottom: 1em;
+}
+
+/* Form elements */
+.form-control {
+    border-radius: 10px;
+    box-shadow: none;
+    padding: 10px;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.7); /* Red focus effect */
+    border-color: #e74c3c;
+}
+
+.form-label {
+    color: #333;
+    font-weight: 500;
+}
+
+textarea.form-control {
+    border-radius: 10px;
+    min-height: 100px;
+}
+
+/* Buttons */
+.btn-primary, .btn-danger {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+    border-radius: 8px;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover, .btn-danger:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-link {
+    color: #e74c3c;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    color: #c0392b;
+    text-decoration: underline;
+}
+
+/* List items */
+.list-group-item {
+    background-color: #fce6f5;
+    border: 1px solid #f8e1f4;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    padding: 15px;
+    transition: background-color 0.3s;
+}
+
+.list-group-item:hover {
+    background-color: #f8d1e6;
+}
+
+/* Flash messages */
+.flash-messages {
+    margin-bottom: 20px;
+}
+
+.alert {
+    border-radius: 8px;
+    padding: 12px 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    h2 {
+        font-size: 1.8em;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+/* Utility classes */
+.text-danger {
+    color: #e74c3c !important;
+}
+
+.text-muted {
+    color: #777 !important;
+}
+
+.mt-large {
+    margin-top: 40px;
+}
+
+.mb-large {
+    margin-bottom: 40px;
+}
