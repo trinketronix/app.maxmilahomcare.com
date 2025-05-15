@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
+    <title>User Profile</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS for Pink Theme -->
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
+    <!-- Custom CSS for Pink Theme -->
     <style>
         body {
             background-color: #f8e1f4; /* Light pink background */
@@ -23,221 +23,177 @@
         }
         h2 {
             color: #d85b85; /* Pinkish color for header */
+            text-align: center;
+            margin-bottom: 30px;
         }
-        .list-group-item {
-            background-color: #fce6f5; /* Light pink background for each list item */
+        .profile-card {
+            background-color: #fce6f5; /* Light pink background for profile card */
             border: 1px solid #f8e1f4;
             border-radius: 10px;
-            margin-bottom: 10px;
-            padding: 15px;
+            margin-bottom: 20px;
+            padding: 25px;
         }
-        .list-group-item:hover {
+        .profile-card:hover {
             background-color: #f8d1e6; /* Slightly darker pink for hover effect */
+        }
+        .profile-section {
+            margin-bottom: 15px;
+        }
+        .profile-label {
+            font-weight: bold;
+            color: #d85b85; /* Pinkish color for labels */
+            margin-bottom: 5px;
+        }
+        .profile-value {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 15px;
         }
         .btn-primary {
             background-color: #e74c3c;
             border-color: #e74c3c;
+            margin-top: 10px;
         }
         .btn-primary:hover {
             background-color: #c0392b;
             border-color: #c0392b;
         }
-        .form-control-static {
-            font-size: 1.1em;
-            color: #555;
-        }
-        .list-group-item h5 {
-            color: #d85b85; /* Pinkish color for user names */
-        }
-        .list-group-item p {
-            color: #555;
-        }
-        .list-group-item small {
-            color: #777; /* Muted color for phone numbers */
+        .btn-danger {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
         }
         .btn-danger:hover {
             background-color: darkred;
             color: white;
         }
-        .alert {
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        .no-data-message {
+        .flash-message {
             text-align: center;
-            color: #777;
-            font-style: italic;
-            padding: 20px;
-            background-color: #fce6f5;
-            border-radius: 10px;
+            color: red;
             margin-bottom: 20px;
         }
-        .button-container {
+        .actions-container {
             display: grid;
-            grid-gap: 10px;
-            margin-top: 20px;
+            grid-gap: 15px;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- Display flash messages -->
-    <?php if ($this->flashSession->has()): ?>
-        <?php if ($this->flashSession->has('error')): ?>
-            <div class="alert alert-danger">
-                <?php echo $this->flashSession->output('error'); ?>
-            </div>
-        <?php endif; ?>
-        <?php if ($this->flashSession->has('success')): ?>
-            <div class="alert alert-success">
-                <?php echo $this->flashSession->output('success'); ?>
-            </div>
-        <?php endif; ?>
-    <?php endif; ?>
-
-    <h2 class="text-center mb-4">User Profile</h2>
-
-    <div class="list-group mb-4">
-        <?php
-        $foundUser = false;
-
-        // Debug output
-        if (empty($managers)) {
-            echo '<div class="no-data-message">No user data available. This might be due to an API error.</div>';
-        } else {
-            foreach ($managers as $manager):
-                if ($manager['id'] == $myid):
-                    $foundUser = true;
-                    ?>
-                    <div class="list-group-item" data-id="<?= $manager['id'] ?>">
-                        <h4 class="mb-3">Profile Information</h4>
-
-                        <div class="row mb-2">
-                            <div class="col-md-4"><strong>Username:</strong></div>
-                            <div class="col-md-8"><?= isset($manager['username']) ? $manager['username'] : 'N/A' ?></div>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col-md-4"><strong>First Name:</strong></div>
-                            <div class="col-md-8"><?= isset($manager['firstname']) ? $manager['firstname'] : 'N/A' ?></div>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col-md-4"><strong>Last Name:</strong></div>
-                            <div class="col-md-8"><?= isset($manager['lastname']) ? $manager['lastname'] : 'N/A' ?></div>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col-md-4"><strong>Middle Name:</strong></div>
-                            <div class="col-md-8"><?= isset($manager['middlename']) ? $manager['middlename'] : 'N/A' ?></div>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col-md-4"><strong>Birth Date:</strong></div>
-                            <div class="col-md-8"><?= isset($manager['birthdate']) ? $manager['birthdate'] : 'N/A' ?></div>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col-md-4"><strong>Address:</strong></div>
-                            <div class="col-md-8"><?= isset($manager['address']) ? $manager['address'] : 'N/A' ?></div>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col-md-4"><strong>City:</strong></div>
-                            <div class="col-md-8"><?= isset($manager['city']) ? $manager['city'] : 'N/A' ?></div>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col-md-4"><strong>Languages:</strong></div>
-                            <div class="col-md-8"><?= isset($manager['languages']) ? $manager['languages'] : 'N/A' ?></div>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col-md-4"><strong>User ID:</strong></div>
-                            <div class="col-md-8"><?= $manager['id'] ?></div>
-                        </div>
-                    </div>
-                <?php
-                endif;
-            endforeach;
-
-            if (!$foundUser) {
-                echo '<div class="no-data-message">Your user profile could not be found. Your user ID is: ' . $myid . '</div>';
-            }
-        }
-        ?>
+    <h2>My Profile</h2>
+    <!-- Flash Message Display -->
+    <div class="flash-message">
+        <?php echo $this->flashSession->output(); ?>
     </div>
 
-    <div class="button-container">
-        <button type="button" class="btn btn-danger" onclick="window.location.href='<?= $liga ?>';" style="background-color: red; border: none; transition: background-color 0.3s;">
-            <i class="bi bi-arrow-left-circle"></i> Back to Dashboard
+    <?php if (isset($account['data'])): ?>
+        <div class="profile-card" data-id="<?= $id ?>">
+            <div class="profile-section">
+                <div class="profile-label">Username / Email</div>
+                <div class="profile-value"><?= $account['data']['username'] ?? 'Not provided' ?></div>
+            </div>
+
+            <div class="profile-section">
+                <div class="profile-label">First Name</div>
+                <div class="profile-value"><?= $account['data']['firstname'] ?? 'Not provided' ?></div>
+            </div>
+
+            <div class="profile-section">
+                <div class="profile-label">Last Name</div>
+                <div class="profile-value"><?= $account['data']['lastname'] ?? 'Not provided' ?></div>
+            </div>
+
+            <div class="profile-section">
+                <div class="profile-label">Middle Name</div>
+                <div class="profile-value"><?= $account['data']['middlename'] ?? 'Not provided' ?></div>
+            </div>
+
+            <div class="profile-section">
+                <div class="profile-label">Birth Date</div>
+                <div class="profile-value"><?= $account['data']['birthdate'] ?? 'Not provided' ?></div>
+            </div>
+
+            <div class="profile-section">
+                <div class="profile-label">Address</div>
+                <div class="profile-value"><?= $account['data']['address'] ?? 'Not provided' ?></div>
+            </div>
+
+            <div class="profile-section">
+                <div class="profile-label">City</div>
+                <div class="profile-value"><?= $account['data']['city'] ?? 'Not provided' ?></div>
+            </div>
+
+            <div class="profile-section">
+                <div class="profile-label">Phone</div>
+                <div class="profile-value"><?= $account['data']['phone'] ?? 'Not provided' ?></div>
+            </div>
+
+            <div class="profile-section">
+                <div class="profile-label">Languages</div>
+                <div class="profile-value"><?= $account['data']['languages'] ?? 'Not provided' ?></div>
+            </div>
+
+            <?php if (isset($account['data']['service_provider_code'])): ?>
+                <div class="profile-section">
+                    <div class="profile-label">Service Provider Code</div>
+                    <div class="profile-value"><?= $account['data']['service_provider_code'] ?></div>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <div class="actions-container">
+            <!-- Back Button -->
+            <button type="button" class="btn btn-danger" onclick="window.location.href='/<?= $liga ?>'">
+                <i class="bi bi-arrow-left-circle"></i> Back to Menu
+            </button>
+
+            <!-- Update Profile Button -->
+            <button type="button" class="btn btn-primary" onclick="setManagerIdAndRedirect()">
+                <i class="bi bi-pencil-square"></i> Update Profile
+            </button>
+
+            <!-- Change Password Button -->
+            <button type="button" class="btn btn-primary" onclick="window.location.href='/forgot'">
+                <i class="bi bi-key"></i> Change Password
+            </button>
+
+            <!-- Logout Button -->
+            <button type="button" class="btn btn-primary" onclick="window.location.href='/logout'">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    <?php else: ?>
+        <div class="alert alert-danger">
+            No profile data available. Please try again later or contact support.
+        </div>
+        <button type="button" class="btn btn-danger" onclick="window.location.href='/<?= $liga ?>'">
+            <i class="bi bi-arrow-left-circle"></i> Back to Menu
         </button>
-
-        <?php if ($foundUser): ?>
-            <button type="button" class="btn btn-primary" onclick="setManagerIdAndUpdate()">Update Profile</button>
-            <button type="button" class="btn btn-primary" onclick="setManagerIdAndRole()">Change Role</button>
-        <?php endif; ?>
-    </div>
+    <?php endif; ?>
 </div>
 
-<!-- Bootstrap JS and dependencies -->
+<!-- JavaScript for handling the update redirect -->
 <script>
-    function setManagerIdAndUpdate() {
-        var managerId = getManagerId();
+    function setManagerIdAndRedirect() {
+        let managerId = <?= $id ?>;
+
         if (managerId) {
+            // Store ID in cookie for the update page to use
             let date = new Date();
-            date.setTime(date.getTime() + (24 * 60 * 60 * 1000)); // 1 day from now
+            date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 day from now
             let expires = "expires=" + date.toUTCString();
             document.cookie = "activateid=" + managerId + "; " + expires + "; path=/";
 
+            // Redirect to update page
             window.location.href = "/userupdate";
         } else {
-            console.error("Manager ID not found!");
-            alert("Could not determine your user ID. Please try again later.");
+            console.error("Profile ID not found!");
+            alert("Profile ID not found. Unable to update profile.");
         }
     }
-
-    function setManagerIdAndRole() {
-        var managerId = getManagerId();
-        if (managerId) {
-            let date = new Date();
-            date.setTime(date.getTime() + (24 * 60 * 60 * 1000)); // 1 day from now
-            let expires = "expires=" + date.toUTCString();
-            document.cookie = "activateid=" + managerId + "; " + expires + "; path=/";
-
-            window.location.href = "/changerole";
-        } else {
-            console.error("Manager ID not found!");
-            alert("Could not determine your user ID. Please try again later.");
-        }
-    }
-
-    function getManagerId() {
-        // Get the manager ID from the list item with the data-id attribute
-        var managerRow = document.querySelector('.list-group-item');
-        if (managerRow) {
-            return managerRow.getAttribute("data-id");
-        }
-
-        // Fallback: directly use the myid from PHP
-        return "<?= $myid ?>";
-    }
-
-    // If there are flash messages, automatically hide them after 5 seconds
-    document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            setTimeout(function() {
-                alert.style.opacity = '0';
-                alert.style.transition = 'opacity 0.5s';
-                setTimeout(function() {
-                    alert.remove();
-                }, 500);
-            }, 5000);
-        });
-    });
 </script>
 
+<!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
