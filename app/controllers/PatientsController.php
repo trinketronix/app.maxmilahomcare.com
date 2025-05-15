@@ -3,6 +3,7 @@
 namespace Homecare\Controllers;
 
 use Exception;
+use Homecare\Utils\Endpoint;
 use Phalcon\Http\Response;
 use Homecare\Utils\HttpRequest;
 
@@ -83,22 +84,22 @@ class PatientsController extends BaseController
 
         try {
             // Fetch patient details - make sure the 'patient' endpoint is properly defined
-            $response = HttpRequest::get('patient', $headers, ['id' => $id]);
+            $response = HttpRequest::get(Endpoint::PATIENT, $headers, ['id' => $id]);
 
             if (isset($response['data'])) {
                 $this->view->patient = $response['data'];
                 $this->view->pageTitle = "Patient Details";
 
                 // Try to fetch patient visits if available
-                try {
-                    $visitsResponse = HttpRequest::get('patient_visits', $headers, ['patient_id' => $id]);
-                    if (isset($visitsResponse['data'])) {
-                        $this->view->patientVisits = $visitsResponse['data'];
-                    }
-                } catch (Exception $e) {
-                    // Just log this error but continue showing patient details
-                    error_log("Error fetching patient visits: " . $e->getMessage());
-                }
+//                try {
+//                    $visitsResponse = HttpRequest::get('patient_visits', $headers, ['patient_id' => $id]);
+//                    if (isset($visitsResponse['data'])) {
+//                        $this->view->patientVisits = $visitsResponse['data'];
+//                    }
+//                } catch (Exception $e) {
+//                    // Just log this error but continue showing patient details
+//                    error_log("Error fetching patient visits: " . $e->getMessage());
+//                }
             } else {
                 $this->flashSession->warning('Patient details not found');
                 return $this->response->redirect('patients');
