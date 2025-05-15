@@ -49,6 +49,31 @@
             padding: 20px;
         }
 
+        /* Responsive button text hiding */
+        @media (max-width: 576px) {
+            .btn-sm .button-text {
+                display: none;
+            }
+
+            .btn-sm {
+                padding: 0.25rem 0.5rem;
+                margin-right: 5px;
+                min-width: 34px;
+                height: 34px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .action-buttons {
+                gap: 5px;
+            }
+
+            .dropdown-toggle::after {
+                display: none;
+            }
+        }
+
         @media (max-width: 768px) {
             .manager-row {
                 flex-direction: column;
@@ -79,7 +104,7 @@
     <!-- Back Button -->
     <div class="text-center mb-4">
         <button type="button" class="btn btn-danger" onclick="window.history.back();">
-            <i class="bi bi-arrow-left-circle"></i> Back
+            <i class="bi bi-arrow-left-circle"></i> <span class="button-text">Back</span>
         </button>
     </div>
 
@@ -121,13 +146,13 @@
                         isset($patient['addresses'][0]['latitude']) &&
                         isset($patient['addresses'][0]['longitude'])): ?>
                         <button class="btn btn-sm btn-danger" onclick="viewLocation(<?= $patient['addresses'][0]['latitude'] ?>, <?= $patient['addresses'][0]['longitude'] ?>)">
-                            <i class="bi bi-geo-alt"></i> Location
+                            <i class="bi bi-geo-alt"></i> <span class="button-text">Location</span>
                         </button>
                     <?php elseif (isset($patient['addresses']) && count($patient['addresses']) > 1): ?>
                         <!-- Dropdown for multiple addresses -->
                         <div class="dropdown">
                             <button class="btn btn-sm btn-danger dropdown-toggle" type="button" id="locationDropdown<?= $patient['id'] ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="bi bi-geo-alt"></i> Locations (<?= count($patient['addresses']) ?>)
+                                <i class="bi bi-geo-alt"></i> <span class="button-text">Locations (<?= count($patient['addresses']) ?>)</span>
                             </button>
                             <div class="dropdown-menu" aria-labelledby="locationDropdown<?= $patient['id'] ?>">
                                 <?php foreach ($patient['addresses'] as $index => $address): ?>
@@ -144,25 +169,25 @@
                     <?php else: ?>
                         <!-- No location available -->
                         <button class="btn btn-sm btn-secondary" disabled>
-                            <i class="bi bi-geo-alt"></i> No Location
+                            <i class="bi bi-geo-alt"></i> <span class="button-text">No Location</span>
                         </button>
                     <?php endif; ?>
 
                     <!-- Call Button -->
                     <?php if (!empty($patient['phone'])): ?>
                         <a href="tel:<?= htmlspecialchars($patient['phone']) ?>" class="btn btn-sm btn-danger">
-                            <i class="bi bi-telephone"></i> Call
+                            <i class="bi bi-telephone"></i> <span class="button-text">Call</span>
                         </a>
                     <?php endif; ?>
 
                     <!-- Check-in Button -->
                     <a href="/patients/visit/<?= $patient['id'] ?? '' ?>" class="btn btn-sm btn-danger">
-                        <i class="bi bi-calendar-check"></i> Check-in
+                        <i class="bi bi-calendar-check"></i> <span class="button-text">Check-in</span>
                     </a>
 
                     <!-- View Details Button -->
                     <a href="/patients/view/<?= $patient['id'] ?? '' ?>" class="btn btn-sm btn-danger">
-                        <i class="bi bi-eye"></i> Details
+                        <i class="bi bi-eye"></i> <span class="button-text">Details</span>
                     </a>
                 </div>
             </div>
