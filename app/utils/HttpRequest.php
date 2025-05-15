@@ -13,6 +13,8 @@ class HttpRequest{
     private const ENDPOINTS = [
         'register'=>'/auth/register',
         'login'=>'/auth/login',
+        'account'=>'/account/',
+        'accounts'=>'/accounts/',
         'activateAccount'=>'/auth/activate/account',
         'renewToken'=>'/auth/renewtoken',
         'changeRole'=>'/auth/changerole',
@@ -145,11 +147,15 @@ class HttpRequest{
      * @throws Exception
      * GET Request
      */
-    public static function get(string $endpointName, array $headers = []): array {
+    public static function get(string $endpointName, ?string $values = null, array $headers = []): array {
         // Initialize cURL
         $ch = curl_init();
         // Set options for the cURL transfer
-        curl_setopt($ch, CURLOPT_URL, self::getEndPoint($endpointName));
+        $urlEndPoint = "";
+        if(is_null($values)) $urlEndPoint = self::getEndPoint($endpointName);
+        else $urlEndPoint = self::getEndPoint($endpointName) . '/' . $values;
+        $urlEndPoint = self::getEndPoint($endpointName);
+        curl_setopt($ch, CURLOPT_URL, $urlEndPoint);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         // Set custom headers
         $headerArray = [];
