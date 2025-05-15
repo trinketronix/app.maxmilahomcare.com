@@ -31,7 +31,7 @@ class DetailsController extends BaseController {
 
         try {
             // Make API request
-            $account = HttpRequest::get(Endpoint::ACCOUNT.'/'.$id, $headers);
+            $account = HttpRequest::get(Endpoint::ACCOUNT, $id, $headers);
 
             // Check if data exists and has the right structure
             if (isset($account['data'])) {
