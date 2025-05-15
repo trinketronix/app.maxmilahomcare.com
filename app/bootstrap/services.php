@@ -9,18 +9,8 @@ use Phalcon\Mvc\View;
 use Phalcon\Mvc\Url;
 use Phalcon\Session\Manager;
 use Phalcon\Session\Adapter\Stream;
-use Phalcon\Flash\Direct as FlashDirect;
-use Phalcon\Flash\Session as FlashSession;
 use Phalcon\Cache\Adapter\Stream as CacheStream;
 use Phalcon\Storage\SerializerFactory;
-
-// Common flash message styles
-$flashMessageStyles = [
-    'error'   => 'alert alert-danger',
-    'success' => 'alert alert-success',
-    'notice'  => 'alert alert-info',
-    'warning' => 'alert alert-warning',
-];
 
 if (isset($di)) {
 
@@ -67,14 +57,42 @@ if (isset($di)) {
         return $session;
     });
 
-    // Setup the flash service
-    $di->set('flash', function () use ($flashMessageStyles) {
-        return new FlashDirect($flashMessageStyles);
+    // Fixed version:
+    $di->set('flash', function () {
+        // Create an escaper instance first
+        $escaper = new \Phalcon\Html\Escaper();
+
+        // Pass the escaper to the Flash service constructor
+        $flash = new \Phalcon\Flash\Direct($escaper);
+
+        // Set custom CSS classes for messages
+        $flash->setCssClasses([
+            'error'   => 'alert alert-danger',
+            'success' => 'alert alert-success',
+            'notice'  => 'alert alert-info',
+            'warning' => 'alert alert-warning',
+        ]);
+
+        return $flash;
     });
 
-    // Setup flash session service for persistent messages
-    $di->set('flashSession', function () use ($flashMessageStyles) {
-        return new FlashSession($flashMessageStyles);
+// Also fix the flashSession service similarly
+    $di->set('flashSession', function () {
+        // Create an escaper instance first
+        $escaper = new \Phalcon\Html\Escaper();
+
+        // Create the Flash Session service with the escaper
+        $flash = new \Phalcon\Flash\Session($escaper);
+
+        // Set custom CSS classes for messages
+        $flash->setCssClasses([
+            'error'   => 'alert alert-danger',
+            'success' => 'alert alert-success',
+            'notice'  => 'alert alert-info',
+            'warning' => 'alert alert-warning',
+        ]);
+
+        return $flash;
     });
 
     // Create a cache factory to be reused
