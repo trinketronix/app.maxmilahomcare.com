@@ -86,57 +86,57 @@
         <?php echo $this->flashSession->output(); ?>
     </div>
 
-    <?php if (isset($account['data'])): ?>
-        <div class="profile-card" data-id="<?= $account['data']['id'] ?>">
+    <?php if (isset($account)): ?>
+        <div class="profile-card" data-id="<?= $account['id'] ?>">
             <div class="profile-section">
                 <div class="profile-label">Username / Email</div>
-                <div class="profile-value"><?= $account['data']['username'] ?? 'Not provided' ?></div>
+                <div class="profile-value"><?= $account['username'] ?? 'Not provided' ?></div>
             </div>
 
             <div class="profile-section">
                 <div class="profile-label">First Name</div>
-                <div class="profile-value"><?= $account['data']['firstname'] ?? 'Not provided' ?></div>
+                <div class="profile-value"><?= $account['firstname'] ?? 'Not provided' ?></div>
             </div>
 
             <div class="profile-section">
                 <div class="profile-label">Last Name</div>
-                <div class="profile-value"><?= $account['data']['lastname'] ?? 'Not provided' ?></div>
+                <div class="profile-value"><?= $account['lastname'] ?? 'Not provided' ?></div>
             </div>
 
             <div class="profile-section">
                 <div class="profile-label">Middle Name</div>
-                <div class="profile-value"><?= $account['data']['middlename'] ?? 'Not provided' ?></div>
+                <div class="profile-value"><?= $account['middlename'] ?? 'Not provided' ?></div>
             </div>
 
             <div class="profile-section">
                 <div class="profile-label">Birth Date</div>
-                <div class="profile-value"><?= $account['data']['birthdate'] ?? 'Not provided' ?></div>
+                <div class="profile-value"><?= $account['birthdate'] ?? 'Not provided' ?></div>
             </div>
 
             <div class="profile-section">
                 <div class="profile-label">Address</div>
-                <div class="profile-value"><?= $account['data']['address'] ?? 'Not provided' ?></div>
+                <div class="profile-value"><?= $account['address'] ?? 'Not provided' ?></div>
             </div>
 
             <div class="profile-section">
                 <div class="profile-label">City</div>
-                <div class="profile-value"><?= $account['data']['city'] ?? 'Not provided' ?></div>
+                <div class="profile-value"><?= $account['city'] ?? 'Not provided' ?></div>
             </div>
 
             <div class="profile-section">
                 <div class="profile-label">Phone</div>
-                <div class="profile-value"><?= $account['data']['phone'] ?? 'Not provided' ?></div>
+                <div class="profile-value"><?= $account['phone'] ?? 'Not provided' ?></div>
             </div>
 
             <div class="profile-section">
                 <div class="profile-label">Languages</div>
-                <div class="profile-value"><?= $account['data']['languages'] ?? 'Not provided' ?></div>
+                <div class="profile-value"><?= $account['languages'] ?? 'Not provided' ?></div>
             </div>
 
-            <?php if (isset($account['data']['code'])): ?>
+            <?php if (isset($account['code'])): ?>
                 <div class="profile-section">
                     <div class="profile-label">Service Provider Code</div>
-                    <div class="profile-value"><?= $account['data']['code'] ?></div>
+                    <div class="profile-value"><?= $account['code'] ?></div>
                 </div>
             <?php endif; ?>
         </div>
