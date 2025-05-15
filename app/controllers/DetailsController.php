@@ -37,8 +37,6 @@ class DetailsController extends BaseController {
             if (isset($account['data'])) {
                 // Also set as direct properties for compatibility
                 $this->view->account = $account;
-                $this->view->id = $id;
-                $this->view->liga = $liga;
 
             } else {
                 // No data in response
@@ -50,11 +48,13 @@ class DetailsController extends BaseController {
             $role = $this->getRole($token);
             $liga = ($role < 2) ? 'main' : 'caregiver';
 
+            $this->view->id = $id;
+            $this->view->liga = $liga;
+
         } catch (\Exception $e) {
             // Log and display error
             error_log("Error in DetailsController: " . $e->getMessage());
             $this->flashSession->error('An error occurred while loading profile data: ' . $e->getMessage());
         }
-
     }
 }

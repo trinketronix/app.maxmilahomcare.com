@@ -87,7 +87,7 @@
     </div>
 
     <?php if (isset($account['data'])): ?>
-        <div class="profile-card" data-id="<?= $id ?>">
+        <div class="profile-card" data-id="<?= $account['data']['id'] ?>">
             <div class="profile-section">
                 <div class="profile-label">Username / Email</div>
                 <div class="profile-value"><?= $account['data']['username'] ?? 'Not provided' ?></div>
@@ -133,10 +133,10 @@
                 <div class="profile-value"><?= $account['data']['languages'] ?? 'Not provided' ?></div>
             </div>
 
-            <?php if (isset($account['data']['service_provider_code'])): ?>
+            <?php if (isset($account['data']['code'])): ?>
                 <div class="profile-section">
                     <div class="profile-label">Service Provider Code</div>
-                    <div class="profile-value"><?= $account['data']['service_provider_code'] ?></div>
+                    <div class="profile-value"><?= $account['data']['code'] ?></div>
                 </div>
             <?php endif; ?>
         </div>
