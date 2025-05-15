@@ -47,6 +47,7 @@ class DetailsController extends BaseController {
             $liga = ($role < 2) ? 'main' : 'caregiver';
 
             $this->view->setVars([
+                'id' => $id,
                 'account' => $account,
                 'liga' => $liga,
                 'role' => $role,
