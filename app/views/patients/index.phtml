@@ -40,6 +40,7 @@
         .action-buttons {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .patient-container {
@@ -95,16 +96,55 @@
             <div class="manager-row" data-patient-id="<?= $patient['id'] ?? '' ?>">
                 <!-- Patient Info -->
                 <div class="user-info">
-                    <div><?= htmlspecialchars($patient['lastname'] ?? '') ?> <?= htmlspecialchars($patient['firstname'] ?? '') ?></div>
-                    <div class="text-muted"><?= htmlspecialchars($patient['phone'] ?? '') ?></div>
+                    <div>
+                        <?= htmlspecialchars($patient['lastname'] ?? '') ?>
+                        <?= htmlspecialchars($patient['firstname'] ?? '') ?>
+                        <?php if (!empty($patient['patient'])): ?>
+                            <small class="text-muted">(<?= htmlspecialchars($patient['patient']) ?>)</small>
+                        <?php endif; ?>
+                    </div>
+                    <?php if (!empty($patient['phone'])): ?>
+                        <div class="text-muted"><?= htmlspecialchars($patient['phone'] ?? '') ?></div>
+                    <?php endif; ?>
+                    <?php if (isset($patient['addresses']) && !empty($patient['addresses'])): ?>
+                        <div class="small text-muted">
+                            <?= htmlspecialchars($patient['addresses'][0]['address'] ?? '') ?>,
+                            <?= htmlspecialchars($patient['addresses'][0]['city'] ?? '') ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="action-buttons">
                     <!-- Location Button -->
-                    <?php if (isset($patient['addresses'][0]['latitude']) && isset($patient['addresses'][0]['longitude'])): ?>
-                        <button class="btn btn-sm btn-danger" onclick="viewLocation(<?= $patient['latitude'] ?>, <?= $patient['longitude'] ?>)">
+                    <?php if (isset($patient['addresses']) && !empty($patient['addresses']) &&
+                        isset($patient['addresses'][0]['latitude']) &&
+                        isset($patient['addresses'][0]['longitude'])): ?>
+                        <button class="btn btn-sm btn-danger" onclick="viewLocation(<?= $patient['addresses'][0]['latitude'] ?>, <?= $patient['addresses'][0]['longitude'] ?>)">
                             <i class="bi bi-geo-alt"></i> Location
+                        </button>
+                    <?php elseif (isset($patient['addresses']) && count($patient['addresses']) > 1): ?>
+                        <!-- Dropdown for multiple addresses -->
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-danger dropdown-toggle" type="button" id="locationDropdown<?= $patient['id'] ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="bi bi-geo-alt"></i> Locations (<?= count($patient['addresses']) ?>)
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="locationDropdown<?= $patient['id'] ?>">
+                                <?php foreach ($patient['addresses'] as $index => $address): ?>
+                                    <?php if (isset($address['latitude']) && isset($address['longitude'])): ?>
+                                        <a class="dropdown-item" href="#" onclick="viewLocation(<?= $address['latitude'] ?>, <?= $address['longitude'] ?>); return false;">
+                                            <?= htmlspecialchars($address['type'] ?? 'Address ' . ($index + 1)) ?>:
+                                            <?= htmlspecialchars($address['city'] ?? '') ?>,
+                                            <?= htmlspecialchars($address['state'] ?? '') ?>
+                                        </a>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <!-- No location available -->
+                        <button class="btn btn-sm btn-secondary" disabled>
+                            <i class="bi bi-geo-alt"></i> No Location
                         </button>
                     <?php endif; ?>
 
@@ -130,21 +170,35 @@
     </div>
 </div>
 
-<!-- JavaScript -->
+<!-- Bootstrap JS (needed for dropdown) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- JavaScript for location viewing -->
 <script>
     // Function to open Google Maps with patient location
     function viewLocation(latitude, longitude) {
         if (latitude && longitude) {
-            window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
+            // Check if device is mobile
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (isMobile) {
+                // Open in native maps app on mobile
+                window.open(`geo:${latitude},${longitude}?q=${latitude},${longitude}`, '_system');
+
+                // Fallback to Google Maps if the geo URI doesn't work
+                setTimeout(function() {
+                    window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
+                }, 500);
+            } else {
+                // Open Google Maps in browser
+                window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
+            }
         } else {
-            alert('Location information is not available for this patient.');
+            alert('Location information is not available for this address.');
         }
     }
-
-    // Enable all tooltips
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize any components that need JavaScript here
-    });
 </script>
 </body>
 </html>
