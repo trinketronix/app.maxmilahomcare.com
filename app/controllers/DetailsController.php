@@ -1,7 +1,7 @@
 <?php
 
 namespace Homecare\Controllers;
-use Homecare\utils\Endpoint;
+use Homecare\Utils\Endpoint;
 use Homecare\Utils\HttpRequest;
 
 /**
