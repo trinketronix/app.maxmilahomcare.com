@@ -3,7 +3,6 @@
 namespace Homecare\Controllers;
 
 use Exception;
-use Homecare\Utils\Endpoint;
 use Phalcon\Http\Response;
 use Homecare\Utils\HttpRequest;
 
@@ -19,7 +18,8 @@ class PatientsController extends BaseController
      *
      * @return void
      */
-    public function indexAction() {
+    public function indexAction()
+    {
         // Check authentication
         $token = $this->session->get('auth-token');
         if (!$token) {
@@ -35,7 +35,7 @@ class PatientsController extends BaseController
             $patients = [];
 
             // Fetch patients data
-            $response = HttpRequest::get(Endpoint::PATIENTS, $headers);
+            $response = HttpRequest::get('patients', $headers);
 
             // Process response
             if (isset($response['data'])) {
@@ -46,8 +46,8 @@ class PatientsController extends BaseController
             }
 
             // Set view variables
-            $this->view->setVar("patients", $patients);
-            $this->view->setVar("pageTitle", "Patients List");
+            $this->view->patients = $patients;
+            $this->view->pageTitle = "Patients List";
 
         } catch (Exception $e) {
             // Log error and display user-friendly message
@@ -59,10 +59,13 @@ class PatientsController extends BaseController
     /**
      * View a single patient's details
      *
-     * @param int $id Patient ID
      * @return void
      */
-    public function viewAction($id = null) {
+    public function viewAction()
+    {
+        // Get patient ID from route parameter
+        $id = $this->dispatcher->getParam('id');
+
         // Validate ID
         if (!$id) {
             $this->flashSession->error('Patient ID is required');
@@ -79,12 +82,23 @@ class PatientsController extends BaseController
         $headers = ["Authorization" => $token];
 
         try {
-            // Fetch patient details
+            // Fetch patient details - make sure the 'patient' endpoint is properly defined
             $response = HttpRequest::get('patient', $headers, ['id' => $id]);
 
             if (isset($response['data'])) {
-                $this->view->setVar("patient", $response['data']);
-                $this->view->setVar("pageTitle", "Patient Details");
+                $this->view->patient = $response['data'];
+                $this->view->pageTitle = "Patient Details";
+
+                // Try to fetch patient visits if available
+                try {
+                    $visitsResponse = HttpRequest::get('patient_visits', $headers, ['patient_id' => $id]);
+                    if (isset($visitsResponse['data'])) {
+                        $this->view->patientVisits = $visitsResponse['data'];
+                    }
+                } catch (Exception $e) {
+                    // Just log this error but continue showing patient details
+                    error_log("Error fetching patient visits: " . $e->getMessage());
+                }
             } else {
                 $this->flashSession->warning('Patient details not found');
                 return $this->response->redirect('patients');
@@ -100,16 +114,19 @@ class PatientsController extends BaseController
     /**
      * Register a visit for a patient
      *
-     * @param int $id Patient ID
      * @return void
      */
-    public function visitAction($id = null) {
+    public function visitAction()
+    {
+        // Get patient ID from route parameter
+        $id = $this->dispatcher->getParam('id');
+
         if (!$id) {
             $this->flashSession->error('Patient ID is required');
             return $this->response->redirect('patients');
         }
 
-        // Store patient ID in cookie or session for the visit form
+        // Store patient ID in cookie for the visit form
         $this->cookies->set('patient_id', $id, time() + 86400);
 
         // Redirect to visit registration page

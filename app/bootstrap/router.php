@@ -42,6 +42,19 @@ if (isset($di)) {
             ], $route));
         }
 
+        // Add these route definitions to your existing router setup
+        $router->add('/patients/view/{id}', [
+            'namespace'  => 'Homecare\Controllers',
+            'controller' => 'patients',
+            'action'     => 'view'
+        ]);
+
+        $router->add('/patients/visit/{id}', [
+            'namespace'  => 'Homecare\Controllers',
+            'controller' => 'patients',
+            'action'     => 'visit'
+        ]);
+
         // Set the 404 not found page
         $router->notFound([
             'namespace'  => 'Homecare\Controllers',

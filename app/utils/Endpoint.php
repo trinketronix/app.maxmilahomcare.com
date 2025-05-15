@@ -18,5 +18,6 @@ class Endpoint {
     public const ACCOUNTS ='accounts';
     public const PATIENT ='patient';
     public const PATIENTS ='patients';
+    public const PATIENT_VISITS ='patient_visits';
 
 }
