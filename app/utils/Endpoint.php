@@ -4,6 +4,8 @@ namespace Homecare\utils;
 class Endpoint {
     public const REGISTER ='register';
     public const LOGIN ='login';
+    public const ACCOUNT ='account';
+    public const ACCOUNTS ='accounts';
     public const ACTIVATE_ACOUNT ='activateAccount';
     public const RENEW_TOKEN ='renewToken';
     public const CHANGE_ROLE ='changeRole';
