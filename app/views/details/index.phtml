@@ -59,36 +59,124 @@
             background-color: darkred;
             color: white;
         }
+        .alert {
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .no-data-message {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+            padding: 20px;
+            background-color: #fce6f5;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .button-container {
+            display: grid;
+            grid-gap: 10px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
+    <!-- Display flash messages -->
+    <?php if ($this->flashSession->has()): ?>
+        <?php if ($this->flashSession->has('error')): ?>
+            <div class="alert alert-danger">
+                <?php echo $this->flashSession->output('error'); ?>
+            </div>
+        <?php endif; ?>
+        <?php if ($this->flashSession->has('success')): ?>
+            <div class="alert alert-success">
+                <?php echo $this->flashSession->output('success'); ?>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
+
+    <h2 class="text-center mb-4">User Profile</h2>
+
     <div class="list-group mb-4">
-        <?php foreach ($managers as $manager): ?>
-            <?php if ($manager['id'] == $myid): ?>
-                <div class="list-group-item" data-id="<?= $manager['id'] ?>">
-                    <h4 class="mb-1">Profiles</h4>
-                    <h5 class="mb-1"><?= $manager['username'] ?></h5>
-                    <p class="mb-1"><?= $manager['firstname'] ?></p>
-                    <p class="mb-1"><?= $manager['lastname'] ?></p>
-                    <p class="mb-1"><?= $manager['middlename'] ?></p>
-                    <p class="mb-1"><?= $manager['birthdate'] ?></p>
-                    <p class="mb-1"><?= $manager['address'] ?></p>
-                    <p class="mb-1"><?= $manager['city'] ?></p>
-                    <p class="mb-1"><?= $manager['languages'] ?></p>
-                </div>
-            <?php endif; ?>    
-        <?php endforeach; ?>
+        <?php
+        $foundUser = false;
+
+        // Debug output
+        if (empty($managers)) {
+            echo '<div class="no-data-message">No user data available. This might be due to an API error.</div>';
+        } else {
+            foreach ($managers as $manager):
+                if ($manager['id'] == $myid):
+                    $foundUser = true;
+                    ?>
+                    <div class="list-group-item" data-id="<?= $manager['id'] ?>">
+                        <h4 class="mb-3">Profile Information</h4>
+
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Username:</strong></div>
+                            <div class="col-md-8"><?= isset($manager['username']) ? $manager['username'] : 'N/A' ?></div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>First Name:</strong></div>
+                            <div class="col-md-8"><?= isset($manager['firstname']) ? $manager['firstname'] : 'N/A' ?></div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Last Name:</strong></div>
+                            <div class="col-md-8"><?= isset($manager['lastname']) ? $manager['lastname'] : 'N/A' ?></div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Middle Name:</strong></div>
+                            <div class="col-md-8"><?= isset($manager['middlename']) ? $manager['middlename'] : 'N/A' ?></div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Birth Date:</strong></div>
+                            <div class="col-md-8"><?= isset($manager['birthdate']) ? $manager['birthdate'] : 'N/A' ?></div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Address:</strong></div>
+                            <div class="col-md-8"><?= isset($manager['address']) ? $manager['address'] : 'N/A' ?></div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>City:</strong></div>
+                            <div class="col-md-8"><?= isset($manager['city']) ? $manager['city'] : 'N/A' ?></div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>Languages:</strong></div>
+                            <div class="col-md-8"><?= isset($manager['languages']) ? $manager['languages'] : 'N/A' ?></div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-4"><strong>User ID:</strong></div>
+                            <div class="col-md-8"><?= $manager['id'] ?></div>
+                        </div>
+                    </div>
+                <?php
+                endif;
+            endforeach;
+
+            if (!$foundUser) {
+                echo '<div class="no-data-message">Your user profile could not be found. Your user ID is: ' . $myid . '</div>';
+            }
+        }
+        ?>
     </div>
 
-    <hr>
-
-    <div class="d-grid">
-        <button type="button" class="btn btn-danger" onclick="window.history.back();" style="background-color: red; border: none; transition: background-color 0.3s;">
-            <i class="bi bi-arrow-left-circle"></i> Back to Previous Page
+    <div class="button-container">
+        <button type="button" class="btn btn-danger" onclick="window.location.href='<?= $liga ?>';" style="background-color: red; border: none; transition: background-color 0.3s;">
+            <i class="bi bi-arrow-left-circle"></i> Back to Dashboard
         </button>
-        <button type="button" class="btn btn-primary" onclick="setManagerIdAndUpdate()">Update</button>
-        <button type="button" class="btn btn-primary" onclick="setManagerIdAndRole()">Role</button>
+
+        <?php if ($foundUser): ?>
+            <button type="button" class="btn btn-primary" onclick="setManagerIdAndUpdate()">Update Profile</button>
+            <button type="button" class="btn btn-primary" onclick="setManagerIdAndRole()">Change Role</button>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -105,6 +193,7 @@
             window.location.href = "/userupdate";
         } else {
             console.error("Manager ID not found!");
+            alert("Could not determine your user ID. Please try again later.");
         }
     }
 
@@ -119,6 +208,7 @@
             window.location.href = "/changerole";
         } else {
             console.error("Manager ID not found!");
+            alert("Could not determine your user ID. Please try again later.");
         }
     }
 
@@ -128,12 +218,24 @@
         if (managerRow) {
             return managerRow.getAttribute("data-id");
         }
-        return null;
+
+        // Fallback: directly use the myid from PHP
+        return "<?= $myid ?>";
     }
 
-    
-    
-
+    // If there are flash messages, automatically hide them after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                alert.style.opacity = '0';
+                alert.style.transition = 'opacity 0.5s';
+                setTimeout(function() {
+                    alert.remove();
+                }, 500);
+            }, 5000);
+        });
+    });
 </script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
