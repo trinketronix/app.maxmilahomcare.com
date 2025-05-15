@@ -34,7 +34,6 @@ class DetailsController extends BaseController {
             // Ensure 'account' endpoint is defined in HttpRequest::ENDPOINTS
             $response = HttpRequest::get(Endpoint::ACCOUNT, $headers, ['id' => $id]);
 
-            error_log(implode($response));
             // Check if data exists and has the right structure
             if (isset($response['data'])) {
                 // Set the account data for the view
