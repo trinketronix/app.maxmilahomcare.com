@@ -30,17 +30,20 @@ class DetailsController extends BaseController {
         $headers = ["Authorization" => $token];
 
         try {
-            // Make API request
-            $account = HttpRequest::get(Endpoint::ACCOUNT, $headers, ['id' => $id]);
+            // Make API request using the updated HttpRequest class with URL parameters
+            // Ensure 'account' endpoint is defined in HttpRequest::ENDPOINTS
+            $response = HttpRequest::get(Endpoint::ACCOUNT, $headers, ['id' => $id]);
 
             // Check if data exists and has the right structure
-            if (isset($account['data'])) {
-                // Also set as direct properties for compatibility
-                $this->view->account = $account;
-
+            if (isset($response['data'])) {
+                // Set the account data for the view
+                $this->view->account = $response['data'];
+//
+//                // For compatibility with the view
+//                $this->view->user = $response['data'];
             } else {
                 // No data in response
-                error_log("No data in API response");
+                error_log("No data in API response for user ID: " . $id);
                 $this->flashSession->error('Could not load user data. Please try again later.');
             }
 
