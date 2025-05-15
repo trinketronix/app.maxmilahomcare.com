@@ -1,253 +1,57 @@
 <?php
 
+/**
+ * Entry point for the application.
+ * Simplified version that includes bootstrap files.
+ */
+
 use Phalcon\Di\FactoryDefault;
-use Phalcon\Autoload\Loader;
-use Phalcon\Mvc\View;
 use Phalcon\Mvc\Application;
-use Phalcon\Mvc\Url;
-use Phalcon\Session\Manager;
-use Phalcon\Session\Adapter\Stream;
-use Phalcon\Flash\Direct as FlashDirect;
-use Phalcon\Cache\Adapter\Stream as CacheStream;
-use Phalcon\Storage\SerializerFactory;
-use Phalcon\Mvc\Router;
+use Phalcon\Autoload\Loader;
 
-
+// Define paths
 define('BASE_PATH', dirname(__DIR__));
 define('APP_PATH', BASE_PATH . '/app');
 define('CACHE_PATH', BASE_PATH . '/cache');
 
+// Ensure cache directories exist
+if (!is_dir(CACHE_PATH . '/data')) {
+    mkdir(CACHE_PATH . '/data', 0777, true);
+}
+if (!is_dir(CACHE_PATH . '/view')) {
+    mkdir(CACHE_PATH . '/view', 0777, true);
+}
+
 // Register an autoloader
 $loader = new Loader();
 $loader->setNamespaces([
-    // Namespace for constants classes
     'Homecare\Constants' => APP_PATH . '/constants/',
-    // Namespace for utils classes
     'Homecare\Utils' => APP_PATH . '/utils/',
-    // Namespace for model classes
     'Homecare\Models' => APP_PATH . '/models/',
-    // Namespace for controller classes
     'Homecare\Controllers' => APP_PATH . '/controllers/',
 ])->register();
 
-// Create a DI
+// Create a DI container
 $di = new FactoryDefault();
 
-// Setup the router
-$di->set('router', function() {
-    $router = new Router();
+// Load service configurations
+require_once APP_PATH . '/bootstrap/services.php';
 
-    // Set default route (when accessing /)
-    $router->add('/', [
-        'namespace'  => 'Homecare\Controllers',
-        'controller' => 'login',
-        'action'     => 'index'
-    ]);
+// Load router configuration
+require_once APP_PATH . '/bootstrap/router.php';
 
-    // Explicit route for '/login'
-    $router->add('/login', [
-        'namespace'  => 'Homecare\Controllers',
-        'controller' => 'login',
-        'action'     => 'index'
-    ]);
+// Load error handler
+require_once APP_PATH . '/bootstrap/error-handler.php';
 
-    // Explicit route for '/login'
-    $router->add('/list', [
-        'namespace'  => 'Homecare\Controllers',
-        'controller' => 'list',
-        'action'     => 'index'
-    ]);
-
-    // Explicit route for '/forgot'
-    $router->add('/forgot', [
-        'namespace'  => 'Homecare\Controllers',
-        'controller' => 'forgot',
-        'action'     => 'index'
-    ]);
-
-    // Explicit route for '/signup'
-    $router->add('/signup', [
-        'namespace'  => 'Homecare\Controllers',
-        'controller' => 'signup',
-        'action'     => 'index'
-    ]);
-
-    // Explicit route for '/main'
-    $router->add('/main', [
-        'namespace'  => 'Homecare\Controllers',
-        'controller' => 'main',
-        'action'     => 'index'
-    ]);
-    
-    // Explicit route for '/test'
-    $router->add('/test', [
-        'namespace'  => 'Homecare\Controllers',
-        'controller' => 'test',
-        'action'     => 'index'
-    ]);
-
-// Explicit route for '/details'
-$router->add('/details', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'details',
-    'action'     => 'index'
-]);
-
-// Explicit route for '/detailsusers'
-$router->add('/detailsusers', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'detailsusers',
-    'action'     => 'index'
-]);
-
-
-
-// Explicit route for '/logout'
-$router->add('/logout', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'logout',
-    'action'     => 'index'
-]);
-
-
-// Explicit route for '/activate'
-$router->add('/activate', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'activate',
-    'action'     => 'index'
-]);
-
-
-// Explicit route for '/change-role'
-$router->add('/changerole', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'changerole',
-    'action'     => 'index'
-]);
-
-
-// Explicit route for '/users'
-$router->add('/users', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'users',
-    'action'     => 'index'
-]);
-
-// Explicit route for '/users'
-$router->add('/user', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'user',
-    'action'     => 'index'
-]);
-
-
-
-// Explicit route for '/visit'
-$router->add('/patients', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'patients',
-    'action'     => 'index'
-]);
-
-// Explicit route for '/user'
-$router->add('/userupdate', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'userupdate',
-    'action'     => 'index'
-]);
-
-
-$router->add('/caregiver', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'caregiver',
-    'action'     => 'index'
-]);
-
-$router->add('/visit', [
-    'namespace'  => 'Homecare\Controllers',
-    'controller' => 'visit',
-    'action'     => 'index'
-]);
-
-// Set the 404 not found page
-    $router->notFound([
-        'namespace'  => 'Homecare\Controllers',
-        'controller' => 'login',
-        'action'     => 'index'
-    ]);
-
-    return $router;
-});
-
-// Setup the view component
-$di->set('view', function () {
-    $view = new View();
-    $view->setViewsDir(APP_PATH . '/views/');
-    return $view;
-});
-
-
-// Setup the URL component
-$di->set('url', function () {
-    $url = new Url();
-    $url->setBaseUri('/');
-    return $url;
-});
-
-// Setup the session
-$di->set('session', function () {
-    $session = new Manager();
-    $files = new Stream([
-        'savePath' => '/tmp',
-    ]);
-    $session->setAdapter($files);
-    $session->start();
-    return $session;
-});
-
-// Setup the flash service
-$di->set('flash', function () {
-    $flash = new FlashDirect([
-        'error'   => 'alert alert-danger',
-        'success' => 'alert alert-success',
-        'notice'  => 'alert alert-info',
-        'warning' => 'alert alert-warning',
-    ]);
-    return $flash;
-});
-
-// Setup the cache service
-$di->set('cache', function () {
-    $serializerFactory = new SerializerFactory();
-    $options = [
-        'defaultSerializer' => 'Php',
-        'lifetime'         => 7200,
-        'storageDir'       => CACHE_PATH . '/data/',
-    ];
-    
-    return new CacheStream($serializerFactory, $options);
-});
-
-// Setup view cache
-$di->set('viewCache', function () {
-    $serializerFactory = new SerializerFactory();
-    $options = [
-        'defaultSerializer' => 'Php',
-        'lifetime'         => 7200,
-        'storageDir'       => CACHE_PATH . '/view/',
-    ];
-    
-    return new CacheStream($serializerFactory, $options);
-});
-
+// Create application
 $application = new Application($di);
 
+// Handle the request
 try {
-    // Handle the request
     $response = $application->handle($_SERVER['REQUEST_URI']);
     $response->send();
 } catch (\Exception $e) {
-//echo $config->application->controllersDir;
-echo APP_PATH;
-    echo 'Exception: ', $e->getMessage();
-} 
+    // Handle exceptions using the configured error handler
+    $errorHandler = $di->get('errorHandler');
+    $errorHandler->handleException($e);
+}
