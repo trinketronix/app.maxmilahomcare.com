@@ -33,7 +33,6 @@ class DetailsController extends BaseController {
             // Make API request using the updated HttpRequest class with URL parameters
             // Ensure 'account' endpoint is defined in HttpRequest::ENDPOINTS
             $response = HttpRequest::get(Endpoint::ACCOUNT, $headers, ['id' => $id]);
-echo $id;
             $account = $response['data'];
             // Check if data exists and has the right structure
             if (!isset($account)) {

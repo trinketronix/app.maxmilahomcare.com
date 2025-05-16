@@ -32,7 +32,7 @@
             font-weight: 500;
             text-align: center;
         }
-        .manager-row {
+        .account-row {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 1fr; /* 4 columns */
             gap: 20px;
@@ -42,14 +42,14 @@
             margin-bottom: 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        .manager-row div {
+        .account-row div {
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: 'Roboto', sans-serif;
         }
-        .manager-row a,
-        .manager-row .btn {
+        .account-row a,
+        .account-row .btn {
             padding: 12px 24px;
             background-color: red; /* All buttons will be red */
             color: white;
@@ -62,12 +62,12 @@
             font-size: 1em; /* Consistent font size */
             width: 100%; /* Buttons take full width of their container */
         }
-        .manager-row a:hover,
-        .manager-row .btn:hover {
+        .account-row a:hover,
+        .account-row .btn:hover {
             background-color: darkred; /* Darker red on hover */
             transform: scale(1.05); /* Slight zoom effect on hover */
         }
-        .manager-row .user-info {
+        .account-row .user-info {
             font-size: 1.1em;
             font-weight: bold;
             color: #d85b85;
@@ -88,41 +88,46 @@
     </a>
 </center>
     <div class="container">
-        <div id="managers-list" class="row">
-            <?php foreach ($managers as $manager): ?>
-                <div class="manager-row" data-id="<?= $manager['id'] ?>" data-username="<?= $manager['username'] ?>" >
-                    <div class="user-info">
-                        <?= $manager['lastname'].' '.$manager['firstname'].' '.$manager['phone'] ?>
-                    </div>
+        <div id="accounts-list" class="row">
+            <?php
 
-                    <a href="tel:"<?= $manager['phone'] ?>>
-                    <button class="register-btn">
-                     <i class="bi bi-telephone"></i> <!-- Call icon -->
-                    </button>
-                    </a>
+                if (isset($selaccounts))
+            {
+                foreach ($selaccounts as $account): ?>
+                         <div class="account-row" data-id="<?= $account['id'] ?>" data-username="<?= $account['username'] ?>" >
+                                <div class="user-info">
+                                <?= $account['lastname'].' '.$account['firstname'].' '.$account['phone'] ?>
+                        </div>
 
-                    <div>
-                        <a href="#" class="btn" onclick="setManagerIdAndRedirect(this)">Activate</a>
+                        <a href="tel:"<?= $account['phone'] ?>>
+                        <button class="register-btn">
+                         <i class="bi bi-telephone"></i> <!-- Call icon -->
+                        </button>
+                        </a>
+
+                        <div>
+                            <a href="#" class="btn" onclick="setaccountIdAndRedirect(this)">Activate</a>
+                        </div>
+                        <div>
+                            <a href="#" class="btn" onclick="setaccountIdAndDetail(this)">Details</a>
+                        </div>
                     </div>
-                    <div>
-                        <a href="#" class="btn" onclick="setManagerIdAndDetail(this)">Details</a>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+                <?php endforeach;
+            } ?>
         </div>
     </div>
 
     <!-- Move JavaScript to the bottom of the body to ensure elements are loaded before execution -->
     <script>
-        function setManagerIdAndRedirect(button) {
-            var row = button.closest('.manager-row');
-            var managerId = row.getAttribute("data-id");
-            console.log("Manager ID:", managerId);
+        function setaccountIdAndRedirect(button) {
+            let row = button.closest('.account-row');
+            let accountId = row.getAttribute("data-id");
+            console.log("account ID:", accountId);
             
             let date = new Date();
-            date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 day from now
+            date.setTime(date.getTime() + (24 * 60 * 60 * 1000)); // 1 day from now
             let expires = "expires=" + date.toUTCString();
-            document.cookie = "activateid=" + managerId + "; " + expires + "; path=/";
+            document.cookie = "activateid=" + accountId + "; " + expires + "; path=/";
             
             var username = row.getAttribute("data-username");
             document.cookie = "username=" + username + "; " + expires + "; path=/";
@@ -130,15 +135,15 @@
             window.location.href = "/activate"; 
         }
 
-        function setManagerIdAndDetail(button) {
-            var row = button.closest('.manager-row');
-            var managerId = row.getAttribute("data-id");
-            console.log("Manager ID:", managerId);
+        function setaccountIdAndDetail(button) {
+            var row = button.closest('.account-row');
+            var accountId = row.getAttribute("data-id");
+            console.log("account ID:", accountId);
             
             let date = new Date();
             date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 day from now
             let expires = "expires=" + date.toUTCString();
-            document.cookie = "activateid=" + managerId + "; " + expires + "; path=/";
+            document.cookie = "activateid=" + accountId + "; " + expires + "; path=/";
             
             var username = row.getAttribute("data-username");
             document.cookie = "username=" + username + "; " + expires + "; path=/";
