@@ -18,9 +18,7 @@ class DetailsusersController extends BaseController {
         $headers=["Authorization" =>$token];
         if($token != null) {
             // Test Http Request Get managers
-            //$response = HttpRequest::get(Endpoint::ACCOUNTS, $headers,[]);
-           // $response = HttpRequest::get(Endpoint::ACCOUNT, $headers, ['id' => $id]);
-            $response = HttpRequest::get(Endpoint::ACCOUNT, $headers, ['id' => 1]);
+            $response = HttpRequest::get(Endpoint::ACCOUNT, $headers, ['id' => $id]);
             $accounts = $response['data'];
             $this->view->setVars([
                 'id' => $id,
