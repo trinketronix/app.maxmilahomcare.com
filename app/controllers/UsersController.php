@@ -1,30 +1,26 @@
 <?php
 
 namespace Homecare\Controllers;
+use Homecare\Utils\Endpoint;
 use Homecare\Utils\HttpRequest;
-use Phalcon\Mvc\Controller;
-class UsersController extends BaseController {
-    public function indexAction(){
-        $managers = [
-            'username' => 'error'
-        ];
-        $token = 'error';
+class UsersController extends BaseController
+{
+    public function indexAction()
+    {
         $token = $this->session->get('auth-token');
-        $headers=["Authorization" =>$token];
-        if($token != null) {
-            // Test Http Request Get managers
-            $getManaResponse = HttpRequest::get('/accounts',$headers);
-            //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
-            //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
-            $managersjson = $getManaResponse['data'];
-            //file_put_contents('response2_log.txt', print_r($managersjson, true));  
-            $array = $getManaResponse['data'];
-            $accounts = $getManaResponse['data']['accounts'];
-            //file_put_contents('response_log.txt', print_r($getManaResponse, true));  
-            //file_put_contents('response3_log.txt', print_r($accounts , true));  
-
+        $headers = ["Authorization" => $token];
+        if ($token != null) {
+            $response = HttpRequest::get(Endpoint::ACCOUNTS, $headers,[]);
+            if (!isset($response['data']['users'])) {
+                // Handle the case where 'accounts' is missing or not an array
+                $this->view->setVars([
+                    'accounts' => [],
+                    'error' => 'No se pudieron obtener las cuentas correctamente.',
+                ]);
+            } else {
+                $accounts = $response['data']['users'];
+                $this->view->setVar("selaccounts", $accounts);
+            }
         }
-        $this->view->setVar("managers", $accounts);
-
     }
 }

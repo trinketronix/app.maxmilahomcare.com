@@ -67,24 +67,21 @@
 <div class="container">
     <div class="list-group mb-4">
     <form action="/changerole" method="POST" id="myForm">
-        <?php foreach ($managers as $manager): ?>
-            <?php if ($manager['id'] == $myid): ?>
-                <div class="list-group-item" data-id="<?= $manager['id'] ?>">
-                    <h4 class="mb-1">Profile</h4>
-                    <h5 class="mb-1"><?= $manager['username'] ?></h5>
-                    <p class="mb-1"><?= $manager['firstname'] ?></p>
-                    <p class="mb-1"><?= $manager['lastname'] ?></p>
-                    <p class="mb-1"><?= $manager['middlename'] ?></p>
-                    <p class="mb-1"><?= $manager['birthdate'] ?></p>
-                    <p class="mb-1"><?= $manager['address'] ?></p>
-                    <p class="mb-1"><?= $manager['city'] ?></p>
-                    <p class="mb-1"><?= $manager['languages'] ?></p>
-                    <p class="mb-1"><?= $manager['id'] ?></p>
-                    <input type="hidden" name="hiddenusername" class="form-control" id="hiddenusername" value="<?=$manager['username'] ?? ''; ?>">
-                </div>
-            <?php endif; ?>    
-        <?php endforeach; ?>
-        <button type="submit" class="btn btn-primary" onclick="window.location.href = '/change-role'">Role</button>
+            <div class="list-group-item" data-id="<?= $managers['id'] ?>">
+                            <h4 class="mb-1">Profile</h4>
+                            <h5 class="mb-1"><?= $managers['username'] ?></h5>
+                            <p class="mb-1"><?= $managers['firstname'] ?></p>
+                            <p class="mb-1"><?= $managers['lastname'] ?></p>
+                            <p class="mb-1"><?= $managers['middlename'] ?></p>
+                            <p class="mb-1"><?= $managers['birthdate'] ?></p>
+                            <p class="mb-1"><?= $managers['email'] ?></p>
+                            <p class="mb-1"><?= $managers['email2'] ?></p>
+                            <p class="mb-1"><?= $managers['languages'] ?></p>
+                            <p class="mb-1"><?= $managers['id'] ?></p>
+                            <input type="hidden" name="hiddenusername" class="form-control" id="hiddenusername" value="<?=$manager['username'] ?? ''; ?>">
+                        </div>
+
+                   <button type="submit" class="btn btn-primary" onclick="window.location.href = '/change-role'">Role</button>
 </form>
     </div>
 
