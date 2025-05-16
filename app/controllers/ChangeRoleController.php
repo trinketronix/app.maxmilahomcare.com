@@ -6,6 +6,7 @@
 namespace Homecare\Controllers;
 
 use Exception;
+use Homecare\Utils\Endpoint;
 use Phalcon\Http\Response;
 use Phalcon\Http\Request;
 use Phalcon\Mvc\Controller;
@@ -23,6 +24,7 @@ class ChangeroleController extends BaseController
 
 if ($this->request->isPost()) {
     $username = $this->request->getPost('username');
+    $newid = $this->request->getPost('id');
     $role=1;
     //file_put_contents('response_log5.txt', print_r($username, true));
     $token=$this->session->get('auth-token');
@@ -47,8 +49,8 @@ if ($this->request->isPost()) {
             ],
             JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
         );
-       
-        $activateRequest = HttpRequest::put('/change-role', $jsonBody, $headers);
+        $response = HttpRequest::get(Endpoint::CHANGE_ROLE, $headers, ['id' => $id]);
+        $response = HttpRequest::put('/change-role', $jsonBody, $headers);
         //file_put_contents('responsi_log.txt', print_r($username, true));
         $this->flashSession->success('Role Changed');
         if (empty($activateRequest['data'])) {

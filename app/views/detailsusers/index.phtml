@@ -3,110 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
-    <!-- Bootstrap CSS -->
+    <title><?= $pageTitle ?? 'Manager Profile' ?></title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS for Pink Theme -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
+    <link href="/css/theme.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f8e1f4; /* Light pink background */
+        .manager-profile {
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
         }
-        .container {
-            max-width: 800px;
-            margin-top: 50px;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+        .manager-info p {
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #444;
         }
-        h2 {
-            color: #d85b85; /* Pinkish color for header */
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .list-group-item {
-            background-color: #fce6f5; /* Light pink background for each list item */
-            border: 1px solid #f8e1f4;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            padding: 15px;
-        }
-        .list-group-item:hover {
-            background-color: #f8d1e6; /* Slightly darker pink for hover effect */
-        }
-        .btn-primary {
-            background-color: #e74c3c;
-            border-color: #e74c3c;
-        }
-        .btn-primary:hover {
-            background-color: #c0392b;
-            border-color: #c0392b;
-        }
-        .form-control-static {
-            font-size: 1.1em;
-            color: #555;
-        }
-        .list-group-item h5 {
-            color: #d85b85; /* Pinkish color for user names */
-        }
-        .list-group-item p {
-            color: #555;
-        }
-        .list-group-item small {
-            color: #777; /* Muted color for phone numbers */
-        }
-        .btn-danger:hover {
-            background-color: darkred;
-            color: white;
+
+        @media (max-width: 600px) {
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
+<div class="container py-4">
 
+    <h2 class="text-center mb-4"><?= $pageTitle ?? 'User Profile' ?></h2>
 
-<div class="container">
-    <div class="list-group mb-4">
+    <!-- Flash Messages -->
+    <div class="flash-messages mb-3">
+        <?= $this->flashSession->output() ?>
+    </div>
+
+    <!-- Manager Profile -->
     <form action="/changerole" method="POST" id="myForm">
-            <div class="list-group-item" data-id="<?= $managers['id'] ?>">
-                            <h4 class="mb-1">Profile</h4>
-                            <h5 class="mb-1"><?= $managers['username'] ?></h5>
-                            <p class="mb-1"><?= $managers['firstname'] ?></p>
-                            <p class="mb-1"><?= $managers['lastname'] ?></p>
-                            <p class="mb-1"><?= $managers['middlename'] ?></p>
-                            <p class="mb-1"><?= $managers['birthdate'] ?></p>
-                            <p class="mb-1"><?= $managers['email'] ?></p>
-                            <p class="mb-1"><?= $managers['email2'] ?></p>
-                            <p class="mb-1"><?= $managers['languages'] ?></p>
-                            <p class="mb-1"><?= $managers['id'] ?></p>
-                            <input type="hidden" name="hiddenusername" class="form-control" id="hiddenusername" value="<?=$manager['username'] ?? ''; ?>">
-                        </div>
+        <div class="manager-profile" data-id="<?= $managers['id'] ?>">
+            <div class="manager-info">
+                <h4 class="mb-3">Profile</h4>
+                <p><strong>Username:</strong> <?= htmlspecialchars($managers['username']) ?></p>
+                <p><strong>First Name:</strong> <?= htmlspecialchars($managers['firstname']) ?></p>
+                <p><strong>Last Name:</strong> <?= htmlspecialchars($managers['lastname']) ?></p>
+                <p><strong>Middle Name:</strong> <?= htmlspecialchars($managers['middlename']) ?></p>
+                <p><strong>Birthdate:</strong> <?= htmlspecialchars($managers['birthdate']) ?></p>
+                <p><strong>Email 1:</strong> <?= htmlspecialchars($managers['email']) ?></p>
+                <p><strong>Email 2:</strong> <?= htmlspecialchars($managers['email2']) ?></p>
+                <p><strong>Languages:</strong> <?= htmlspecialchars($managers['languages']) ?></p>
+                <p><strong>ID:</strong> <?= htmlspecialchars($managers['id']) ?></p>
+                <input type="hidden" name="hiddenusername" value="<?= htmlspecialchars($manager['username'] ?? '') ?>">
+            </div>
+            <div class="action-buttons mt-3">
+                <button type="submit" class="btn btn-primary" onclick="setManagerIdAndRole(); return false;">
+                    <i class="bi bi-person-check"></i> Role
+                </button>
+            </div>
+        </div>
+    </form>
 
-                   <button type="submit" class="btn btn-primary" onclick="window.location.href = '/change-role'">Role</button>
-</form>
-    </div>
-
-    <hr>
-
-    <div class="d-grid">
-        <button type="button" class="btn btn-danger" onclick="window.history.back();" 
-        style="background-color: red; border: none; transition: background-color 0.3s;">
-            <i class="bi bi-arrow-left-circle"></i> Back to Previous Page
+    <!-- Navigation Buttons -->
+    <div class="action-buttons mt-4">
+        <button type="button" class="btn btn-danger" onclick="window.history.back();">
+            <i class="bi bi-arrow-left-circle"></i> Back
         </button>
-        <button type="button" class="btn btn-primary" onclick="setManagerIdAndUpdate()">Update</button>
-      <!--  <button type="button" class="btn btn-primary" onclick="setManagerIdAndRole()">Role</button>-->
+
+        <button type="button" class="btn btn-primary" onclick="setManagerIdAndUpdate();">
+            <i class="bi bi-pencil-square"></i> Update
+        </button>
     </div>
+
 </div>
 
-<!-- Bootstrap JS and dependencies -->
+<!-- Scripts -->
 <script>
     function setManagerIdAndUpdate() {
-        var managerId = getManagerId();
+        const managerId = getManagerId();
         if (managerId) {
-            let date = new Date();
-            date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 day from now
-            let expires = "expires=" + date.toUTCString();
-            document.cookie = "activateid=" + managerId + "; " + expires + "; path=/";
-
+            const date = new Date();
+            date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000));
+            document.cookie = `activateid=${managerId}; expires=${date.toUTCString()}; path=/`;
             window.location.href = "/userupdate";
         } else {
             console.error("Manager ID not found!");
@@ -114,34 +98,26 @@
     }
 
     function setManagerIdAndRole() {
-        var managerId = getManagerId();
+        const managerId = getManagerId();
         if (managerId) {
-            
-            let date = new Date();
-            date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 day from now
-            let expires = "expires=" + date.toUTCString();
-            document.cookie = "activateid=" + managerId + "; " + expires + "; path=/";
-
-            window.location.href = "/changerole";
+            const date = new Date();
+            date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000));
+            document.cookie = `activateid=${managerId}; expires=${date.toUTCString()}; path=/`;
+            document.getElementById("myForm").submit();
         } else {
             console.error("Manager ID not found!");
         }
-        //sessionStorage.setItem('username', username);
-        //document.getElementById("myForm").submit();
     }
 
     function getManagerId() {
-        // Get the manager ID from the list item with the data-id attribute
-        var managerRow = document.querySelector('.list-group-item');
-        if (managerRow) {
-            return managerRow.getAttribute("data-id");
-        }
-        return null;
+        const managerRow = document.querySelector('.manager-profile');
+        return managerRow ? managerRow.getAttribute("data-id") : null;
     }
 </script>
 
+<!-- Bootstrap JS dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
