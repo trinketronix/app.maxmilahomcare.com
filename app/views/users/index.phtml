@@ -133,8 +133,10 @@
                     <a href="tel:<?= htmlspecialchars($account['phone']) ?>" class="btn-action">
                         <i class="bi bi-hospital"></i> Assign Patient
                     </a>
-                    <a href="#" class="btn-action" onclick="setaccountIdAndRedirect(this)">
-                        <i class="bi bi-check-circle"></i> Activate
+                   <a href="#" class="btn-action <?= $account['is_active'] ? 'disabled' : '' ?>"
+                       onclick="<?= $account['is_active'] ? 'return false;' : 'setaccountIdAndRedirect(this)' ?>"
+                        <?= $account['is_active'] ? 'aria-disabled="true"' : '' ?>>
+                        <i class="bi bi-check-circle"></i> <?= $account['is_active'] ? 'Activated' : 'Activate' ?>
                     </a>
                     <a href="#" class="btn-action" onclick="setaccountIdAndDetail(this)">
                         <i class="bi bi-eye"></i> Details
@@ -155,17 +157,29 @@
     function setaccountIdAndRedirect(button) {
         let row = button.closest('.user-row');
         let accountId = row.getAttribute("data-id");
-        let username = row.getAttribute("data-username");
 
-        if (accountId) {
-            let date = new Date();
-            date.setTime(date.getTime() + (24 * 60 * 60 * 1000));
-            let expires = "expires=" + date.toUTCString();
-            document.cookie = "activateid=" + accountId + "; " + expires + "; path=/";
-            document.cookie = "username=" + username + "; " + expires + "; path=/";
+        if (!accountId) return;
 
-            window.location.href = "/activate";
-        }
+        fetch('/api/accountactivate?id=' + accountId, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.data) {
+                    alert("Cuenta activada exitosamente para ID: " + accountId);
+                    // Opcional: eliminar fila o cambiar su estado
+                    row.remove();
+                } else {
+                    alert("Error al activar la cuenta.");
+                }
+            })
+            .catch(error => {
+                console.error('Error en la activación:', error);
+                alert("Error de conexión al activar cuenta.");
+            });
     }
 
     function setaccountIdAndDetail(button) {
