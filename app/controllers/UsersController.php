@@ -19,7 +19,13 @@ class UsersController extends BaseController
                 ]);
             } else {
                 $accounts = $response['data']['users'];
-                $this->view->setVar("selaccounts", $accounts);
+            //    $this->view->setVar("selaccounts", $accounts);
+                $this->view->setVars([
+                    'id' => $accounts['id'],
+                    'selaccounts' => $accounts,
+
+                ]);
+
             }
         }
     }
