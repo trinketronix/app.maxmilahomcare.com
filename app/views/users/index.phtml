@@ -166,7 +166,7 @@
         }
 
         // Get the account ID from the data attribute
-        const accountId = row.getAttribute("data-id");
+        const accountId = parseInt(row.getAttribute("data-id"));
         if (!accountId) {
             console.error("No account ID found in row.");
             return;
@@ -194,11 +194,12 @@
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
+                console.log('Success:', data);
                 if (data && data.data) {
                     console.log("User activated successfully.");
                     console.log("Managers or related data:", data.data);
@@ -219,8 +220,9 @@
                 }
             })
             .catch(error => {
+                console.error('Error:', error);
                 console.error('Error during activation:', error);
-                alert("An error occurred during the activation.");
+                alert("An error occurred during the activation." + error.toString());
             });
     }
 
