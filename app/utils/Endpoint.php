@@ -19,5 +19,5 @@ class Endpoint {
     public const PATIENT ='patient';
     public const PATIENTS ='patients';
     public const PATIENT_VISITS ='patient_visits';
-
+    public const ASSIGN_PATIENT ='assign_patient';
 }
