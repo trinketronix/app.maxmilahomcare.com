@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $pageTitle ?? 'Users List' ?></title>
+    <title><?= $pageTitle ?? 'Patients List' ?></title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -112,15 +112,13 @@
 
 <div class="container">
 
-    <h2><?= $pageTitle ?? 'Users List' ?></h2>
+
 
     <div class="top-buttons mb-4">
         <a href="/main" class="btn-action">
             <i class="bi bi-arrow-left-circle"></i> <span>Back to Menu</span>
         </a>
-        <a href="/signup" class="btn-action">
-            <i class="bi bi-person-plus"></i> <span>Create Account</span>
-        </a>
+
     </div>
 
     <?php if (isset($selaccounts) && !empty($selaccounts)): ?>
@@ -130,22 +128,15 @@
                     <?= htmlspecialchars($account['lastname'] . ' ' . $account['firstname'] ) ?>
                 </div>
                 <div class="user-actions">
-                    <a href="#" class="btn-action" onclick="setaccountIdAndPatient(this)">
-                        <i class="bi bi-hospital"></i> Assign a patient
-                    </a>
-
-                    <!--          <a href="#" class="btn-action" onclick="setaccountIdAndRedirect(this)">
-                                  <i class="bi bi-check-circle"></i> Activate
-                              </a>-->
-                    <a href="#" class="btn-action" onclick="setaccountIdAndDetail(this)">
-                        <i class="bi bi-eye"></i> Details
+                    <a href="#" class="btn-action" onclick="assignpatientid(this)">
+                        <i class="bi bi-hospital"></i> Assign
                     </a>
                 </div>
             </div>
         <?php endforeach; ?>
     <?php else: ?>
         <div class="alert alert-info text-center">
-            No users found.
+            No patients found.
         </div>
     <?php endif; ?>
 
@@ -158,7 +149,7 @@
 
 <!-- JavaScript -->
 <script>
-    function setaccountIdAndRedirect(button) {
+    function assignpatientid(button) {
         // Find the closest parent with class 'user-row'
         const row = button.closest('.user-row');
         if (!row) {
@@ -167,7 +158,7 @@
         }
 
         // Get the account ID from the data attribute
-        const accountId = parseInt(row.getAttribute("data-id"));
+        const patientId = parseInt(row.getAttribute("data-id"));
         if (!accountId) {
             console.error("No account ID found in row.");
             return;
