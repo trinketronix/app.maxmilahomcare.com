@@ -9,6 +9,7 @@ class UsersController extends BaseController
     {
         $token = $this->session->get('auth-token');
         $headers = ["Authorization" => $token];
+      //  require_once 'c:\xampp\htdocs\app.maxmila.com\app\views\users\index.php';
         if ($token != null) {
             $response = HttpRequest::get(Endpoint::ACCOUNTS, $headers,[]);
             if (!isset($response['data']['users'])) {
@@ -21,9 +22,10 @@ class UsersController extends BaseController
                 $accounts = $response['data']['users'];
             //    $this->view->setVar("selaccounts", $accounts);
                 $this->view->setVars([
-                    'id' => $accounts['id'],
+                  //  'id' => $accounts['id'],
                     'selaccounts' => $accounts,
-
+                    'token' => $token,
+                    'baseUrl' => getenv('BASE_URL_API')?:'https://api-test.maxmilahomecare.com' ,
                 ]);
 
             }
