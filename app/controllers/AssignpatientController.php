@@ -1,34 +1,174 @@
 <?php
 
-namespace Homecare\controllers;
-use Homecare\Utils\Endpoint;
-use Homecare\Utils\HttpRequest;
-class AssignPatient extends BaseController
-{
-    public function indexAction()
-    {
-        $token = $this->session->get('auth-token');
-        $headers = ["Authorization" => $token];
-      //  require_once 'c:\xampp\htdocs\app.maxmila.com\app\views\users\index.php';
-        if ($token != null) {
-            $response = HttpRequest::get(Endpoint::PATIENTS, $headers,[]);
-            if (!isset($response['data']['users'])) {
-                // Handle the case where 'accounts' is missing or not an array
-                $this->view->setVars([
-                    'accounts' => [],
-                    'error' => 'No se pudieron obtener los pacientes correctamente.',
-                ]);
-            } else {
-                $accounts = $response['data']['users'];
-            //    $this->view->setVar("selaccounts", $accounts);
-                $this->view->setVars([
-                  //  'id' => $accounts['id'],
-                    'selaccounts' => $accounts,
-                    'token' => $token,
-                    'baseUrl' => getenv('BASE_URL_API')?:'https://api-test.maxmilahomecare.com' ,
-                ]);
+namespace Homecare\Controllers;
 
-            }
+use Exception;
+use Homecare\Utils\Endpoint;
+use Phalcon\Http\Response;
+use Homecare\Utils\HttpRequest;
+
+/**
+ * Patients Controller
+ *
+ * Manages the listing and interactions with patient data
+ */
+class AssignpatientController extends BaseController
+{
+    /**
+     * Display the list of patients
+     *
+     * @return void
+     */
+public function indexAction()
+{
+    // Check authentication
+    $token = $this->session->get('auth-token');
+    if (!$token) {
+        $this->flashSession->error('Please log in to view patients');
+        return $this->response->redirect('login');
+    }
+
+
+
+
+    // Prepare headers
+    $headers = ["Authorization" => $token];
+
+    try {
+        // Initialize default values
+        $patients = [];
+
+        // Fetch patients data
+        $response = HttpRequest::get('patients', $headers);
+
+        // Process response
+        if (isset($response['data'])) {
+            $patients = $response['data']['patients'];
+        } else {
+            $this->flashSession->warning('No patients found or data unavailable');
+            error_log('Patient data missing in API response: ' . json_encode($response));
         }
+
+        // Retrieve caregiver data from session
+        $userId = $this->session->get('user_id');
+        $userName = $this->session->get('user_name');
+
+        // Set view variables
+        $userId = $this->session->get('user_id');
+        $userName = $this->session->get('user_name');
+
+        $this->view->setVars([
+            'patients' => $patients,
+            'pageTitle' => "Patients to assign",
+            'userId' => $userId,
+            'userName' => $userName,
+        ]);
+
+    } catch (Exception $e) {
+        error_log("Error in AssignpatientController::indexAction: " . $e->getMessage());
+        $this->flashSession->error('Unable to retrieve patients data. Please try again later.');
+    }
+}
+
+
+    /**
+     * View a single patient's details
+     *
+     * @return void
+     */
+
+    //Getting sessions variables
+    public function setSessionAction()
+    {
+        $this->view->disable(); // No view is returned
+
+        $userId = $this->request->getPost('userId', 'int');
+        $username = $this->request->getPost('username', 'string');
+
+        if ($userId && $username) {
+            $this->session->set('user_id', $userId);
+            $this->session->set('user_name', $username);
+            return $this->response->setJsonContent(['status' => 'ok']);
+        }
+
+        return $this->response->setStatusCode(400, 'Bad Request')
+            ->setJsonContent(['status' => 'error', 'message' => 'Missing parameters']);
+    }
+    public function viewAction()
+    {
+        // Get patient ID from route parameter
+        $id = $this->dispatcher->getParam('id');
+
+        // Validate ID
+        if (!$id) {
+            $this->flashSession->error('Patient ID is required');
+            return $this->response->redirect('patients');
+        }
+
+        // Check authentication
+        $token = $this->session->get('auth-token');
+        if (!$token) {
+            $this->flashSession->error('Please log in to view patient details');
+            return $this->response->redirect('login');
+        }
+
+        $headers = ["Authorization" => $token];
+
+        try {
+            // Fetch patient details - make sure the 'patient' endpoint is properly defined
+            $response = HttpRequest::get(Endpoint::PATIENT, $headers, ['id' => $id]);
+
+            if (isset($response['data'])) {
+                $this->view->patient = $response['data'];
+                $this->view->pageTitle = "Patient Details";
+                //Retrieve caregiver data
+                $userId = $this->session->get('user_id');
+                $userName = $this->session->get('user_name');
+                $this->view->userId = $userId;
+                $this->view->userName = $userName;
+
+
+                // Try to fetch patient visits if available
+//                try {
+//                    $visitsResponse = HttpRequest::get('patient_visits', $headers, ['patient_id' => $id]);
+//                    if (isset($visitsResponse['data'])) {
+//                        $this->view->patientVisits = $visitsResponse['data'];
+//                    }
+//                } catch (Exception $e) {
+//                    // Just log this error but continue showing patient details
+//                    error_log("Error fetching patient visits: " . $e->getMessage());
+//                }
+            } else {
+                $this->flashSession->warning('Patient details not found');
+                return $this->response->redirect('patients');
+            }
+
+        } catch (Exception $e) {
+            error_log("Error in PatientsController::viewAction: " . $e->getMessage());
+            $this->flashSession->error('Unable to retrieve patient details. Please try again later.');
+            return $this->response->redirect('patients');
+        }
+    }
+
+    /**
+     * Register a visit for a patient
+     *
+     * @return void
+     */
+    public function visitAction()
+    {
+        // Get patient ID from route parameter
+        $id = $this->dispatcher->getParam('id');
+
+        if (!$id) {
+            $this->flashSession->error('Patient ID is required');
+            return $this->response->redirect('patients');
+        }
+
+        // Store patient ID in cookie for the visit form
+        $this->cookies->set('patient_id', $id, time() + 86400);
+
+        // Redirect to visit registration page
+        return $this->response->redirect('visit');
     }
 }

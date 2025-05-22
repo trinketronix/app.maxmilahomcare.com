@@ -3,107 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $pageTitle ?? 'Patients List' ?></title>
-    <!-- Bootstrap CSS -->
+    <title><?= $pageTitle ?? 'Patients To Assign' ?></title>
+
+    <!-- Bootstrap & Icons -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
-    <!-- Custom CSS -->
+    <!-- Custom Theme -->
+    <link href="/css/theme.css" rel="stylesheet">
+
     <style>
+
+        html {
+            scroll-behavior: smooth;
+        }
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            background-color: #fce6f5;
+            padding: 15px 10px;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .sticky-header h3,
+        .sticky-header h4 {
+            margin: 0;
+            color: #d63384;
+        }
+
         body {
-            background-color: #f8e1f4;
-            font-family: 'Roboto', sans-serif;
-            color: #333;
+            background-color: #fce6f5; /* Light pink background */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 30px;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            max-width: 960px;
+            padding: 30px 15px;
+            margin: 0 auto;
         }
 
-        h2 {
-            font-family: 'Poppins', sans-serif;
-            color: #d85b85;
-            font-size: 2rem;
-            font-weight: 500;
+        h3, h4, h5 {
             text-align: center;
-            margin-bottom: 30px;
+            color: #d63384;
+            font-weight: 600;
         }
 
-        .user-row {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #fce6f5;
-            padding: 15px 20px;
-            border-radius: 10px;
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .btn-back {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .manager-row {
+            background-color: #fff;
+            border-left: 5px solid #e83e8c;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            padding: 20px;
             margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            align-items: center;
         }
 
         .user-info {
-            flex: 1 1 40%;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #d85b85;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #333;
+            flex-grow: 1;
         }
 
-        .user-actions {
-            display: flex;
-            gap: 10px;
-            flex: 1 1 55%;
-            justify-content: flex-end;
-            flex-wrap: wrap;
+        .action-buttons a {
+            min-width: 100px;
         }
 
-        .btn-action {
-            padding: 8px 16px;
-            background-color: red;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.95em;
-            transition: background-color 0.3s, transform 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            text-decoration: none;
+        .btn-danger {
+            background-color: #e83e8c;
+            border-color: #e83e8c;
         }
 
-        .btn-action:hover {
-            background-color: darkred;
-            transform: scale(1.05);
-            color: #fff;
+        .btn-danger:hover {
+            background-color: #c82368;
+            border-color: #bd2162;
         }
 
-        .top-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        @media (max-width: 600px) {
-            .user-actions {
+        @media (max-width: 768px) {
+            .manager-row {
                 flex-direction: column;
-                align-items: stretch;
-            }
-
-            .top-buttons {
-                flex-direction: column;
-                gap: 10px;
+                align-items: flex-start;
             }
 
             .user-info {
                 margin-bottom: 10px;
+                width: 100%;
+            }
+
+            .action-buttons {
+                width: 100%;
+                justify-content: flex-start;
+                gap: 10px;
             }
         }
     </style>
@@ -112,152 +116,58 @@
 
 <div class="container">
 
-
-
-    <div class="top-buttons mb-4">
-        <a href="/main" class="btn-action">
-            <i class="bi bi-arrow-left-circle"></i> <span>Back to Menu</span>
-        </a>
-
+    <!-- Sticky Header -->
+    <div class="sticky-header">
+        <h3><?= htmlspecialchars($userName) ?> </h3>
+        <h4><?= $pageTitle ?? 'Patients To Assign' ?></h4>
     </div>
 
-    <?php if (isset($selaccounts) && !empty($selaccounts)): ?>
-        <?php foreach ($selaccounts as $account): ?>
-            <div class="user-row" data-id="<?= $account['id'] ?>" data-username="<?= $account['username'] ?>">
+    <!-- Flash Messages -->
+    <div class="flash-messages">
+        <?= $this->flashSession->output() ?>
+    </div>
+
+    <!-- Back Button -->
+    <div class="btn-back">
+        <button type="button" class="btn btn-outline-secondary" onclick="window.history.back();">
+            <i class="bi bi-arrow-left-circle"></i> <span class="button-text">Back</span>
+        </button>
+    </div>
+
+    <!-- No Patients Message -->
+    <?php if (empty($patients)): ?>
+        <div class="alert alert-info text-center">No patients found.</div>
+    <?php endif; ?>
+
+    <!-- Patients List -->
+    <div class="patient-container">
+        <?php foreach ($patients as $patient): ?>
+            <div class="manager-row" data-patient-id="<?= $patient['id'] ?? '' ?>">
+                <!-- Patient Info -->
                 <div class="user-info">
-                    <?= htmlspecialchars($account['lastname'] . ' ' . $account['firstname'] ) ?>
+                    <?= htmlspecialchars($patient['lastname'] ?? '') ?>
+                    <?= htmlspecialchars($patient['firstname'] ?? '') ?>
+                    <?php if (!empty($patient['patient'])): ?>
+                        <small class="text-muted">(<?= htmlspecialchars($patient['patient']) ?>)</small>
+                    <?php endif; ?>
                 </div>
-                <div class="user-actions">
-                    <a href="#" class="btn-action" onclick="assignpatientid(this)">
-                        <i class="bi bi-hospital"></i> Assign
+
+                <!-- Assign Button -->
+                <div class="action-buttons">
+                    <a href="/patients/view/<?= $patient['id'] ?? '' ?>" class="btn btn-sm btn-danger">
+                        <i class="bi bi-eye"></i> <span class="button-text">Assign</span>
                     </a>
                 </div>
             </div>
         <?php endforeach; ?>
-    <?php else: ?>
-        <div class="alert alert-info text-center">
-            No patients found.
-        </div>
-    <?php endif; ?>
+    </div>
 
 </div>
 
-<script>
-    const token = "<?= $token ?>";
-    const baseUrl = "<?= $baseUrl ?>";
-</script>
-
-<!-- JavaScript -->
-<script>
-    function assignpatientid(button) {
-        // Find the closest parent with class 'user-row'
-        const row = button.closest('.user-row');
-        if (!row) {
-            console.error("No row found for the clicked button.");
-            return;
-        }
-
-        // Get the account ID from the data attribute
-        const patientId = parseInt(row.getAttribute("data-id"));
-        if (!accountId) {
-            console.error("No account ID found in row.");
-            return;
-        }
-
-        // Make sure the token is defined
-        if (typeof token === 'undefined' || !token) {
-            console.error("Authorization token is not defined.");
-            alert("Missing authorization token.");
-            return;
-        }
-
-        // Build API URL
-        const apiUrl = baseUrl + '/auth/activate/account';
-
-        // Make the API call
-        fetch(apiUrl, {
-            method: 'PUT',
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ id: accountId })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Success:', data);
-                if (data && data.data) {
-                    console.log("User activated successfully.");
-                    console.log("Managers or related data:", data.data);
-
-                    alert("User activated successfully.");
-
-                    // Update the button visually
-                    const updatedRow = document.querySelector(`.user-row[data-id="${accountId}"]`);
-                    const btn = updatedRow.querySelector('.btn-action:nth-child(2)');
-                    if (btn) {
-                        btn.textContent = "Activated";
-                        btn.classList.add("disabled");
-                        btn.setAttribute("aria-disabled", "true");
-                        btn.onclick = () => false;
-                    }
-                } else {
-                    alert("No data returned from activation.");
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                console.error('Error during activation:', error);
-                alert("An error occurred during the activation." + error.toString());
-            });
-    }
-
-
-    function setaccountIdAndDetail(button) {
-        let row = button.closest('.user-row');
-        let accountId = row.getAttribute("data-id");
-        let username = row.getAttribute("data-username");
-
-        if (accountId) {
-            let date = new Date();
-            date.setTime(date.getTime() + (24 * 60 * 60 * 1000));
-            let expires = "expires=" + date.toUTCString();
-            document.cookie = "activateid=" + accountId + "; " + expires + "; path=/";
-            document.cookie = "username=" + username + "; " + expires + "; path=/";
-
-            window.location.href = "/detailsusers";
-        }
-    }
-
-    nuevooooo
-    function setaccountIdAndPatient(button) {
-        let row = button.closest('.user-row');
-        let accountId = row.getAttribute("data-id");
-        let username = row.getAttribute("data-username");
-
-        if (accountId) {
-            let date = new Date();
-            date.setTime(date.getTime() + (24 * 60 * 60 * 1000));
-            let expires = "expires=" + date.toUTCString();
-            document.cookie = "activateid=" + accountId + "; " + expires + "; path=/";
-            document.cookie = "username=" + username + "; " + expires + "; path=/";
-
-            window.location.href = "/assignpatient";
-        }
-    }
-
-</script>
-
-<!-- Bootstrap JS Dependencies -->
+<!-- Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-<script></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </body>
 </html>
