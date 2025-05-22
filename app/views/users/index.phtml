@@ -125,7 +125,7 @@
 
     <?php if (isset($selaccounts) && !empty($selaccounts)): ?>
         <?php foreach ($selaccounts as $account): ?>
-            <div class="user-row" data-id="<?= $account['id'] ?>" data-username="<?= $account['username'] ?>">
+            <div class="user-row" data-id="<?= $account['id'] ?>" data-username="<?= $account['username'] ?>" data-user-info="<?= ($account['lastname'] . ' ' . $account['firstname'] ) ?>">
                 <div class="user-info">
                     <?= htmlspecialchars($account['lastname'] . ' ' . $account['firstname'] ) ?>
                 </div>
@@ -244,20 +244,32 @@
         }
     }
 
-    nuevooooo
     function setaccountIdAndPatient(button) {
         let row = button.closest('.user-row');
         let accountId = row.getAttribute("data-id");
-        let username = row.getAttribute("data-username");
-
+        //let username = row.getAttribute("data-username");
+        let username = row.getAttribute("data-user-info");
         if (accountId) {
-            let date = new Date();
-            date.setTime(date.getTime() + (24 * 60 * 60 * 1000));
-            let expires = "expires=" + date.toUTCString();
-            document.cookie = "activateid=" + accountId + "; " + expires + "; path=/";
-            document.cookie = "username=" + username + "; " + expires + "; path=/";
-
-            window.location.href = "/assignpatient";
+            fetch('/assignpatient/setSession', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `userId=${encodeURIComponent(accountId)}&username=${encodeURIComponent(username)}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        // Now redirect after session is set
+                        window.location.href = "/assignpatient";
+                    } else {
+                        alert("Failed to set session.");
+                    }
+                })
+                .catch(err => {
+                    console.error("Error setting session:", err);
+                    alert("Error communicating with server.");
+                });
         }
     }
 
