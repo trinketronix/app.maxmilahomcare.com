@@ -33,6 +33,7 @@ if (isset($di)) {
             '/caregiver' => ['controller' => 'caregiver'],
             '/visit' => ['controller' => 'visit'],
             '/assignpatient' => ['controller' => 'assignpatient'],
+            '/confirmassign' => ['controller' => 'confirmassign'],
         ];
 
         // Register all routes
@@ -71,6 +72,19 @@ if (isset($di)) {
     	]
 	);
 
-        return $router;
+
+        $router->addPost('/assignpatient/setPatient', [
+            'namespace'  => 'Homecare\Controllers',
+            'controller' => 'assignpatient',
+            'action'     => 'setPatient'
+        ]);
+
+        $router->addPost('/comfirmassign/setPatient', [
+            'namespace'  => 'Homecare\Controllers',
+            'controller' => 'confirmassign',
+            'action'     => 'setPatient'
+        ]);
+
+      return $router;
     });
 }

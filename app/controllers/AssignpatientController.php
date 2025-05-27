@@ -19,56 +19,54 @@ class AssignpatientController extends BaseController
      *
      * @return void
      */
-public function indexAction()
-{
-    // Check authentication
-    $token = $this->session->get('auth-token');
-    if (!$token) {
-        $this->flashSession->error('Please log in to view patients');
-        return $this->response->redirect('login');
-    }
-
-
-
-
-    // Prepare headers
-    $headers = ["Authorization" => $token];
-
-    try {
-        // Initialize default values
-        $patients = [];
-
-        // Fetch patients data
-        $response = HttpRequest::get('patients', $headers);
-
-        // Process response
-        if (isset($response['data'])) {
-            $patients = $response['data']['patients'];
-        } else {
-            $this->flashSession->warning('No patients found or data unavailable');
-            error_log('Patient data missing in API response: ' . json_encode($response));
+    public function indexAction()
+    {
+        // Check authentication
+        $token = $this->session->get('auth-token');
+        if (!$token) {
+            $this->flashSession->error('Please log in to view patients');
+            return $this->response->redirect('login');
         }
 
-        // Retrieve caregiver data from session
-        $userId = $this->session->get('user_id');
-        $userName = $this->session->get('user_name');
 
-        // Set view variables
-        $userId = $this->session->get('user_id');
-        $userName = $this->session->get('user_name');
+        // Prepare headers
+        $headers = ["Authorization" => $token];
 
-        $this->view->setVars([
-            'patients' => $patients,
-            'pageTitle' => "Patients to assign",
-            'userId' => $userId,
-            'userName' => $userName,
-        ]);
+        try {
+            // Initialize default values
+            $patients = [];
 
-    } catch (Exception $e) {
-        error_log("Error in AssignpatientController::indexAction: " . $e->getMessage());
-        $this->flashSession->error('Unable to retrieve patients data. Please try again later.');
+            // Fetch patients data
+            $response = HttpRequest::get('patients', $headers);
+
+            // Process response
+            if (isset($response['data'])) {
+                $patients = $response['data']['patients'];
+            } else {
+                $this->flashSession->warning('No patients found or data unavailable');
+                error_log('Patient data missing in API response: ' . json_encode($response));
+            }
+
+            // Retrieve caregiver data from session
+            $userId = $this->session->get('user_id');
+            $userName = $this->session->get('user_name');
+
+            // Set view variables
+            $userId = $this->session->get('user_id');
+            $userName = $this->session->get('user_name');
+
+            $this->view->setVars([
+                'patients' => $patients,
+                'pageTitle' => "Patients to assign",
+                'userId' => $userId,
+                'userName' => $userName,
+            ]);
+
+        } catch (Exception $e) {
+            error_log("Error in AssignpatientController::indexAction: " . $e->getMessage());
+            $this->flashSession->error('Unable to retrieve patients data. Please try again later.');
+        }
     }
-}
 
 
     /**
@@ -94,6 +92,7 @@ public function indexAction()
         return $this->response->setStatusCode(400, 'Bad Request')
             ->setJsonContent(['status' => 'error', 'message' => 'Missing parameters']);
     }
+
     public function viewAction()
     {
         // Get patient ID from route parameter
@@ -171,4 +170,49 @@ public function indexAction()
         // Redirect to visit registration page
         return $this->response->redirect('visit');
     }
+
+
+    public function setPatientAction()
+    {
+        $this->view->disable();
+
+
+        if (!$this->request->isPost()) {
+            return $this->response
+                ->setStatusCode(405, 'Method Not Allowed')
+                ->setContentType('application/json', 'UTF-8')
+                ->setJsonContent([
+                    'status' => 'error',
+                    'message' => 'Only POST requests allowed.'
+                ]);
+        }
+
+
+        $data = $this->request->getJsonRawBody(true);
+
+        $patientId = $data['patientId'] ?? null;
+        $patientName = $data['patientName'] ?? null;
+
+        if (!$patientId || !$patientName) {
+            return $this->response
+                ->setStatusCode(400, 'Bad Request')
+                ->setContentType('application/json', 'UTF-8')
+                ->setJsonContent([
+                    'status' => 'error',
+                    'message' => 'Missing patientId or patientName'
+                ]);
+        }
+
+
+        $this->session->set('patientId', $patientId);
+        $this->session->set('patientname', $patientName);
+
+
+        return $this->response
+            ->setContentType('application/json', 'UTF-8')
+            ->setJsonContent([
+                'status' => 'ok'
+            ]);
+    }
+
 }
