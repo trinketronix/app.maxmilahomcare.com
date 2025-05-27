@@ -17,9 +17,8 @@ class ConfirmassignController extends BaseController
             $this->flashSession->error('Please log in to view your profile');
             return $this->response->redirect('login');
         }
-
-        $userId = $this->getUserId($token);
-        $username = $this->session->get('username'); //
+        $userId = $this->session->get('user_id');;
+        $username = $this->session->get('user_name'); //
         $patientId = $this->session->get('patientId');
         $patientname = $this->session->get('patientname'); //
 
@@ -53,7 +52,7 @@ class ConfirmassignController extends BaseController
         $role = $this->getRole($token);
         $liga = ($role < 2) ? 'main' : 'caregiver';
 
-        // ✅ Set all variables needed in the view
+
         $this->view->setVars([
             'userId'     => $userId,
             'username'   => $username,
