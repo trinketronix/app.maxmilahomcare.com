@@ -22,11 +22,11 @@ class UsersController extends BaseController
                 $accounts = $response['data']['users'];
                 //    $this->view->setVar("selaccounts", $accounts);
                 if (!empty($token)) {
-                    $this->session->set('user_id', $accounts['id']);
-                    $this->session->set(key: 'user_name', value: $accounts['lastname'] . ' ' . $accounts['firstname']);
+       //             $this->session->set('user_id', $accounts['id']);
+      //              $this->session->set(key: 'user_name', value: $accounts['lastname'] . ' ' . $accounts['firstname']);
                     $this->view->setVars([
-                        'userid' => $accounts['id'],
-                        'namename' => $accounts['lastname'] . ' ' . $accounts['firstname'],
+     //                   'userid' => $accounts['id'],
+    //                    'namename' => $accounts['lastname'] . ' ' . $accounts['firstname'],
                         'selaccounts' => $accounts,
                         'token' => $token,
                         'baseUrl' => getenv('BASE_URL_API')?:'https://api-test.maxmilahomecare.com' ,

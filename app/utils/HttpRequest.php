@@ -48,7 +48,8 @@ class HttpRequest {
         'accounts' => '/accounts',
         'patient' => '/patients/{id}', // Dynamic path with placeholder
         'patients' => '/patients',
-        'patient_visits' => '/patients/{patientid}/visits'
+        'patient_visits' => '/patients/{patientid}/visits',
+        'assign_patient' => '/user/assign/patient',
     ];
 
     /**

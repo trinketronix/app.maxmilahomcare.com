@@ -8,14 +8,10 @@
     <!-- Bootstrap & Icons -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom Theme -->
     <link href="/css/theme.css" rel="stylesheet">
 
     <style>
-
-        html {
-            scroll-behavior: smooth;
-        }
+        html { scroll-behavior: smooth; }
         .sticky-header {
             position: sticky;
             top: 0;
@@ -26,39 +22,19 @@
             text-align: center;
             margin-bottom: 15px;
         }
-
-        .sticky-header h3,
-        .sticky-header h4 {
-            margin: 0;
-            color: #d63384;
-        }
-
+        .sticky-header h3, .sticky-header h4 { margin: 0; color: #d63384; }
         body {
-            background-color: #fce6f5; /* Light pink background */
+            background-color: #fce6f5;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        .container {
-            max-width: 960px;
-            padding: 30px 15px;
-            margin: 0 auto;
-        }
-
+        .container { max-width: 960px; padding: 30px 15px; margin: 0 auto; }
         h3, h4, h5 {
             text-align: center;
             color: #d63384;
             font-weight: 600;
         }
-
-        .flash-messages {
-            margin-bottom: 20px;
-        }
-
-        .btn-back {
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
+        .flash-messages { margin-bottom: 20px; }
+        .btn-back { margin-bottom: 30px; text-align: center; }
         .manager-row {
             background-color: #fff;
             border-left: 5px solid #e83e8c;
@@ -71,79 +47,58 @@
             flex-wrap: wrap;
             align-items: center;
         }
-
         .user-info {
             font-size: 1.1rem;
             font-weight: 500;
             color: #333;
             flex-grow: 1;
         }
-
-        .action-buttons a {
-            min-width: 100px;
-        }
-
+        .action-buttons a { min-width: 100px; }
         .btn-danger {
             background-color: #e83e8c;
             border-color: #e83e8c;
         }
-
         .btn-danger:hover {
             background-color: #c82368;
             border-color: #bd2162;
         }
-
         @media (max-width: 768px) {
             .manager-row {
                 flex-direction: column;
                 align-items: flex-start;
             }
-
-            .user-info {
-                margin-bottom: 10px;
-                width: 100%;
-            }
-
-            .action-buttons {
-                width: 100%;
-                justify-content: flex-start;
-                gap: 10px;
-            }
+            .user-info { margin-bottom: 10px; width: 100%; }
+            .action-buttons { width: 100%; justify-content: flex-start; gap: 10px; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-
-    <!-- Sticky Header -->
     <div class="sticky-header">
         <h3><?= htmlspecialchars($userName) ?> </h3>
         <h4><?= $pageTitle ?? 'Patients To Assign' ?></h4>
     </div>
 
-    <!-- Flash Messages -->
     <div class="flash-messages">
         <?= $this->flashSession->output() ?>
     </div>
 
-    <!-- Back Button -->
     <div class="btn-back">
         <button type="button" class="btn btn-outline-secondary" onclick="window.history.back();">
             <i class="bi bi-arrow-left-circle"></i> <span class="button-text">Back</span>
         </button>
     </div>
 
-    <!-- No Patients Message -->
     <?php if (empty($patients)): ?>
         <div class="alert alert-info text-center">No patients found.</div>
     <?php endif; ?>
 
-    <!-- Patients List -->
     <div class="patient-container">
         <?php foreach ($patients as $patient): ?>
-            <div class="manager-row" data-patient-id="<?= $patient['id'] ?? '' ?>">
-                <!-- Patient Info -->
+            <div class="manager-row"
+                 data-patient-id="<?= $patient['id'] ?? '' ?>"
+                 data-patient-name="<?= htmlspecialchars($patient['lastname'] . ' ' . $patient['firstname']) ?>">
                 <div class="user-info">
                     <?= htmlspecialchars($patient['lastname'] ?? '') ?>
                     <?= htmlspecialchars($patient['firstname'] ?? '') ?>
@@ -152,17 +107,62 @@
                     <?php endif; ?>
                 </div>
 
-                <!-- Assign Button -->
                 <div class="action-buttons">
-                    <a href="/patients/view/<?= $patient['id'] ?? '' ?>" class="btn btn-sm btn-danger">
+                    <a href="#" class="btn btn-sm btn-danger" onclick="setPatient(this)">
                         <i class="bi bi-eye"></i> <span class="button-text">Assign</span>
                     </a>
                 </div>
             </div>
         <?php endforeach; ?>
     </div>
-
 </div>
+
+<script>
+    function setPatient(button) {
+        let row = button.closest('.manager-row');
+        let patientId = row.getAttribute("data-patient-id");
+        let patientName = row.getAttribute("data-patient-name");
+
+        console.log("Sending:", { patientId, patientName });
+
+        fetch('/assignpatient/setPatient', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                patientId: parseInt(patientId),
+                patientName: patientName
+            })
+        })
+            .then(async response => {
+                const contentType = response.headers.get("Content-Type");
+                const text = await response.text();
+
+                if (!response.ok) {
+                    throw new Error("Server error: " + response.status + " - " + text);
+                }
+
+                if (!contentType.includes("application/json")) {
+                    throw new Error("Invalid content type: " + contentType + "\n\nResponse: " + text);
+                }
+
+                return JSON.parse(text);
+            })
+            .then(data => {
+                if (data.status === 'ok') {
+                    window.location.href = "/confirmassign";
+                } else {
+                    alert("Error: " + (data.message || "Unknown error"));
+                }
+            })
+            .catch(error => {
+                console.error("setPatient error:", error);
+                alert("Error communicating with server:\n" + error.message);
+            });
+    }
+</script>
 
 <!-- Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
