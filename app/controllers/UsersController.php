@@ -29,7 +29,7 @@ class UsersController extends BaseController
     //                    'namename' => $accounts['lastname'] . ' ' . $accounts['firstname'],
                         'selaccounts' => $accounts,
                         'token' => $token,
-                        'baseUrl' => getenv('BASE_URL_API')?:'https://api-test.maxmilahomecare.com' ,
+                        'baseUrl' => BASE_URL,
                     ]);
                 }
 

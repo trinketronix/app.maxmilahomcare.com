@@ -13,7 +13,7 @@ use Phalcon\Autoload\Loader;
 define('BASE_PATH', dirname(__DIR__));
 define('APP_PATH', BASE_PATH . '/app');
 define('CACHE_PATH', BASE_PATH . '/cache');
-
+define('BASE_URL',getenv('BASE_URL_API')?: 'https://api-test.maxmilahomecare.com');
 // Ensure cache directories exist
 if (!is_dir(CACHE_PATH . '/data')) {
     mkdir(CACHE_PATH . '/data', 0777, true);
