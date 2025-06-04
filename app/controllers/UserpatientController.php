@@ -5,7 +5,7 @@ use Homecare\Utils\Endpoint;
 //use Phalcon\Http\Response;
 use Homecare\Utils\HttpRequest;
 
-class UserPatientController extends BaseController
+class UserpatientController extends BaseController
 {
 
     public function indexAction()
