@@ -125,7 +125,7 @@ if (isset($di)) {
     // Using getenv() to get values from .htaccess
     $di->set('api', function () {
         return [
-            'baseUrl' => getenv('BASE_URL_API') ?: 'https://api-test.maxmilahomecare.com',
+            'baseUrl' => BASE_URL,
         ];
     });
 }

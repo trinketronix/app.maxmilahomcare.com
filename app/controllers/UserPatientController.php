@@ -47,7 +47,10 @@ class UserPatientController extends BaseController
             'userId' => $userId,
             'userName' => $userName,
             'assignedPatients' => $assigned,
-            'unassignedPatients' => $unassigned
+            'unassignedPatients' => $unassigned,
+            'baseURL'=> BASE_URL,
+            'token' => $token,
+
         ]);
 
     }
@@ -79,7 +82,7 @@ class UserPatientController extends BaseController
     private function getAssignedPatients($userId)
     {
         $token = $this->session->get('auth-token');
-        $url = "http://api-test.maxmilahomecare.com/assigned/patients/{$userId}";
+        $url = BASE_URL."/assigned/patients/{$userId}";
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -105,7 +108,7 @@ class UserPatientController extends BaseController
     {
         {
             $token = $this->session->get('auth-token');
-            $url = "http://api-test.maxmilahomecare.com/unassigned/patients/{$userId}";
+            $url = BASE_URL."/unassigned/patients/{$userId}";
 
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

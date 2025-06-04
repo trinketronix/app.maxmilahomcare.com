@@ -95,7 +95,7 @@ class HttpRequest {
      * @return string Base URL for API
      */
     public static function getBaseUrl(): string {
-        return getenv('BASE_URL_API') ?: 'https://api-test.maxmilahomecare.com';
+        return BASE_URL;
     }
 
     /**
