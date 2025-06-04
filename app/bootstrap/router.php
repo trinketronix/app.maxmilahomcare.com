@@ -34,6 +34,7 @@ if (isset($di)) {
             '/visit' => ['controller' => 'visit'],
             '/assignpatient' => ['controller' => 'assignpatient'],
             '/confirmassign' => ['controller' => 'confirmassign'],
+            '/userpatient' => ['controller' => 'userpatient'],
         ];
 
         // Register all routes
