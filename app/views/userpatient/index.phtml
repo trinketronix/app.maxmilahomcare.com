@@ -1,0 +1,228 @@
+<style>
+    html { scroll-behavior: smooth; }
+    .sticky-header {
+        position: sticky;
+        top: 0;
+        background-color: #fce6f5;
+        padding: 15px 10px;
+        z-index: 1000;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .sticky-header h3, .sticky-header h4 { margin: 0; color: #d63384; }
+    body {
+        background-color: #fce6f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .container { max-width: 960px; padding: 30px 15px; margin: 0 auto; }
+    h3, h4, h5 {
+        text-align: center;
+        color: #d63384;
+        font-weight: 600;
+    }
+    .flash-messages { margin-bottom: 20px; text-align: center; color: green; }
+    .btn-back { margin-bottom: 30px; text-align: center; }
+    .manager-row {
+        background-color: #fff;
+        border-left: 5px solid #e83e8c;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+    .column {
+        flex: 1;
+        min-width: 200px;
+    }
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+    .btn-danger {
+        background-color: #e83e8c;
+        border: none;
+        color: #fff;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    .btn-danger:hover {
+        background-color: #c82368;
+    }
+
+    /* Spinner */
+    #loadingSpinner {
+        display: none;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .spinner {
+        width: 30px;
+        height: 30px;
+        border: 4px solid #d63384;
+        border-top: 4px solid transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<div class="sticky-header">
+    <h3>Patient Assignment Manager</h3>
+    <h4>Caregiver: <?= $userName ?></h4>
+</div>
+<div class="btn-back">
+    <button type="button" class="btn btn-outline-secondary" onclick="window.history.back();">
+        <i class="bi bi-arrow-left-circle"></i> <span class="button-text">Back</span>
+    </button>
+</div>
+
+
+<div class="container">
+    <div id="loadingSpinner">
+        <div class="spinner"></div>
+        <small>Loading...</small>
+    </div>
+
+    <div class="flash-messages" id="flashMsg"></div>
+
+    <div class="manager-row">
+        <!-- Column A -->
+        <div class="column">
+            <h5>Assigned Patients</h5>
+            <!-- Assigned patients -->
+            <ul id="assignedList">
+                <?php foreach ($assignedPatients as $patient): ?>
+                    <li>
+                        <label>
+                            <input type="checkbox" class="assigned-checkbox" value="<?= $patient['id'] ?>">
+                            <?= $patient['id'] ?> - <?= $patient['lastname'] ?> <?= $patient['firstname'] ?>
+                        </label>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+
+        <!-- Column B -->
+        <div class="column action-buttons">
+            <button class="btn-danger" onclick="assignPatients()">Assign &raquo;</button>
+            <button class="btn-danger" onclick="unassignPatients()">&laquo; Unassign</button>
+        </div>
+
+        <!-- Column C -->
+        <div class="column">
+            <h5>Unassigned Patients</h5>
+            <!-- Unassigned patients -->
+            <ul id="unassignedList">
+                <?php foreach ($unassignedPatients as $patient): ?>
+                    <li>
+                        <label>
+                            <input type="checkbox" class="unassigned-checkbox" value="<?= $patient['id'] ?>">
+                            <?= $patient['id'] ?> - <?= $patient['lastname'] ?> <?= $patient['firstname'] ?>
+                        </label>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function getCheckedValues(className) {
+        return Array.from(document.querySelectorAll('.' + className + ':checked')).map(cb => cb.value);
+    }
+
+    function assignPatients() {
+        const selected = getCheckedValues('unassigned-checkbox');
+        if (selected.length === 0) return alert("Select patients to assign.");
+        toggleSpinner(true);
+
+        fetch('http://api-test.maxmilahomecare.com/assign/patients', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: <?= $userId ?>,
+                patient_ids: selected
+            })
+        })
+            .then(res => res.json())
+            .then(() => {
+                showMessage('Patients assigned successfully.');
+                refreshPatientLists();
+            })
+            .catch(() => showMessage('Assignment failed.'))
+            .finally(() => toggleSpinner(false));
+    }
+
+    function unassignPatients() {
+        const selected = getCheckedValues('assigned-checkbox');
+        if (selected.length === 0) return alert("Select patients to unassign.");
+        toggleSpinner(true);
+
+        fetch('http://api-test.maxmilahomecare.com/unassign/patient', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: <?= $userId ?>,
+                patient_ids: selected
+            })
+        })
+            .then(res => res.json())
+            .then(() => {
+                showMessage('Patients unassigned successfully.');
+                refreshPatientLists();
+            })
+            .catch(() => showMessage('Unassignment failed.'))
+            .finally(() => toggleSpinner(false));
+    }
+
+    function showMessage(msg) {
+        const el = document.getElementById('flashMsg');
+        el.innerHTML = msg;
+        setTimeout(() => el.innerHTML = '', 3000);
+    }
+
+    function toggleSpinner(show) {
+        document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+    }
+
+    function refreshPatientLists() {
+        fetch('/userpatient/refreshLists/<?= $userId ?>')
+            .then(res => res.json())
+            .then(data => {
+                const assignedList = document.getElementById('assignedList');
+                assignedList.innerHTML = data.assigned.map(patient =>
+                    `<li><label>
+                    <input type="checkbox" class="assigned-checkbox" value="${patient.id}">
+                    ${patient.id} - ${patient.lastname} ${patient.firstname}
+                </label></li>`
+                ).join('');
+
+                const unassignedList = document.getElementById('unassignedList');
+                unassignedList.innerHTML = data.unassigned.map(patient =>
+                    `<li><label>
+                    <input type="checkbox" class="unassigned-checkbox" value="${patient.id}">
+                    ${patient.id} - ${patient.lastname} ${patient.firstname}
+                </label></li>`
+                ).join('');
+            })
+            .catch(error => {
+                console.error('Error refreshing patient lists:', error);
+                showMessage('Failed to refresh patient lists.', 'error');
+            });
+    }
+
+</script>

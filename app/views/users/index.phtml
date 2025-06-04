@@ -261,7 +261,8 @@
                 .then(data => {
                     if (data.status === 'ok') {
                         // Now redirect after session is set
-                        window.location.href = "/assignpatient";
+                       // window.location.href = "/assignpatient";
+                        window.location.href = "/userpatient";
                     } else {
                         alert("Failed to set session.");
                     }
