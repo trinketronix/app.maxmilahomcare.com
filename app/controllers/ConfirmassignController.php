@@ -1,9 +1,9 @@
 <?php
 
-namespace Homecare\Controllers;
+namespace App\Controllers;
 
-use Homecare\Utils\Endpoint;
-use Homecare\Utils\HttpRequest;
+use App\Utils\Endpoint;
+use App\Utils\HttpRequest;
 use Exception;
 
 class ConfirmassignController extends BaseController

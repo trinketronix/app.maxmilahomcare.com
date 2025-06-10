@@ -1,8 +1,8 @@
 <?php
 
-namespace Homecare\Controllers;
-use Homecare\Utils\Endpoint;
-use Homecare\Utils\HttpRequest;
+namespace App\Controllers;
+use App\Utils\Endpoint;
+use App\Utils\HttpRequest;
 class UsersController extends BaseController
 {
     public function indexAction()
@@ -29,7 +29,7 @@ class UsersController extends BaseController
     //                    'namename' => $accounts['lastname'] . ' ' . $accounts['firstname'],
                         'selaccounts' => $accounts,
                         'token' => $token,
-                        'baseUrl' => BASE_URL,
+                        'baseUrl' => $this->config->api->baseUrl,
                     ]);
                 }
 

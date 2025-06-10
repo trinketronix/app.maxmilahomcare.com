@@ -1,8 +1,8 @@
 <?php
 
-namespace Homecare\Models;
+namespace App\Models;
 
-use Homecare\utils\HttpRequest;
+use App\utils\HttpRequest;
 use Phalcon\Di\Di;
 
 class Users {

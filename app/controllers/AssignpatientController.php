@@ -1,11 +1,11 @@
 <?php
 
-namespace Homecare\Controllers;
+namespace App\Controllers;
 
 use Exception;
-use Homecare\Utils\Endpoint;
+use App\Utils\Endpoint;
 use Phalcon\Http\Response;
-use Homecare\Utils\HttpRequest;
+use App\Utils\HttpRequest;
 
 /**
  * Patients Controller

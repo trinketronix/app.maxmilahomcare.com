@@ -1,10 +1,10 @@
 <?php
 
-namespace Homecare\Controllers;
+namespace App\Controllers;
 
 use Exception;
 use JsonException;
-use Homecare\Constants\Auth;
+use App\Constants\Auth;
 use Phalcon\Mvc\Controller;
 
 /**
@@ -18,6 +18,7 @@ class BaseController extends Controller {
      * Default error values for invalid tokens
      */
     protected const DEFAULT_ERROR_VALUES = [
+        'name' => 'Unknown',
         'username' => 'Unknown',
         'id' => -1,
         'role' => -1
@@ -109,9 +110,7 @@ class BaseController extends Controller {
     protected function getTokenField(?string $token, string $field, $default) {
         $auth = $this->getTokenData($token);
 
-        if ($auth === null || !isset($auth[$field])) {
-            return $default;
-        }
+        if ($auth === null || !isset($auth[$field])) return $default;
 
         return $auth[$field];
     }
@@ -194,6 +193,7 @@ class BaseController extends Controller {
         if ($token === null) {
             return [
                 'id' => self::DEFAULT_ERROR_VALUES['id'],
+                'name' => self::DEFAULT_ERROR_VALUES['name'],
                 'username' => self::DEFAULT_ERROR_VALUES['username'],
                 'role' => self::DEFAULT_ERROR_VALUES['role'],
                 'isAuthenticated' => false
@@ -202,6 +202,7 @@ class BaseController extends Controller {
 
         return [
             'id' => $this->getUserId($token),
+            'name' => $this->getName($token),
             'username' => $this->getUsername($token),
             'role' => $this->getRole($token),
             'isAuthenticated' => !$this->isExpired($token)

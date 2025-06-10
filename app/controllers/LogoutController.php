@@ -1,6 +1,6 @@
 <?php
 
-namespace Homecare\Controllers;
+namespace App\Controllers;
 
 use Phalcon\Mvc\Controller;
 
