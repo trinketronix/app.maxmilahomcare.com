@@ -199,6 +199,33 @@ $router->add('/list', [
     'action'     => 'index'
 ]);
 
+// Reports routes (Admin only)
+$router->add('/reports', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'reports',
+    'action'     => 'index'
+]);
+
+// Settings routes (Admin only)
+$router->add('/settings', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'settings',
+    'action'     => 'index'
+]);
+
+// Visit management routes
+$router->add('/visit/my-visits', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'visit',
+    'action'     => 'myVisits'
+]);
+
+$router->add('/visit/schedule', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'visit',
+    'action'     => 'schedule'
+]);
+
 // ========================================================================
 // API ROUTES (Using Router Groups - FIXED for Phalcon 5.x)
 // ========================================================================
