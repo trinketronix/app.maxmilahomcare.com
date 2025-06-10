@@ -1,9 +1,11 @@
 <?php
+
 use Phalcon\Mvc\Router;
+use Phalcon\Mvc\Router\Group as RouterGroup;
 
 $router = new Router();
 
-// Remove extra slashes
+// Remove extra slashes automatically
 $router->removeExtraSlashes(true);
 
 // Set default route (when accessing /)
@@ -13,7 +15,11 @@ $router->add('/', [
     'action'     => 'index'
 ]);
 
-// Authentication routes
+// ========================================================================
+// AUTHENTICATION ROUTES
+// ========================================================================
+
+// Login routes (GET and POST)
 $router->addGet('/login', [
     'namespace'  => 'App\Controllers',
     'controller' => 'login',
@@ -26,105 +32,233 @@ $router->addPost('/login', [
     'action'     => 'index'
 ]);
 
+// Logout route
 $router->add('/logout', [
     'namespace'  => 'App\Controllers',
     'controller' => 'logout',
     'action'     => 'index'
 ]);
 
-$router->add('/forgot', [
+// Forgot password routes
+$router->addGet('/forgot', [
     'namespace'  => 'App\Controllers',
     'controller' => 'forgot',
     'action'     => 'index'
 ]);
 
-// User management routes
-$router->add('/signup', [
+$router->addPost('/forgot', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'forgot',
+    'action'     => 'index'
+]);
+
+// ========================================================================
+// USER MANAGEMENT ROUTES
+// ========================================================================
+
+// Signup routes
+$router->addGet('/signup', [
     'namespace'  => 'App\Controllers',
     'controller' => 'signup',
     'action'     => 'index'
 ]);
 
-$router->add('/activate', [
+$router->addPost('/signup', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'signup',
+    'action'     => 'index'
+]);
+
+// Activate account routes
+$router->addGet('/activate', [
     'namespace'  => 'App\Controllers',
     'controller' => 'activate',
     'action'     => 'index'
 ]);
 
-$router->add('/changerole', [
+$router->addPost('/activate', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'activate',
+    'action'     => 'index'
+]);
+
+// Change role routes
+$router->addGet('/changerole', [
     'namespace'  => 'App\Controllers',
     'controller' => 'changerole',
     'action'     => 'index'
 ]);
 
+$router->addPost('/changerole', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'changerole',
+    'action'     => 'index'
+]);
+
+// Users listing and management
 $router->add('/users', [
     'namespace'  => 'App\Controllers',
     'controller' => 'users',
     'action'     => 'index'
 ]);
 
-$router->add('/userupdate', [
+$router->add('/user', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'user',
+    'action'     => 'index'
+]);
+
+// User update routes
+$router->addGet('/userupdate', [
     'namespace'  => 'App\Controllers',
     'controller' => 'userupdate',
     'action'     => 'index'
 ]);
 
-// Dashboard routes
+$router->addPost('/userupdate', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'userupdate',
+    'action'     => 'index'
+]);
+
+// ========================================================================
+// DASHBOARD ROUTES
+// ========================================================================
+
+// Main dashboard (Admin)
 $router->add('/main', [
     'namespace'  => 'App\Controllers',
     'controller' => 'main',
     'action'     => 'index'
 ]);
 
+// Caregiver dashboard
 $router->add('/caregiver', [
     'namespace'  => 'App\Controllers',
     'controller' => 'caregiver',
     'action'     => 'index'
 ]);
 
-// Profile and details routes
+// ========================================================================
+// PROFILE AND DETAILS ROUTES
+// ========================================================================
+
+// User profile/details
 $router->add('/details', [
     'namespace'  => 'App\Controllers',
     'controller' => 'details',
     'action'     => 'index'
 ]);
 
+// Detailed user information
 $router->add('/detailsusers', [
     'namespace'  => 'App\Controllers',
     'controller' => 'detailsusers',
     'action'     => 'index'
 ]);
 
-// Patient management routes
+// ========================================================================
+// PATIENT MANAGEMENT ROUTES
+// ========================================================================
+
+// Patients listing
 $router->add('/patients', [
     'namespace'  => 'App\Controllers',
     'controller' => 'patients',
     'action'     => 'index'
 ]);
 
-$router->add('/visit', [
+// Visit management
+$router->addGet('/visit', [
     'namespace'  => 'App\Controllers',
     'controller' => 'visit',
     'action'     => 'index'
 ]);
 
-// Administrative routes
+$router->addPost('/visit', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'visit',
+    'action'     => 'index'
+]);
+
+// ========================================================================
+// ADMINISTRATIVE ROUTES
+// ========================================================================
+
+// Test/Debug routes
 $router->add('/test', [
     'namespace'  => 'App\Controllers',
     'controller' => 'test',
     'action'     => 'index'
 ]);
 
+// List route
 $router->add('/list', [
     'namespace'  => 'App\Controllers',
     'controller' => 'list',
     'action'     => 'index'
 ]);
 
-// API routes (if needed for internal API calls)
-$router->addGroup('/api', [
+// ========================================================================
+// API ROUTES (Using Router Groups - FIXED for Phalcon 5.x)
+// ========================================================================
+
+// Create API group
+$apiGroup = new RouterGroup([
     'namespace' => 'App\Controllers\Api',
+    'prefix' => '/api'
 ]);
+
+// Add API routes to the group
+$apiGroup->addGet('/users', [
+    'controller' => 'users',
+    'action' => 'index'
+]);
+
+$apiGroup->addGet('/users/{id}', [
+    'controller' => 'users',
+    'action' => 'show'
+]);
+
+$apiGroup->addPost('/users', [
+    'controller' => 'users',
+    'action' => 'create'
+]);
+
+$apiGroup->addPut('/users/{id}', [
+    'controller' => 'users',
+    'action' => 'update'
+]);
+
+$apiGroup->addDelete('/users/{id}', [
+    'controller' => 'users',
+    'action' => 'delete'
+]);
+
+// ✅ FIXED: Use mount() instead of addGroup() for Phalcon 5.x
+$router->mount($apiGroup);
+
+// ========================================================================
+// ERROR HANDLING ROUTES
+// ========================================================================
+
+// 404 Not Found route
+$router->add('/404', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'error',
+    'action'     => 'notFound'
+]);
+
+// 500 Server Error route
+$router->add('/500', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'error',
+    'action'     => 'serverError'
+]);
+
+// ========================================================================
+// CATCH-ALL AND 404 HANDLING
+// ========================================================================
 
 // Set the 404 not found page
 $router->notFound([
