@@ -27,8 +27,7 @@ class Users {
 
     }
 
-    public function getAllUsers($token)
-    {
+    public function getAllUsers($token) {
         $cacheKey = 'all_users';
         $usersList = $this->cache->get($cacheKey);
         
@@ -58,8 +57,7 @@ class Users {
         }
     }
 
-    public function clearCache()
-    {
+    public function clearCache() {
         $this->cache->clear();
     }
 } 

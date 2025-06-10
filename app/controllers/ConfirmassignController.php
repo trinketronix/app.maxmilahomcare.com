@@ -6,10 +6,8 @@ use App\Utils\Endpoint;
 use App\Utils\HttpRequest;
 use Exception;
 
-class ConfirmassignController extends BaseController
-{
-    public function indexAction()
-    {
+class ConfirmassignController extends BaseController {
+    public function indexAction() {
         $liga = 'main';
         $token = $this->session->get('auth-token');
 
@@ -64,8 +62,7 @@ class ConfirmassignController extends BaseController
         ]);
     }
 
-    public function setPatientAction()
-    {
+    public function setPatientAction() {
         $this->view->disable();
 
         // Optional: you may use this method if you POST patient data to set session values

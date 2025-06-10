@@ -13,10 +13,8 @@ use Phalcon\Mvc\Controller;
 use App\Utils\HttpRequest;
 
 
-class SignupController extends BaseController
-{
-    public function indexAction()
-    {
+class SignupController extends BaseController {
+    public function indexAction() {
         if ($this->request->isPost()) {
             $username = $this->request->getPost('username');
             $password = $this->request->getPost('password');

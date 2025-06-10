@@ -14,10 +14,8 @@ use App\Utils\HttpRequest;
 
 
 
-class ChangeroleController extends BaseController
-{
-    public function indexAction()
-    {
+class ChangeroleController extends BaseController {
+    public function indexAction() {
 
        
     

@@ -12,15 +12,13 @@ use App\Utils\HttpRequest;
  *
  * Manages the listing and interactions with patient data
  */
-class PatientsController extends BaseController
-{
+class PatientsController extends BaseController {
     /**
      * Display the list of patients
      *
      * @return void
      */
-    public function indexAction()
-    {
+    public function indexAction() {
         // Check authentication
         $token = $this->session->get('auth-token');
         if (!$token) {
@@ -62,8 +60,7 @@ class PatientsController extends BaseController
      *
      * @return void
      */
-    public function viewAction()
-    {
+    public function viewAction() {
         // Get patient ID from route parameter
         $id = $this->dispatcher->getParam('id');
 
@@ -117,8 +114,7 @@ class PatientsController extends BaseController
      *
      * @return void
      */
-    public function visitAction()
-    {
+    public function visitAction() {
         // Get patient ID from route parameter
         $id = $this->dispatcher->getParam('id');
 

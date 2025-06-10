@@ -5,12 +5,10 @@ namespace App\Services;
 use Phalcon\Di\Injectable;
 use Phalcon\Http\Response;
 
-class ErrorHandlerService extends Injectable
-{
+class ErrorHandlerService extends Injectable {
     private readonly string $logPath;
 
-    public function __construct()
-    {
+    public function __construct() {
         // PHP 8.4 compatible path handling
         $this->logPath = BASE_PATH . '/storage/logs/';
         $this->ensureLogDirectory();
@@ -19,8 +17,7 @@ class ErrorHandlerService extends Injectable
     /**
      * Handle exceptions (PHP 8.4 compatible)
      */
-    public function handleException(\Throwable $e): void
-    {
+    public function handleException(\Throwable $e): void {
         $this->logError($e);
         $this->sendErrorResponse($e);
     }
@@ -28,8 +25,7 @@ class ErrorHandlerService extends Injectable
     /**
      * Handle PHP errors (PHP 8.4 compatible)
      */
-    public function handleError(int $severity, string $message, string $file, int $line): bool
-    {
+    public function handleError(int $severity, string $message, string $file, int $line): bool {
         $exception = new \ErrorException($message, 0, $severity, $file, $line);
         $this->handleException($exception);
         return true;
@@ -38,8 +34,7 @@ class ErrorHandlerService extends Injectable
     /**
      * Handle fatal errors (PHP 8.4 compatible)
      */
-    public function handleFatalError(): void
-    {
+    public function handleFatalError(): void {
         $error = error_get_last();
 
         if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
@@ -58,8 +53,7 @@ class ErrorHandlerService extends Injectable
     /**
      * Ensure log directory exists (PHP 8.4 compatible)
      */
-    private function ensureLogDirectory(): void
-    {
+    private function ensureLogDirectory(): void {
         if (!is_dir($this->logPath)) {
             mkdir($this->logPath, 0755, true);
         }
@@ -68,8 +62,7 @@ class ErrorHandlerService extends Injectable
     /**
      * Log error with context (PHP 8.4 optimized)
      */
-    private function logError(\Throwable $e): void
-    {
+    private function logError(\Throwable $e): void {
         $this->ensureLogDirectory();
 
         $context = [
@@ -115,8 +108,7 @@ class ErrorHandlerService extends Injectable
     /**
      * Send error response (PHP 8.4 compatible)
      */
-    private function sendErrorResponse(\Throwable $e): void
-    {
+    private function sendErrorResponse(\Throwable $e): void {
         $isDevelopment = $this->isDevelopmentMode();
         $isAjax = $this->isAjaxRequest();
         $statusCode = $this->getHttpStatusCode($e);
@@ -136,8 +128,7 @@ class ErrorHandlerService extends Injectable
     /**
      * Get client IP (PHP 8.4 optimized)
      */
-    private function getClientIP(): string
-    {
+    private function getClientIP(): string {
         $ipHeaders = [
             'HTTP_CLIENT_IP',
             'HTTP_X_FORWARDED_FOR',
@@ -165,16 +156,14 @@ class ErrorHandlerService extends Injectable
     /**
      * Check if in development mode
      */
-    private function isDevelopmentMode(): bool
-    {
+    private function isDevelopmentMode(): bool {
         return in_array(getenv('APP_ENV'), ['development', 'dev', 'local'], true);
     }
 
     /**
      * Check if AJAX request
      */
-    private function isAjaxRequest(): bool
-    {
+    private function isAjaxRequest(): bool {
         return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
             strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
@@ -182,8 +171,7 @@ class ErrorHandlerService extends Injectable
     /**
      * Get HTTP status code from exception
      */
-    private function getHttpStatusCode(\Throwable $e): int
-    {
+    private function getHttpStatusCode(\Throwable $e): int {
         return match (true) {
             method_exists($e, 'getStatusCode') => $e->getStatusCode(),
             $e instanceof \App\Exceptions\NotFoundException => 404,
@@ -196,8 +184,7 @@ class ErrorHandlerService extends Injectable
 
     // ... (rest of the methods remain the same)
 
-    private function sendJsonErrorResponse(\Throwable $e, int $statusCode, bool $isDevelopment): void
-    {
+    private function sendJsonErrorResponse(\Throwable $e, int $statusCode, bool $isDevelopment): void {
         http_response_code($statusCode);
         header('Content-Type: application/json; charset=UTF-8');
 
@@ -222,8 +209,7 @@ class ErrorHandlerService extends Injectable
         exit;
     }
 
-    private function sendHtmlErrorResponse(\Throwable $e, int $statusCode, bool $isDevelopment): void
-    {
+    private function sendHtmlErrorResponse(\Throwable $e, int $statusCode, bool $isDevelopment): void {
         http_response_code($statusCode);
         header('Content-Type: text/html; charset=UTF-8');
 
@@ -236,8 +222,7 @@ class ErrorHandlerService extends Injectable
         exit;
     }
 
-    private function getDevelopmentErrorPage(\Throwable $e, int $statusCode): string
-    {
+    private function getDevelopmentErrorPage(\Throwable $e, int $statusCode): string {
         // Same as before, but with PHP 8.4 compatibility
         return sprintf('
         <!DOCTYPE html>
@@ -289,8 +274,7 @@ class ErrorHandlerService extends Injectable
         );
     }
 
-    private function getProductionErrorPage(int $statusCode): string
-    {
+    private function getProductionErrorPage(int $statusCode): string {
         $errors = [
             404 => ['title' => 'Page Not Found', 'message' => 'The page you are looking for could not be found.'],
             500 => ['title' => 'Server Error', 'message' => 'We are experiencing technical difficulties. Please try again later.'],
@@ -330,8 +314,7 @@ class ErrorHandlerService extends Injectable
         );
     }
 
-    private function formatBytes(int $bytes, int $precision = 2): string
-    {
+    private function formatBytes(int $bytes, int $precision = 2): string {
         $units = ['B', 'KB', 'MB', 'GB'];
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;

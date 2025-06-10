@@ -6,10 +6,8 @@ use Phalcon\Mvc\Controller;
 use App\Models\Users;
 use App\utils\HttpRequest;
 
-class ListController extends BaseController
-{
-    public function indexAction()
-    {
+class ListController extends BaseController {
+    public function indexAction() {
         if (!$this->session->has('auth-token')) {
             return $this->response->redirect('login');
         }

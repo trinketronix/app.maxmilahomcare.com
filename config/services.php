@@ -1,7 +1,9 @@
 <?php
 
+use App\Middleware\AuthMiddleware;
 use App\Services\ErrorHandlerService;
 use App\Services\AuthService;
+use App\Services\RoleRedirectService;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Mvc\View;
 use Phalcon\Mvc\Url;
@@ -29,7 +31,7 @@ $di->setShared('router', function () {
 // Events Manager service
 $di->setShared('eventsManager', function () {
     $eventsManager = new EventsManager();
-    $eventsManager->attach('dispatch', new \App\Middleware\AuthMiddleware());
+    $eventsManager->attach('dispatch', new AuthMiddleware());
     return $eventsManager;
 });
 
@@ -107,6 +109,10 @@ $di->setShared('viewCache', function () use ($di) {
         'lifetime'         => $config->cache->lifetime,
         'storageDir'       => $config->cache->viewDir,
     ]);
+});
+
+$di->setShared('roleRedirectService', function () {
+    return new RoleRedirectService();
 });
 
 // Authentication Service

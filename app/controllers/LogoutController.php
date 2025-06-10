@@ -7,17 +7,15 @@ namespace App\Controllers;
  *
  * Handles user logout
  */
-class LogoutController extends BaseController
-{
+class LogoutController extends BaseController {
     /**
      * Log out the current user
      *
      * @return mixed
      */
-    public function indexAction()
-    {
+    public function indexAction() {
         // Use the auth service to logout
-        $this->authService->logout();
+        $this->authService->signout();
 
         // Add success message
         $this->flashSession->success('You have been logged out successfully.');

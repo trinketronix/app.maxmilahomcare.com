@@ -3,10 +3,8 @@
 namespace App\Controllers;
 use App\Utils\Endpoint;
 use App\Utils\HttpRequest;
-class UsersController extends BaseController
-{
-    public function indexAction()
-    {
+class UsersController extends BaseController {
+    public function indexAction() {
         $token = $this->session->get('auth-token');
         $headers = ["Authorization" => $token];
         //  require_once 'c:\xampp\htdocs\app.maxmila.com\app\views\users\index.php';

@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Constants\Session;
+use App\Constants\User;
 use Exception;
 use JsonException;
 use App\Constants\Auth;
@@ -13,8 +15,7 @@ use Phalcon\Mvc\Controller;
  *
  * Provides common functionality for all controllers including authentication utilities.
  */
-class BaseController extends Controller
-{
+class BaseController extends Controller {
     /**
      * @var AuthService
      */
@@ -23,8 +24,7 @@ class BaseController extends Controller
     /**
      * Initialize base controller
      */
-    public function initialize()
-    {
+    public function initialize() {
         // Get auth service from DI
         $this->authService = $this->di->get('auth');
     }
@@ -34,8 +34,7 @@ class BaseController extends Controller
      *
      * @return array|null
      */
-    protected function getCurrentUser(): ?array
-    {
+    protected function getCurrentUser(): ?array {
         return $this->authService->getCurrentUser();
     }
 
@@ -44,9 +43,44 @@ class BaseController extends Controller
      *
      * @return bool
      */
-    protected function isAuthenticated(): bool
-    {
+    protected function isAuthenticated(): bool {
         return $this->authService->isAuthenticated();
+    }
+
+    /**
+     * Get the current authenticated user's id
+     *
+     * @return int
+     */
+    protected function getUserId(): int {
+        return $this->authService->getUserId();
+    }
+
+    /**
+     * Get the current authenticated user's username
+     *
+     * @return string
+     */
+    protected function getUsername(): string {
+        return $this->authService->getUsername();
+    }
+
+    /**
+     * Get the current authenticated user's full name
+     *
+     * @return string
+     */
+    protected function getUserFullname(): string {
+        return $this->authService->getUserFullname();
+    }
+
+    /**
+     * Get the current authenticated user's photo
+     *
+     * @return string
+     */
+    protected function getUserPhoto(): string {
+        return $this->authService->getUserPhoto();
     }
 
     /**
@@ -54,8 +88,7 @@ class BaseController extends Controller
      *
      * @return int
      */
-    protected function getUserRole(): int
-    {
+    protected function getUserRole(): int {
         return $this->authService->getUserRole();
     }
 
@@ -65,8 +98,7 @@ class BaseController extends Controller
      * @param int $role
      * @return bool
      */
-    protected function hasRole(int $role): bool
-    {
+    protected function hasRole(int $role): bool {
         return $this->authService->hasRole($role);
     }
 
@@ -76,8 +108,7 @@ class BaseController extends Controller
      * @param array $roles
      * @return bool
      */
-    protected function hasAnyRole(array $roles): bool
-    {
+    protected function hasAnyRole(array $roles): bool {
         return $this->authService->hasAnyRole($roles);
     }
 
@@ -87,8 +118,7 @@ class BaseController extends Controller
      *
      * @return bool True if authenticated, redirects otherwise
      */
-    protected function requireAuth(): bool
-    {
+    protected function requireAuth(): bool {
         if (!$this->isAuthenticated()) {
             $this->flashSession->error('Please log in to access this page');
             $this->response->redirect('login');
@@ -106,8 +136,7 @@ class BaseController extends Controller
      * @param string $redirectTo Where to redirect if unauthorized
      * @return bool True if authorized, redirects otherwise
      */
-    protected function requireRole(int $roleId, string $redirectTo = 'main'): bool
-    {
+    protected function requireRole(int $roleId, string $redirectTo = 'main'): bool {
         if (!$this->requireAuth()) {
             return false;
         }
@@ -128,8 +157,7 @@ class BaseController extends Controller
      * @param string $redirectTo Where to redirect if unauthorized
      * @return bool
      */
-    protected function requireAnyRole(array $roles, string $redirectTo = 'main'): bool
-    {
+    protected function requireAnyRole(array $roles, string $redirectTo = 'main'): bool {
         if (!$this->requireAuth()) {
             return false;
         }
@@ -149,8 +177,7 @@ class BaseController extends Controller
      * @param string $message Error message to log
      * @return void
      */
-    protected function logError(string $message): void
-    {
+    protected function logError(string $message): void {
         error_log("[Homecare] " . $message);
     }
 
@@ -159,154 +186,13 @@ class BaseController extends Controller
      *
      * @return void
      */
-    protected function setCommonViewVars(): void
-    {
+    protected function setCommonViewVars(): void {
         $user = $this->getCurrentUser();
         if ($user) {
             $this->view->currentUser = $user;
-            $this->view->userRole = $user['role'];
-            $this->view->isAdmin = $user['role'] === 0;
-            $this->view->isManager = $user['role'] === 1;
-            $this->view->isCaregiver = $user['role'] === 2;
+            $this->view->isAdmin = $user[Auth::ROLE] === 0;
+            $this->view->isManager = $user[Auth::ROLE] === 1;
+            $this->view->isCaregiver = $user[Auth::ROLE] === 2;
         }
-    }
-
-    /**
-     * Get filtered data based on user role
-     * Admins/Managers see all data, Caregivers see only their assigned data
-     *
-     * @param string $dataType Type of data (patients, visits, etc.)
-     * @return array
-     */
-    protected function getFilteredDataByRole(string $dataType): array
-    {
-        $user = $this->getCurrentUser();
-        if (!$user) {
-            return [];
-        }
-
-        // Admins and Managers see all data
-        if ($user['role'] < 2) {
-            return ['filter' => 'all', 'user_id' => null];
-        }
-
-        // Caregivers see only their assigned data
-        return ['filter' => 'assigned', 'user_id' => $user['id']];
-    }
-
-    // ===== LEGACY METHODS FOR BACKWARD COMPATIBILITY =====
-    // These methods maintain compatibility with existing code
-
-    /**
-     * Get the decoded array from the token (legacy)
-     *
-     * @param string|null $token JWT token to decode
-     * @return array|null Decoded token data or null if invalid
-     */
-    protected function decodeToken(?string $token): ?array
-    {
-        if ($token === null) {
-            return null;
-        }
-
-        try {
-            $decoded = base64_decode($token, true);
-            if ($decoded === false) {
-                return null;
-            }
-
-            return json_decode($decoded, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
-            $this->logError("Invalid JSON in token: " . $e->getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Check if the token is expired (legacy)
-     *
-     * @param string|null $token JWT token to check
-     * @return bool True if expired, null, or invalid
-     */
-    protected function isExpired(?string $token): bool
-    {
-        $auth = $this->decodeToken($token);
-        if ($auth === null) {
-            return true;
-        }
-
-        $currentTime = (int)(microtime(true) * 1000);
-        return $auth['expiration'] < $currentTime;
-    }
-
-    /**
-     * Get username from token (legacy)
-     *
-     * @param string|null $token JWT token
-     * @return string Username or "Unknown" if invalid
-     */
-    protected function getUsername(?string $token): string
-    {
-        $auth = $this->decodeToken($token);
-        return $auth['username'] ?? 'Unknown';
-    }
-
-    /**
-     * Get user ID from token (legacy)
-     *
-     * @param string|null $token JWT token
-     * @return int User ID or -1 if invalid
-     */
-    protected function getUserId(?string $token): int
-    {
-        $auth = $this->decodeToken($token);
-        return $auth['id'] ?? -1;
-    }
-
-    /**
-     * Get user role from token (legacy)
-     *
-     * @param string|null $token JWT token
-     * @return int Role ID or -1 if invalid
-     */
-    protected function getRole(?string $token): int
-    {
-        $auth = $this->decodeToken($token);
-        return $auth['role'] ?? -1;
-    }
-
-    /**
-     * Get name from token (legacy)
-     *
-     * @param string|null $token JWT token
-     * @return string Name or "Unknown" if invalid
-     */
-    protected function getName(?string $token): string
-    {
-        $auth = $this->decodeToken($token);
-        // Try to get name, fallback to username, then to "Unknown"
-        return $auth['name'] ?? $auth['username'] ?? 'Unknown';
-    }
-
-    /**
-     * Check if the current session has a valid token (legacy)
-     *
-     * @return bool True if valid session exists
-     */
-    protected function hasValidSession(): bool
-    {
-        return $this->isAuthenticated();
-    }
-
-    /**
-     * Get the current user's token from session (legacy)
-     *
-     * @return string|null Token or null if not found
-     */
-    protected function getSessionToken(): ?string
-    {
-        return $this->session->has('auth-token')
-            ? $this->session->get('auth-token')
-            : null;
     }
 }

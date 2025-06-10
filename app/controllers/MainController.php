@@ -15,7 +15,6 @@ use App\utils\HttpRequest;
 class MainController extends BaseController {
 
     private string $token;
-    private string $name;
     private string $username;
     private int $userId;
     private int $userRole; // Changed from string to int

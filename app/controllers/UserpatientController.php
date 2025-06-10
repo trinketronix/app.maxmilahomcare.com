@@ -5,11 +5,9 @@ use App\Utils\Endpoint;
 //use Phalcon\Http\Response;
 use App\Utils\HttpRequest;
 
-class UserpatientController extends BaseController
-{
+class UserpatientController extends BaseController {
 
-    public function indexAction()
-    {
+    public function indexAction() {
 
         // Check authentication
         $token = $this->session->get('auth-token');
@@ -55,8 +53,7 @@ class UserpatientController extends BaseController
 
     }
 
-    public function manageAction($userId)
-    {
+    public function manageAction($userId) {
 
         // Retrieve caregiver data from session
         $userId = $this->session->get('user_id');
@@ -79,8 +76,7 @@ class UserpatientController extends BaseController
     }
 
 
-    private function getAssignedPatients($userId)
-    {
+    private function getAssignedPatients($userId) {
         $token = $this->session->get('auth-token');
         $url = "{$this->config->api->baseUrl}/assigned/patients/{$userId}";
         $ch = curl_init($url);
@@ -104,8 +100,7 @@ class UserpatientController extends BaseController
     }
 
 
-    private function getUserUnassignedPatients($userId)
-    {
+    private function getUserUnassignedPatients($userId) {
         {
             $token = $this->session->get('auth-token');
             $url = BASE_URL."/unassigned/patients/{$userId}";
