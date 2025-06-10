@@ -64,6 +64,7 @@ class AuthMiddleware extends Injectable
         'visit:update' => [0, 1],            // Update visit
         'visit:delete' => [0],               // Delete visit (Admin only)
         'visit:schedule' => [0, 1, 2],       // Schedule visits
+        'visit:myvisits' => [2],             // List caregiver's own visits (no underscore in action name)
 
         // Patient Assignment (Admin & Manager)
         'assignpatient:index' => [0, 1],     // Patient assignment interface
@@ -74,8 +75,8 @@ class AuthMiddleware extends Injectable
 
         // Caregiver-specific routes
         'patients:assigned' => [2],          // List only assigned patients
-        'visit:my_visits' => [2],            // List caregiver's own visits
-        'visit:my_schedule' => [2],          // View caregiver's schedule
+        'visit:myvisits' => [2],             // List caregiver's own visits
+        'visit:myschedule' => [2],           // View caregiver's schedule
 
         // Profile routes (all roles can access their own)
         'details:index' => [0, 1, 2],        // View own profile
