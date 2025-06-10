@@ -90,14 +90,21 @@ class HttpRequest {
         return self::getBaseUrl() . $endpoint;
     }
 
+
     /**
      * Get API base URL from environment or use default
      *
      * @return string Base URL for API
      */
     public static function getBaseUrl(): string {
-        $config = Di::getDefault()->getConfig();
-        return $config->api->baseUrl;
+        $di = Di::getDefault();
+        if ($di && $di->has('config')) {
+            $config = $di->getConfig();
+            return $config->api->baseUrl;
+        }
+
+        // Fallback to constant or environment variable
+        return defined('BASE_URL') ? BASE_URL : (getenv('BASE_URL_API') ?: 'https://api-test.maxmilahomecare.com');
     }
 
     /**
