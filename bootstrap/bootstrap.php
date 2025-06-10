@@ -1,6 +1,5 @@
 <?php
 
-
 // Environment configuration
 if (!getenv('APP_ENV')) {
     putenv('APP_ENV=development');
@@ -14,6 +13,7 @@ if (getenv('APP_ENV') === 'development') {
     error_reporting(E_ALL);
     ini_set('display_errors', 0);
 }
+
 // Define path constants
 define('BASE_PATH', dirname(__DIR__));
 define('APP_PATH', BASE_PATH . '/app');
@@ -32,6 +32,9 @@ if (file_exists($envFile)) {
     }
 }
 
+// Define API base URL constant
+define('BASE_URL', getenv('BASE_URL_API') ?: 'https://api-test.maxmilahomecare.com');
+
 // Ensure required directories exist
 $requiredDirs = [
     CACHE_PATH,
@@ -46,4 +49,5 @@ foreach ($requiredDirs as $dir) {
         mkdir($dir, 0755, true);
     }
 }
+
 return true;

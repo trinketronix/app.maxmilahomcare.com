@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu</title>
+    <title>Admin Dashboard - Maxmila Homecare</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons for icons -->
@@ -24,6 +24,10 @@
         h2 {
             color: #d85b85; /* Pinkish color for header */
             font-size: 2.5em;
+        }
+        h3 {
+            color: #c2185b;
+            font-size: 1.8em;
         }
         .d-grid {
             display: grid;
@@ -49,29 +53,57 @@
         .btn i {
             margin-right: 10px;
         }
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-<h2 class="text-center mb-4">Welcome <?= $username; ?> </h2>
-<!--h3 class="text-center mb-4">decode data from token <?= "id: $userid , role: $role , expiration: $expiration"; ?></h3>-->
-<h3 class="text-center mb-4">Administrator</h3>
-    <div class="container">
-        <h2 class="text-center mb-4">Menu</h2>
-        
-        <div class="d-grid gap-3">
-            <?php foreach ($menuItems as $item): ?>
-            <a href="<?= $item['url'] ?>" class="btn btn-lg">
-                <i class="bi bi-<?= $item['icon'] ?>"></i>
-                <?= $item['text'] ?>
-            </a>
-            <?php endforeach; ?>
+<div class="container">
+    <div class="welcome-section">
+        <h2>Welcome <?= htmlspecialchars($username ?? 'User') ?></h2>
+        <div class="role-badge">
+            <?php if ($role == 0): ?>
+                Administrator
+            <?php elseif ($role == 1): ?>
+                Manager
+            <?php else: ?>
+                User
+            <?php endif; ?>
         </div>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script></script>
+    <h3 class="text-center mb-4">Dashboard Menu</h3>
+
+    <div class="d-grid gap-3">
+        <?php if (!empty($menuItems)): ?>
+            <?php foreach ($menuItems as $item): ?>
+                <a href="<?= $item['url'] ?>" class="btn btn-lg">
+                    <i class="bi bi-<?= $item['icon'] ?>"></i>
+                    <?= $item['text'] ?>
+                </a>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="alert alert-warning">
+                No menu items available. Please contact administrator.
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

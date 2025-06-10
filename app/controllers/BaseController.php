@@ -284,6 +284,7 @@ class BaseController extends Controller
     protected function getName(?string $token): string
     {
         $auth = $this->decodeToken($token);
+        // Try to get name, fallback to username, then to "Unknown"
         return $auth['name'] ?? $auth['username'] ?? 'Unknown';
     }
 
