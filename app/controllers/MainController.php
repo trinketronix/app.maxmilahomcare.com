@@ -1,9 +1,9 @@
 <?php
 
-namespace Homecare\Controllers;
+namespace App\Controllers;
 
 use Phalcon\Mvc\Controller;
-use Homecare\utils\HttpRequest;
+use App\utils\HttpRequest;
 
 /**
  * Main Controller
@@ -13,13 +13,26 @@ use Homecare\utils\HttpRequest;
  * and provides appropriate navigation based on user role.
  */
 class MainController extends BaseController {
+
+    private string $token;
+    private string $name;
+    private string $username;
+    private string $userId;
+    private string $userRole;
     /**
      * Initialize method - runs before every action
      */
     public function initialize() {
         // Require authentication for all actions in this controller
         if (!$this->session->has('auth-token')) {
-            $this->flashSession->error('Please log in to access this page');
+            $this->flashSession->error('Invalid authentication token.');
+            return $this->response->redirect('login');
+        }
+
+        $this->token = $this->session->get('auth-token');
+
+        if($this->isExpired($this->token)){
+            $this->flashSession->error('Session expired please login again.');
             return $this->response->redirect('login');
         }
     }
@@ -43,22 +56,18 @@ class MainController extends BaseController {
      * @return void
      */
     private function setUserInformation() {
-        $token = $this->session->get('auth-token');
 
         // User info
-        $username = $this->getUsername($token);
-        $userId = $this->getUserId($token);
-        $userRole = $this->getRole($token);
-
-        // Token status
-        $isExpired = $this->isExpired($token);
-        $expiration = $isExpired ? "is expired" : "is not expired";
+        $this->name = $this->getName($this->token);
+        $this->username = $this->getUsername($this->token);
+        $this->userId = $this->getUserId($this->token);
+        $this->userRole = $this->getRole($this->token);
 
         // Set view variables
-        $this->view->setVar("username", $username);
-        $this->view->setVar("userid", $userId);
-        $this->view->setVar("role", $userRole);
-        $this->view->setVar("expiration", $expiration);
+        $this->view->setVar("name", $this->name);
+        $this->view->setVar("username", $this->username);
+        $this->view->setVar("userid", $this->userId);
+        $this->view->setVar("role", $this->userRole);
     }
 
     /**
@@ -67,11 +76,9 @@ class MainController extends BaseController {
      * @return void
      */
     private function loadMenuByRole() {
-        $token = $this->session->get('auth-token');
-        $role = $this->getRole($token);
 
         // Admin and Manager menu
-        if ($role < 2) {
+        if ($this->role < 2) {
             $this->loadAdminMenu();
         } else {
             $this->loadCaregiverMenu();

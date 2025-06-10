@@ -1,9 +1,9 @@
 <?php
 
-namespace Homecare\Controllers;
+namespace App\Controllers;
 
 use Phalcon\Mvc\Controller;
-use Homecare\utils\HttpRequest;
+use App\utils\HttpRequest;
 
 class CaregiverController extends BaseController {
 

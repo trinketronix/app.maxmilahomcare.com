@@ -2,11 +2,11 @@
 //use Phalcon\Http\Response;
 //use Phalcon\Http\Client\Request;
 
-namespace Homecare\Controllers;
+namespace App\Controllers;
 
 use Exception;
-use Homecare\Utils\Endpoint;
-use Homecare\Utils\HttpRequest;
+use App\Utils\Endpoint;
+use App\Utils\HttpRequest;
 
 class AssignpatientController extends BaseController
 {

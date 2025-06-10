@@ -1,9 +1,9 @@
 <?php
-namespace Homecare\Controllers;
+namespace App\Controllers;
 use Exception;
-use Homecare\Utils\Endpoint;
+use App\Utils\Endpoint;
 //use Phalcon\Http\Response;
-use Homecare\Utils\HttpRequest;
+use App\Utils\HttpRequest;
 
 class UserpatientController extends BaseController
 {
@@ -82,7 +82,7 @@ class UserpatientController extends BaseController
     private function getAssignedPatients($userId)
     {
         $token = $this->session->get('auth-token');
-        $url = BASE_URL."/assigned/patients/{$userId}";
+        $url = "{$this->config->api->baseUrl}/assigned/patients/{$userId}";
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [

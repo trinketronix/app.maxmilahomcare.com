@@ -1,8 +1,8 @@
 <?php
 
-namespace Homecare\Controllers;
-use Homecare\Utils\Endpoint;
-use Homecare\Utils\HttpRequest;
+namespace App\Controllers;
+use App\Utils\Endpoint;
+use App\Utils\HttpRequest;
 use Phalcon\Mvc\Controller;
 class DetailsusersController extends BaseController {
     public function indexAction(){

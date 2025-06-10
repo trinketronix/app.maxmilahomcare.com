@@ -1,7 +1,7 @@
 <?php
 
-namespace Homecare\Controllers;
-use Homecare\Utils\HttpRequest;
+namespace App\Controllers;
+use App\Utils\HttpRequest;
 use Phalcon\Mvc\Controller;
 class TestController extends BaseController {
     public function indexAction(){

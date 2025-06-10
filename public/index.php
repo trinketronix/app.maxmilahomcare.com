@@ -1,57 +1,34 @@
 <?php
-
-/**
- * Entry point for the application.
- * Simplified version that includes bootstrap files.
- */
-
-use Phalcon\Di\FactoryDefault;
 use Phalcon\Mvc\Application;
-use Phalcon\Autoload\Loader;
 
-// Define paths
-define('BASE_PATH', dirname(__DIR__));
-define('APP_PATH', BASE_PATH . '/app');
-define('CACHE_PATH', BASE_PATH . '/cache');
-define('BASE_URL',getenv('BASE_URL_API')?: 'https://api-test.maxmilahomecare.com');
-// Ensure cache directories exist
-if (!is_dir(CACHE_PATH . '/data')) {
-    mkdir(CACHE_PATH . '/data', 0777, true);
-}
-if (!is_dir(CACHE_PATH . '/view')) {
-    mkdir(CACHE_PATH . '/view', 0777, true);
-}
+require_once dirname(__DIR__) . '/bootstrap/bootstrap.php';
 
-// Register an autoloader
-$loader = new Loader();
-$loader->setNamespaces([
-    'Homecare\Constants' => APP_PATH . '/constants/',
-    'Homecare\Utils' => APP_PATH . '/utils/',
-    'Homecare\Models' => APP_PATH . '/models/',
-    'Homecare\Controllers' => APP_PATH . '/controllers/',
-])->register();
-
-// Create a DI container
-$di = new FactoryDefault();
-
-// Load service configurations
-require_once APP_PATH . '/bootstrap/services.php';
-
-// Load router configuration
-require_once APP_PATH . '/bootstrap/router.php';
-
-// Load error handler
-require_once APP_PATH . '/bootstrap/error-handler.php';
-
-// Create application
-$application = new Application($di);
-
-// Handle the request
 try {
+    require_once BASE_PATH . '/config/loader.php';
+    $di = require_once BASE_PATH . '/config/services.php';
+
+    $errorHandler = $di->getErrorHandler();
+    set_exception_handler([$errorHandler, 'handleException']);
+    set_error_handler([$errorHandler, 'handleError']);
+    register_shutdown_function([$errorHandler, 'handleFatalError']);
+
+    $application = new Application($di);
     $response = $application->handle($_SERVER['REQUEST_URI']);
     $response->send();
-} catch (\Exception $e) {
-    // Handle exceptions using the configured error handler
-    $errorHandler = $di->get('errorHandler');
-    $errorHandler->handleException($e);
+
+} catch (\Throwable $e) {
+    // Fallback error handling if our error handler fails
+    error_log('Critical Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+
+    if (getenv('APP_ENV') === 'production') {
+        http_response_code(500);
+        echo '<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Server Error</h1><p>Please try again later.</p></body></html>';
+    } else {
+        http_response_code(500);
+        echo '<h1>Critical Application Error</h1>';
+        echo '<p><strong>Message:</strong> ' . htmlspecialchars($e->getMessage()) . '</p>';
+        echo '<p><strong>File:</strong> ' . htmlspecialchars($e->getFile()) . '</p>';
+        echo '<p><strong>Line:</strong> ' . $e->getLine() . '</p>';
+        echo '<pre>' . htmlspecialchars($e->getTraceAsString()) . '</pre>';
+    }
 }

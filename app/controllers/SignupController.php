@@ -4,13 +4,13 @@
 //use Phalcon\Http\Client\Request;
 
 
-namespace Homecare\Controllers;
+namespace App\Controllers;
 
 use Exception;
 use Phalcon\Http\Response;
 use Phalcon\Http\Request;
 use Phalcon\Mvc\Controller;
-use Homecare\Utils\HttpRequest;
+use App\Utils\HttpRequest;
 
 
 class SignupController extends BaseController

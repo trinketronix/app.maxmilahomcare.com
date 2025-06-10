@@ -1,9 +1,10 @@
 <?php
 
-namespace Homecare\Utils;
+namespace App\Utils;
 
 use Exception;
 use JsonException;
+use Phalcon\Di\Di;
 
 /**
  * HttpRequest class for handling API requests
@@ -95,7 +96,8 @@ class HttpRequest {
      * @return string Base URL for API
      */
     public static function getBaseUrl(): string {
-        return BASE_URL;
+        $config = Di::getDefault()->getConfig();
+        return $config->api->baseUrl;
     }
 
     /**

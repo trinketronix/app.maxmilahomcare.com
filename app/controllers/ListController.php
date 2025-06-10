@@ -1,10 +1,10 @@
 <?php
 
-namespace Homecare\Controllers;
+namespace App\Controllers;
 
 use Phalcon\Mvc\Controller;
-use Homecare\Models\Users;
-use Homecare\utils\HttpRequest;
+use App\Models\Users;
+use App\utils\HttpRequest;
 
 class ListController extends BaseController
 {

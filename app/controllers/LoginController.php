@@ -1,11 +1,11 @@
 <?php
 
-namespace Homecare\Controllers;
+namespace App\Controllers;
 
 use Exception;
 use Phalcon\Http\Response;
-use Homecare\Utils\HttpRequest;
-use Homecare\Utils\Endpoint;
+use App\Utils\HttpRequest;
+use App\Utils\Endpoint;
 
 /**
  * Login Controller
@@ -24,7 +24,7 @@ class LoginController extends BaseController {
             // Determine where to redirect based on user role
             $token = $this->session->get('auth-token');
             $role = $this->getRole($token);
-            return $this->redirectBasedOnRole($role);
+            $this->redirectBasedOnRole($role);
         }
 
         // Process login form submission
@@ -71,7 +71,7 @@ class LoginController extends BaseController {
             error_log('Login error: ' . $e->getMessage());
 
             // Inform the user
-            $this->flashSession->error('An error occurred during login: ' . $e->getMessage());
+            $this->flashSession->error('An exception error occurred during login: ' . $e->getMessage());
 
             // Stay on login page
             return $this->dispatcher->forward([
@@ -91,11 +91,6 @@ class LoginController extends BaseController {
     private function establishUserSession($username, $token) {
         // Store essential data in session
         $this->session->set('auth-token', $token);
-        $this->session->set('username', $username);
-
-        // You could store additional user data here
-        // $userData = $this->getUserProfile($token);
-        // $this->session->set('user_data', $userData);
     }
 
     /**
@@ -125,7 +120,7 @@ class LoginController extends BaseController {
         // If token is invalid or missing
         if ($role === -1) {
             $this->session->destroy();
-            $this->flashSession->error('Your session is invalid or expired. Please login again.');
+            $this->flashSession->error('Your user is not activated, please check your email to activate your account.');
             return $this->response->redirect('login');
         }
 
