@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\ErrorHandlerService;
+use App\Services\AuthService;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Mvc\View;
 use Phalcon\Mvc\Url;
@@ -106,6 +107,11 @@ $di->setShared('viewCache', function () use ($di) {
         'lifetime'         => $config->cache->lifetime,
         'storageDir'       => $config->cache->viewDir,
     ]);
+});
+
+// Authentication Service
+$di->setShared('auth', function () {
+    return new AuthService();
 });
 
 // Error Handler Service

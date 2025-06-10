@@ -5,6 +5,7 @@ namespace App\Middleware;
 use Phalcon\Events\Event;
 use Phalcon\Mvc\Dispatcher;
 use Phalcon\Di\Injectable;
+use App\Services\AuthService;
 
 /**
  * Authentication Middleware
@@ -101,9 +102,15 @@ class AuthMiddleware extends Injectable
             return true;
         }
 
+        // Get auth service
+        $authService = $this->getDI()->get('auth');
+
         // Check if user is authenticated
-        if (!$this->session->has('auth-token')) {
+        if (!$authService->isAuthenticated()) {
             $this->flashSession->error('Please log in to access this page');
+
+            // Store intended URL for redirect after login
+            $this->session->set('redirect_after_login', $this->request->getURI());
 
             // Redirect to login
             $dispatcher->forward([
@@ -114,25 +121,9 @@ class AuthMiddleware extends Injectable
             return false;
         }
 
-        // Get token and check if expired
-        $token = $this->session->get('auth-token');
-
-        // Decode and validate token
-        if ($this->isTokenExpired($token)) {
-            $this->session->destroy();
-            $this->flashSession->error('Your session has expired. Please log in again.');
-
-            $dispatcher->forward([
-                'controller' => 'login',
-                'action' => 'index'
-            ]);
-
-            return false;
-        }
-
         // Check role-based access
         if (isset($this->roleBasedRoutes[$routeKey])) {
-            $userRole = $this->getUserRole($token);
+            $userRole = $authService->getUserRole();
             $allowedRoles = $this->roleBasedRoutes[$routeKey];
 
             if (!in_array($userRole, $allowedRoles)) {
@@ -153,7 +144,7 @@ class AuthMiddleware extends Injectable
             // This ensures new routes must be explicitly added
             $this->flashSession->warning('Access to this page is restricted');
 
-            $userRole = $this->getUserRole($token);
+            $userRole = $authService->getUserRole();
             $redirectController = $userRole < 2 ? 'main' : 'caregiver';
 
             $dispatcher->forward([
@@ -163,9 +154,6 @@ class AuthMiddleware extends Injectable
 
             return false;
         }
-
-        // Set role context for controllers to use
-        $this->setRoleContext($token);
 
         return true;
     }
