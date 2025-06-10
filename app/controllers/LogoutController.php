@@ -2,19 +2,27 @@
 
 namespace App\Controllers;
 
-use Phalcon\Mvc\Controller;
-
+/**
+ * Logout Controller
+ *
+ * Handles user logout
+ */
 class LogoutController extends BaseController
 {
-    public function indexAction() {
-        // Clear session data (destroy the session)
-        $this->session->remove('auth-token');
-        $this->session->remove('username');
+    /**
+     * Log out the current user
+     *
+     * @return mixed
+     */
+    public function indexAction()
+    {
+        // Use the auth service to logout
+        $this->authService->logout();
 
-        // Optionally, add a flash message
+        // Add success message
         $this->flashSession->success('You have been logged out successfully.');
 
-        // Redirect to login page (or any other page like homepage)
+        // Redirect to login page
         return $this->response->redirect('login');
     }
 }

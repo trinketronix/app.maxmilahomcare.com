@@ -5,229 +5,80 @@ namespace App\Controllers;
 use Exception;
 use JsonException;
 use App\Constants\Auth;
+use App\Services\AuthService;
 use Phalcon\Mvc\Controller;
 
 /**
  * Base Controller
  *
- * Provides common functionality for all controllers including token management
- * and authentication utilities.
+ * Provides common functionality for all controllers including authentication utilities.
  */
-class BaseController extends Controller {
+class BaseController extends Controller
+{
     /**
-     * Default error values for invalid tokens
+     * @var AuthService
      */
-    protected const DEFAULT_ERROR_VALUES = [
-        'name' => 'Unknown',
-        'username' => 'Unknown',
-        'id' => -1,
-        'role' => -1
-    ];
+    protected $authService;
 
     /**
-     * Get the decoded array from the token
-     *
-     * @param string|null $token JWT token to decode
-     * @return array|null Decoded token data or null if invalid
+     * Initialize base controller
      */
-    protected function decodeToken(?string $token): ?array {
-        // Handle null token
-        if ($token === null) {
-            $this->logError("Token is null.");
-            return null;
-        }
-
-        // Decode base64
-        $decoded = base64_decode($token, true);
-        if ($decoded === false) {
-            $this->logError("Invalid Base64 token.");
-            return null;
-        }
-
-        // Parse JSON
-        try {
-            return json_decode($decoded, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
-            $this->logError("Invalid JSON in token: " . $e->getMessage());
-            return null;
-        }
+    public function initialize()
+    {
+        // Get auth service from DI
+        $this->authService = $this->di->get('auth');
     }
 
     /**
-     * Get current time in milliseconds
+     * Get the current authenticated user
      *
-     * @return int Current timestamp in milliseconds
+     * @return array|null
      */
-    private function getCurrentMilliseconds(): int {
-        return (int) (microtime(true) * 1000);
+    protected function getCurrentUser(): ?array
+    {
+        return $this->authService->getCurrentUser();
     }
 
     /**
-     * Check if the token is expired
+     * Check if user is authenticated
      *
-     * @param string|null $token JWT token to check
-     * @return bool True if expired, null, or invalid
+     * @return bool
      */
-    protected function isExpired(?string $token): bool {
-        $auth = $this->getTokenData($token);
-
-        if ($auth === null) {
-            return true; // Invalid or null token is considered expired
-        }
-
-        return $auth[Auth::EXPIRATION] < $this->getCurrentMilliseconds();
+    protected function isAuthenticated(): bool
+    {
+        return $this->authService->isAuthenticated();
     }
 
     /**
-     * Get token data safely with error handling
+     * Get current user's role
      *
-     * This is a central method to retrieve token data used by other methods
-     *
-     * @param string|null $token JWT token
-     * @return array|null Decoded token data or null if invalid
+     * @return int
      */
-    protected function getTokenData(?string $token): ?array {
-        if ($token === null) {
-            return null;
-        }
-
-        try {
-            return $this->decodeToken($token);
-        } catch (Exception $e) {
-            $this->logError("Error processing token: " . $e->getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Generic method to extract a specific field from token
-     *
-     * @param string|null $token JWT token
-     * @param string $field Field name to extract
-     * @param mixed $default Default value if not found
-     * @return mixed Field value or default if not found
-     */
-    protected function getTokenField(?string $token, string $field, $default) {
-        $auth = $this->getTokenData($token);
-
-        if ($auth === null || !isset($auth[$field])) return $default;
-
-        return $auth[$field];
-    }
-
-    /**
-     * Get username from token
-     *
-     * @param string|null $token JWT token
-     * @return string Username or "Unknown" if invalid
-     */
-    protected function getUsername(?string $token): string {
-        return $this->getTokenField(
-            $token,
-            Auth::USERNAME,
-            self::DEFAULT_ERROR_VALUES['username']
-        );
-    }
-
-    /**
-     * Get user ID from token
-     *
-     * @param string|null $token JWT token
-     * @return int User ID or -1 if invalid
-     */
-    protected function getUserId(?string $token): int {
-        return $this->getTokenField(
-            $token,
-            Auth::ID,
-            self::DEFAULT_ERROR_VALUES['id']
-        );
-    }
-
-    /**
-     * Get user role from token
-     *
-     * @param string|null $token JWT token
-     * @return int Role ID or -1 if invalid
-     */
-    protected function getRole(?string $token): int {
-        return $this->getTokenField(
-            $token,
-            Auth::ROLE,
-            self::DEFAULT_ERROR_VALUES['role']
-        );
-    }
-
-    /**
-     * Check if the current session has a valid token
-     *
-     * @return bool True if valid session exists
-     */
-    protected function hasValidSession(): bool {
-        if (!$this->session->has('auth-token')) {
-            return false;
-        }
-
-        $token = $this->session->get('auth-token');
-        return !$this->isExpired($token);
-    }
-
-    /**
-     * Get the current user's token from session
-     *
-     * @return string|null Token or null if not found
-     */
-    protected function getSessionToken(): ?string {
-        return $this->session->has('auth-token')
-            ? $this->session->get('auth-token')
-            : null;
-    }
-
-    /**
-     * Get the current user's profile information
-     *
-     * @return array User profile with default values if invalid
-     */
-    protected function getCurrentUser(): array {
-        $token = $this->getSessionToken();
-
-        if ($token === null) {
-            return [
-                'id' => self::DEFAULT_ERROR_VALUES['id'],
-                'name' => self::DEFAULT_ERROR_VALUES['name'],
-                'username' => self::DEFAULT_ERROR_VALUES['username'],
-                'role' => self::DEFAULT_ERROR_VALUES['role'],
-                'isAuthenticated' => false
-            ];
-        }
-
-        return [
-            'id' => $this->getUserId($token),
-            'name' => $this->getName($token),
-            'username' => $this->getUsername($token),
-            'role' => $this->getRole($token),
-            'isAuthenticated' => !$this->isExpired($token)
-        ];
+    protected function getUserRole(): int
+    {
+        return $this->authService->getUserRole();
     }
 
     /**
      * Check if user has a specific role
      *
-     * @param int $roleId Role ID to check against
-     * @return bool True if user has the specified role
+     * @param int $role
+     * @return bool
      */
-    protected function hasRole(int $roleId): bool {
-        $token = $this->getSessionToken();
-        return $this->getRole($token) === $roleId;
+    protected function hasRole(int $role): bool
+    {
+        return $this->authService->hasRole($role);
     }
 
     /**
-     * Log an error message consistently
+     * Check if user has any of the specified roles
      *
-     * @param string $message Error message to log
-     * @return void
+     * @param array $roles
+     * @return bool
      */
-    protected function logError(string $message): void {
-        error_log("[Homecare Auth] " . $message);
+    protected function hasAnyRole(array $roles): bool
+    {
+        return $this->authService->hasAnyRole($roles);
     }
 
     /**
@@ -236,8 +87,9 @@ class BaseController extends Controller {
      *
      * @return bool True if authenticated, redirects otherwise
      */
-    protected function requireAuth(): bool {
-        if (!$this->hasValidSession()) {
+    protected function requireAuth(): bool
+    {
+        if (!$this->isAuthenticated()) {
             $this->flashSession->error('Please log in to access this page');
             $this->response->redirect('login');
             return false;
@@ -254,7 +106,8 @@ class BaseController extends Controller {
      * @param string $redirectTo Where to redirect if unauthorized
      * @return bool True if authorized, redirects otherwise
      */
-    protected function requireRole(int $roleId, string $redirectTo = 'main'): bool {
+    protected function requireRole(int $roleId, string $redirectTo = 'main'): bool
+    {
         if (!$this->requireAuth()) {
             return false;
         }
@@ -266,5 +119,193 @@ class BaseController extends Controller {
         }
 
         return true;
+    }
+
+    /**
+     * Require any of the specified roles
+     *
+     * @param array $roles Array of role IDs
+     * @param string $redirectTo Where to redirect if unauthorized
+     * @return bool
+     */
+    protected function requireAnyRole(array $roles, string $redirectTo = 'main'): bool
+    {
+        if (!$this->requireAuth()) {
+            return false;
+        }
+
+        if (!$this->hasAnyRole($roles)) {
+            $this->flashSession->error('You do not have permission to access this page');
+            $this->response->redirect($redirectTo);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Log an error message consistently
+     *
+     * @param string $message Error message to log
+     * @return void
+     */
+    protected function logError(string $message): void
+    {
+        error_log("[Homecare] " . $message);
+    }
+
+    /**
+     * Set common view variables for authenticated pages
+     *
+     * @return void
+     */
+    protected function setCommonViewVars(): void
+    {
+        $user = $this->getCurrentUser();
+        if ($user) {
+            $this->view->currentUser = $user;
+            $this->view->userRole = $user['role'];
+            $this->view->isAdmin = $user['role'] === 0;
+            $this->view->isManager = $user['role'] === 1;
+            $this->view->isCaregiver = $user['role'] === 2;
+        }
+    }
+
+    /**
+     * Get filtered data based on user role
+     * Admins/Managers see all data, Caregivers see only their assigned data
+     *
+     * @param string $dataType Type of data (patients, visits, etc.)
+     * @return array
+     */
+    protected function getFilteredDataByRole(string $dataType): array
+    {
+        $user = $this->getCurrentUser();
+        if (!$user) {
+            return [];
+        }
+
+        // Admins and Managers see all data
+        if ($user['role'] < 2) {
+            return ['filter' => 'all', 'user_id' => null];
+        }
+
+        // Caregivers see only their assigned data
+        return ['filter' => 'assigned', 'user_id' => $user['id']];
+    }
+
+    // ===== LEGACY METHODS FOR BACKWARD COMPATIBILITY =====
+    // These methods maintain compatibility with existing code
+
+    /**
+     * Get the decoded array from the token (legacy)
+     *
+     * @param string|null $token JWT token to decode
+     * @return array|null Decoded token data or null if invalid
+     */
+    protected function decodeToken(?string $token): ?array
+    {
+        if ($token === null) {
+            return null;
+        }
+
+        try {
+            $decoded = base64_decode($token, true);
+            if ($decoded === false) {
+                return null;
+            }
+
+            return json_decode($decoded, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            $this->logError("Invalid JSON in token: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Check if the token is expired (legacy)
+     *
+     * @param string|null $token JWT token to check
+     * @return bool True if expired, null, or invalid
+     */
+    protected function isExpired(?string $token): bool
+    {
+        $auth = $this->decodeToken($token);
+        if ($auth === null) {
+            return true;
+        }
+
+        $currentTime = (int)(microtime(true) * 1000);
+        return $auth['expiration'] < $currentTime;
+    }
+
+    /**
+     * Get username from token (legacy)
+     *
+     * @param string|null $token JWT token
+     * @return string Username or "Unknown" if invalid
+     */
+    protected function getUsername(?string $token): string
+    {
+        $auth = $this->decodeToken($token);
+        return $auth['username'] ?? 'Unknown';
+    }
+
+    /**
+     * Get user ID from token (legacy)
+     *
+     * @param string|null $token JWT token
+     * @return int User ID or -1 if invalid
+     */
+    protected function getUserId(?string $token): int
+    {
+        $auth = $this->decodeToken($token);
+        return $auth['id'] ?? -1;
+    }
+
+    /**
+     * Get user role from token (legacy)
+     *
+     * @param string|null $token JWT token
+     * @return int Role ID or -1 if invalid
+     */
+    protected function getRole(?string $token): int
+    {
+        $auth = $this->decodeToken($token);
+        return $auth['role'] ?? -1;
+    }
+
+    /**
+     * Get name from token (legacy)
+     *
+     * @param string|null $token JWT token
+     * @return string Name or "Unknown" if invalid
+     */
+    protected function getName(?string $token): string
+    {
+        $auth = $this->decodeToken($token);
+        return $auth['name'] ?? $auth['username'] ?? 'Unknown';
+    }
+
+    /**
+     * Check if the current session has a valid token (legacy)
+     *
+     * @return bool True if valid session exists
+     */
+    protected function hasValidSession(): bool
+    {
+        return $this->isAuthenticated();
+    }
+
+    /**
+     * Get the current user's token from session (legacy)
+     *
+     * @return string|null Token or null if not found
+     */
+    protected function getSessionToken(): ?string
+    {
+        return $this->session->has('auth-token')
+            ? $this->session->get('auth-token')
+            : null;
     }
 }
