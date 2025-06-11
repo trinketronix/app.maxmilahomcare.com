@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caregiver Details</title>
+
+    <!-- Bootstrap 5.1 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        .page-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            min-height: 100vh;
+            border-left: 1px solid #dcdcdc;
+            border-right: 1px solid #dcdcdc;
+        }
+
+        /* --- Header --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            position: relative;
+        }
+        .back-button { text-decoration: none; color: #333; font-weight: 500; }
+        .header-title { font-size: 2.2rem; font-weight: bold; margin: 0; }
+        .header-title-group { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; }
+        .profile { text-align: center; }
+        .profile-icon { font-size: 1.5rem; border: 2px solid #333; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        .profile-username { font-size: 0.8rem; color: #555; margin-top: 4px; }
+
+        /* --- Main Content & Details Layout --- */
+        .main-content { padding: 1rem; }
+        .current-status-banner { text-align: center; font-weight: 500; margin-bottom: 1.5rem; padding: 0.5rem; border-radius: 8px; }
+        .status-active { background-color: #d1e7dd; color: #0f5132; }
+        .status-inactive { background-color: #f8d7da; color: #842029; }
+        .status-not-verified { background-color: #fff3cd; color: #664d03; }
+        .status-archived { background-color: #e2d9f3; color: #49247a; }
+
+        .details-grid { display: grid; grid-template-columns: auto 1fr; gap: 1rem 2rem; align-items: center; }
+        .avatar-section { grid-column: 1 / 2; text-align: center; }
+        .avatar-img { width: 100px; height: 100px; border: 3px solid #000; padding: 0.5rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; }
+        .role-text { font-weight: bold; }
+        .name-section { grid-column: 2 / 3; }
+
+        .details-section { grid-column: 1 / -1; margin-top: 1rem; }
+        .detail-item { margin-bottom: 1.25rem; }
+        .detail-item .label { font-weight: bold; display: block; margin-bottom: 0.25rem; }
+        .detail-item .value, .detail-item .form-control { color: #555; border-radius: 8px; border: 2px solid #000; padding: 0.5rem 1rem; width: 100%; background: #f8f9fa; }
+        .detail-item .value { border: 2px solid transparent; background: transparent; padding: 0.5rem 0; }
+
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        /* --- Edit/View Mode Toggle --- */
+        .view-mode .form-control, .view-mode .save-button { display: none; }
+        .edit-mode .value, .edit-mode .action-buttons { display: none !important; }
+
+        /* --- Buttons --- */
+        .action-buttons, .save-button { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; }
+        .btn-custom { border: 2px solid #000; border-radius: 8px; font-weight: 500; background-color: #fff; }
+        .btn-custom.main-action { background-color: #000; color: #fff; width: 100%; padding: 0.75rem; }
+
+        /* --- Status Change Modal --- */
+        .status-modal-body { display: flex; justify-content: space-around; text-align: center; padding: 1.5rem 0; }
+        .status-option { cursor: pointer; color: #333; }
+        .status-option:hover { color: #007bff; }
+        .status-option i { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; width: 50px; }
+
+        #alert-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px; }
+
+        @media (min-width: 768px) {
+            .page-container { max-width: 720px; }
+        }
+    </style>
+</head>
+<body onload="initializePage()">
+
+<div id="alert-container"></div>
+
+<div id="page-container" class="page-container view-mode">
+
+    <!-- Header -->
+    <header class="header">
+        <a href="#" class="back-button" id="back-button"><i class="fas fa-chevron-left"></i> Back</a>
+        <div class="header-title-group">
+            <h1 class="header-title">Details</h1>
+        </div>
+        <div class="profile">
+            <div class="profile-icon"><i class="fa-solid fa-user"></i></div>
+            <span class="profile-username">Admin Name</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div id="current-status" class="current-status-banner">Loading status...</div>
+
+        <form id="details-form">
+            <div class="details-grid">
+                <div class="avatar-section">
+                    <div class="avatar-img"><i class="fa-solid fa-user-smile"></i></div>
+                    <div class="role-text" id="role-text">Role</div>
+                </div>
+                <div class="name-section">
+                    <div class="detail-item">
+                        <span class="value" id="firstname-view"></span>
+                        <input type="text" class="form-control" id="firstname-edit" placeholder="First Name">
+                    </div>
+                    <div class="detail-item">
+                        <span class="value" id="middlename-view"></span>
+                        <input type="text" class="form-control" id="middlename-edit" placeholder="Middle Name">
+                    </div>
+                    <div class="detail-item">
+                        <span class="value" id="lastname-view"></span>
+                        <input type="text" class="form-control" id="lastname-edit" placeholder="Last Name">
+                    </div>
+                </div>
+                <div class="details-section">
+                    <!-- All other fields -->
+                    <div class="detail-item"><span class="label">Birthdate</span><span class="value" id="birthdate-view"></span><input type="date" class="form-control" id="birthdate-edit"></div>
+                    <div class="two-column">
+                        <div class="detail-item"><span class="label">Phone</span><span class="value" id="phone-view"></span><input type="tel" class="form-control" id="phone-edit"></div>
+                        <div class="detail-item"><span class="label">Phone 2</span><span class="value" id="phone2-view"></span><input type="tel" class="form-control" id="phone2-edit"></div>
+                    </div>
+                    <div class="two-column">
+                        <div class="detail-item"><span class="label">Email</span><span class="value" id="email-view"></span><input type="email" class="form-control" id="email-edit"></div>
+                        <div class="detail-item"><span class="label">Email 2</span><span class="value" id="email2-view"></span><input type="email" class="form-control" id="email2-edit"></div>
+                    </div>
+                    <div class="two-column">
+                        <div class="detail-item"><span class="label">SSN</span><span class="value" id="ssn-view"></span><input type="text" class="form-control" id="ssn-edit"></div>
+                        <div class="detail-item"><span class="label">Code</span><span class="value" id="code-view"></span><input type="text" class="form-control" id="code-edit"></div>
+                    </div>
+                    <div class="detail-item"><span class="label">Languages</span><span class="value" id="languages-view"></span><input type="text" class="form-control" id="languages-edit"></div>
+                    <div class="detail-item"><span class="label">Description</span><span class="value" id="description-view"></span><textarea class="form-control" id="description-edit"></textarea></div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="button" class="btn btn-custom">Addresses</button>
+                <button type="button" class="btn btn-custom">Patients</button>
+                <button type="button" class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#statusModal">Status</button>
+                <button type="button" class="btn btn-custom" id="edit-btn">Edit</button>
+            </div>
+            <div class="save-button">
+                <button type="button" class="btn btn-custom main-action" id="save-btn">Save</button>
+            </div>
+        </form>
+    </main>
+</div>
+
+<!-- Status Change Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body status-modal-body">
+                <div class="status-option" onclick="changeUserStatus('activate')"><i class="fa-solid fa-user-plus"></i>Activate</div>
+                <div class="status-option" onclick="changeUserStatus('inactivate')"><i class="fa-solid fa-user-slash"></i>Inactivate</div>
+                <div class="status-option" onclick="changeUserStatus('archive')"><i class="fa-solid fa-user-minus"></i>Archive</div>
+                <div class="status-option" onclick="changeUserStatus('delete')"><i class="fa-solid fa-folder-closed"></i>Delete</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let currentUserData = {};
+    const baseUrl = '<?=$baseUrl?>';
+    const apiToken = '<?=$token?>';
+
+    // --- HELPER FUNCTIONS ---
+    const getRoleText = role => ({ 0: 'Administrator', 1: 'Manager', 2: 'Caregiver' }[role] || 'Unknown Role');
+    const getStatusInfo = status => {
+        const s = parseInt(status);
+        const map = {
+            '-1': { text: 'The user is Not Verified', class: 'status-not-verified' },
+            '0': { text: 'The user is currently Inactive', class: 'status-inactive' },
+            '1': { text: 'The user is currently Active', class: 'status-active' },
+            '2': { text: 'The user is Archived', class: 'status-archived' },
+        };
+        return map[s] || { text: 'Unknown Status', class: '' };
+    };
+    const showAlert = (message, type = 'success') => {
+        $('#alert-container').html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`);
+    };
+
+    // --- DATA POPULATION ---
+    function populateView(data) {
+        const statusInfo = getStatusInfo(data.status);
+        $('#current-status').text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
+        $('#role-text').text(getRoleText(data.role));
+
+        for (const key in data) {
+            $(`#${key}-view`).text(data[key] || 'N/A');
+        }
+    }
+
+    function populateEdit(data) {
+        for (const key in data) {
+            $(`#${key}-edit`).val(data[key]);
+        }
+    }
+
+    // --- API CALLS ---
+    function fetchUserDetails(userId) {
+        $.ajax({
+            url: `${baseUrl}/account/${userId}`,
+            type: 'GET',
+            headers: { 'Authorization': apiToken, 'Content-Type': 'application/json' },
+            success: (response) => {
+                if (response.status === 'success' && response.data) {
+                    currentUserData = response.data;
+                    populateView(currentUserData);
+                }
+            },
+            error: (err) => showAlert('Failed to load user details.', 'danger'),
+        });
+    }
+
+    function saveUserDetails(userId) {
+        const updatedFields = {};
+        // Collect all form data
+        const formData = {
+            firstname: $('#firstname-edit').val(), middlename: $('#middlename-edit').val(),
+            lastname: $('#lastname-edit').val(), birthdate: $('#birthdate-edit').val(),
+            phone: $('#phone-edit').val(), phone2: $('#phone2-edit').val(),
+            email: $('#email-edit').val(), email2: $('#email2-edit').val(),
+            ssn: $('#ssn-edit').val(), code: $('#code-edit').val(),
+            languages: $('#languages-edit').val(), description: $('#description-edit').val()
+        };
+
+        // Compare with original data to find changes
+        for (const key in formData) {
+            if (formData[key] !== (currentUserData[key] || '')) { // Handle null from API
+                updatedFields[key] = formData[key];
+            }
+        }
+
+        if ($.isEmptyObject(updatedFields)) {
+            showAlert('No changes were made.', 'info');
+            setMode('view');
+            return;
+        }
+
+        $.ajax({
+            url: `${baseUrl}}/user/${userId}`,
+            type: 'PUT',
+            headers: { 'Authorization': apiToken, 'Content-Type': 'application/json' },
+            data: JSON.stringify(updatedFields),
+            success: (response) => {
+                showAlert('User details updated successfully!', 'success');
+                fetchUserDetails(userId); // Re-fetch data to show updated info
+                setMode('view');
+            },
+            error: (err) => showAlert('Failed to update user. ' + (err.responseJSON?.message || ''), 'danger'),
+        });
+    }
+
+    function changeUserStatus(action) {
+        const userId = currentUserData.id;
+        const endpoints = {
+            activate: 'activate', inactivate: 'inactivate',
+            archive: 'archive', delete: 'delete'
+        };
+
+        $.ajax({
+            url: `${baseUrl}/auth/${endpoints[action]}/account`,
+            type: 'PUT',
+            headers: { 'Authorization': apiToken, 'Content-Type': 'application/json' },
+            data: JSON.stringify({ id: userId.toString() }),
+            success: (response) => {
+                showAlert(`User status changed successfully. ${response.message || ''}`, 'success');
+                $('#statusModal').modal('hide');
+                fetchUserDetails(userId); // Refresh data
+            },
+            error: (err) => showAlert(`Failed to change status. ${err.responseJSON?.message || ''}`, 'danger'),
+        });
+    }
+
+    // --- UI MODE MANAGEMENT ---
+    function setMode(mode) {
+        const container = $('#page-container');
+        if (mode === 'edit') {
+            populateEdit(currentUserData);
+            container.removeClass('view-mode').addClass('edit-mode');
+        } else { // 'view'
+            container.removeClass('edit-mode').addClass('view-mode');
+        }
+    }
+
+    // --- INITIALIZATION & EVENT HANDLERS ---
+    function initializePage() {
+        // In a real app, you'd get the userId from the URL, e.g., new URLSearchParams(window.location.search).get('userId')
+        const userId = 3; // Using user ID from your example <--- this value needs to come frome serverside
+        fetchUserDetails(userId);
+
+        $('#edit-btn').on('click', () => setMode('edit'));
+        $('#save-btn').on('click', () => saveUserDetails(currentUserData.id));
+        $('#back-button').on('click', function(e) {
+            e.preventDefault();
+            if ($('#page-container').hasClass('edit-mode')) {
+                setMode('view'); // If in edit mode, "Back" cancels edit.
+            } else {
+                // In a real multi-page app, this would be: window.history.back();
+                alert("Navigating back to the previous page.");
+            }
+        });
+    }
+</script>
+</body>
+</html>
