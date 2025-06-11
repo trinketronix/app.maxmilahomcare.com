@@ -20,6 +20,7 @@ class BaseController extends Controller {
      * @var AuthService
      */
     protected $authService;
+    protected $config;
 
     /**
      * Initialize base controller
@@ -27,6 +28,11 @@ class BaseController extends Controller {
     public function initialize() {
         // Get auth service from DI
         $this->authService = $this->di->get('auth');
+        $this->config = $this->di->get('config');
+    }
+
+    public function getApiBaseUrl(){
+        return $this->config->api->baseUrl;
     }
 
     /**
@@ -80,7 +86,7 @@ class BaseController extends Controller {
      * @return string
      */
     protected function getUserPhoto(): string {
-        return $this->authService->getUserPhoto();
+        return $this->getApiBaseUrl() . $this->authService->getUserPhoto();
     }
 
     /**
