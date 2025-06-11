@@ -110,8 +110,6 @@ class AuthService extends Injectable {
      * @return void
      */
     public function signout(): void {
-        error_log("=== SIGNOUT DEBUG ===");
-        error_log("Before signout - Session exists: " . ($this->session->exists() ? 'YES' : 'NO'));
 
         // Only attempt to destroy if a session actually exists
         if ($this->session->exists()) {
@@ -126,11 +124,6 @@ class AuthService extends Injectable {
                 session_regenerate_id(true);
             }
         }
-
-        error_log("After signout - Session exists: " . ($this->session->exists() ? 'YES' : 'NO'));
-        // Note: After destroy(), exists() might still be true if session_regenerate_id starts a new one,
-        // but it will be an empty session, which is correct.
-        error_log("===================");
     }
 
     /**
@@ -170,6 +163,15 @@ class AuthService extends Injectable {
         }
 
         return true;
+    }
+
+    /**
+     * Get the current user's auth token
+     *
+     * @return string 'unknown' if not authenticated
+     */
+    public function getAuthToken(): string {
+        return $this->session->get(Session::AUTH_TOKEN, '');
     }
 
     /**

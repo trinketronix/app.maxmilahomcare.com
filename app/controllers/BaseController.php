@@ -36,6 +36,15 @@ class BaseController extends Controller {
     }
 
     /**
+     * Get the current authenticated user's auth token
+     *
+     * @return string
+     */
+    protected function getAuthToken(): string {
+        return $this->authService->getAuthToken();
+    }
+
+    /**
      * Get the current authenticated user
      *
      * @return array|null
