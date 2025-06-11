@@ -17,8 +17,9 @@ class AuthMiddleware extends Injectable {
      * Routes that don't require authentication
      */
     private array $publicRoutes = [
-        'login:index',
+        'signin:index',
         'forgot:index',
+        'test:index',
         'error:notFound',
         'error:serverError'
     ];
@@ -112,12 +113,12 @@ class AuthMiddleware extends Injectable {
         if (!$authService->isAuthenticated()) {
             $this->flashSession->error('Please log in to access this page');
 
-            // Store intended URL for redirect after login
-            $this->session->set('redirect_after_login', $this->request->getURI());
+            // Store intended URL for redirect after signin
+            $this->session->set('redirect_after_signin', $this->request->getURI());
 
-            // Redirect to login
+            // Redirect to signin
             $dispatcher->forward([
-                'controller' => 'login',
+                'controller' => 'signin',
                 'action' => 'index'
             ]);
 
@@ -133,11 +134,25 @@ class AuthMiddleware extends Injectable {
                 $this->flashSession->error('You do not have permission to access this page');
 
                 // Redirect to appropriate dashboard based on role
-                $redirectController = $userRole < 2 ? 'main' : 'caregiver';
+                $redirectController = $userRole < 2 ? 'admin' : 'caregiver';
+                $action = 'error';
+                switch ($userRole) {
+                    case 0:
+                        $action = 'admin';
+                        break;
+                    case 1:
+                        $action = 'manager';
+                        break;
+                    case 2:
+                        $action = 'caregiver';
+                        break;
+                    default:
+                        echo "Unknown fruit.";
+                }
 
                 $dispatcher->forward([
-                    'controller' => $redirectController,
-                    'action' => 'index'
+                    'controller' => 'dashboard',
+                    'action' => $action
                 ]);
 
                 return false;
@@ -148,11 +163,23 @@ class AuthMiddleware extends Injectable {
             $this->flashSession->warning('Access to this page is restricted');
 
             $userRole = $authService->getUserRole();
-            $redirectController = $userRole < 2 ? 'main' : 'caregiver';
-
+            $action = 'error';
+            switch ($userRole) {
+                case 0:
+                    $action = 'admin';
+                    break;
+                case 1:
+                    $action = 'manager';
+                    break;
+                case 2:
+                    $action = 'caregiver';
+                    break;
+                default:
+                    echo "Unknown fruit.";
+            }
             $dispatcher->forward([
-                'controller' => $redirectController,
-                'action' => 'index'
+                'controller' => 'dashboard',
+                'action' => $action
             ]);
 
             return false;

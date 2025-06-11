@@ -21,13 +21,6 @@ $router->addPost('/signin', [
     'action'     => 'index'
 ]);
 
-// Logout route
-$router->add('/signout', [
-    'namespace'  => 'App\Controllers',
-    'controller' => 'signout',
-    'action'     => 'index'
-]);
-
 $router->add('/forgot', [
     'namespace'  => 'App\Controllers',
     'controller' => 'forgot',
