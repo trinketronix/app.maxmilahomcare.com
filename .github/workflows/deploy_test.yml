@@ -22,10 +22,8 @@ jobs:
           log-level: verbose
           dangerous-clean-slate: false
           exclude: |
-            */.git
-            */.git/**
-            */.github
-            */.github/**
+            **/.git*
+            **/.git*/**
             */test/*
             test/**
             .gitignore
