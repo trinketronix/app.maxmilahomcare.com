@@ -184,7 +184,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    let currentUserData = {};
+    let targetUserData = {};
+    const targetUserId = <?=$targetUserId?>;
     const baseUrl = '<?=$baseUrl?>';
     const authToken = '<?=$authToken?>';
 
@@ -229,8 +230,8 @@
             headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
             success: (response) => {
                 if (response.status === 'success' && response.data) {
-                    currentUserData = response.data;
-                    populateView(currentUserData);
+                    targetUserData = response.data;
+                    populateView(targetUserData);
                 }
             },
             error: (err) => showAlert('Failed to load user details.', 'danger'),
@@ -251,7 +252,7 @@
 
         // Compare with original data to find changes
         for (const key in formData) {
-            if (formData[key] !== (currentUserData[key] || '')) { // Handle null from API
+            if (formData[key] !== (targetUserData[key] || '')) { // Handle null from API
                 updatedFields[key] = formData[key];
             }
         }
@@ -277,7 +278,7 @@
     }
 
     function changeUserStatus(action) {
-        const userId = currentUserData.id;
+        const userId = targetUserData.id;
         const endpoints = {
             activate: 'activate', inactivate: 'inactivate',
             archive: 'archive', delete: 'delete'
@@ -301,7 +302,7 @@
     function setMode(mode) {
         const container = $('#page-container');
         if (mode === 'edit') {
-            populateEdit(currentUserData);
+            populateEdit(targetUserData);
             container.removeClass('view-mode').addClass('edit-mode');
         } else { // 'view'
             container.removeClass('edit-mode').addClass('view-mode');
@@ -311,11 +312,11 @@
     // --- INITIALIZATION & EVENT HANDLERS ---
     function initializePage() {
         // In a real app, you'd get the userId from the URL, e.g., new URLSearchParams(window.location.search).get('userId')
-        const userId = 3; // Using user ID from your example <--- this value needs to come frome serverside
-        fetchUserDetails(userId);
+         // Using user ID from your example <--- this value needs to come frome serverside
+        fetchUserDetails(targetUserId);
 
         $('#edit-btn').on('click', () => setMode('edit'));
-        $('#save-btn').on('click', () => saveUserDetails(currentUserData.id));
+        $('#save-btn').on('click', () => saveUserDetails(targetUserData.id));
         $('#back-button').on('click', function(e) {
             e.preventDefault();
             if ($('#page-container').hasClass('edit-mode')) {
