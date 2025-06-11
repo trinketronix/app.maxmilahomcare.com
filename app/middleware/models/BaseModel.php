@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace Homecare\middleware\models;
 
+use App\Constants\Auth;
 use Exception;
 use JsonException;
-use App\Constants\Auth;
 use Phalcon\Mvc\Model;
 
 class BaseModel extends Model {
