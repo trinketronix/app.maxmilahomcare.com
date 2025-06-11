@@ -97,7 +97,7 @@
 <div class="page-container">
     <!-- Header -->
     <header class="header">
-        <a href="#" class="back-button"><i class="fas fa-chevron-left"></i> Back</a>
+        <a href="/dashboard/admin" class="back-button"><i class="fas fa-chevron-left"></i> Back</a>
         <h1 class="header-title">Management</h1>
         <h2 class="header-subtitle" style="position: absolute; left: 50%; transform: translateX(-50%); top: 4.5rem; font-size: 1.5rem; color: #555;">Caregivers</h2>
         <div class="profile">
@@ -183,8 +183,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const adminId = <?=$userId?>;
-    const baseUrl = <?=$baseUrl?>;
-    const token = <?=$token?>;
+    const baseUrl = '<?=$baseUrl?>';
+    const token = '<?=$token?>';
 
     let allUsers = [];
     let addCaregiverOffcanvas;
