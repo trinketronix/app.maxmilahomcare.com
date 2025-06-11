@@ -12,8 +12,7 @@ use App\Services\AuthService;
  *
  * Handles authentication checks for protected routes
  */
-class AuthMiddleware extends Injectable
-{
+class AuthMiddleware extends Injectable {
     /**
      * Routes that don't require authentication
      */
@@ -92,8 +91,8 @@ class AuthMiddleware extends Injectable
     /**
      * Execute before the dispatcher loop
      */
-    public function beforeExecuteRoute(Event $event, Dispatcher $dispatcher)
-    {
+    public function beforeExecuteRoute(Event $event, Dispatcher $dispatcher) {
+
         $controller = $dispatcher->getControllerName();
         $action = $dispatcher->getActionName();
         $routeKey = $controller . ':' . $action;
@@ -162,8 +161,7 @@ class AuthMiddleware extends Injectable
     /**
      * Check if token is expired
      */
-    private function isTokenExpired(?string $token): bool
-    {
+    private function isTokenExpired(?string $token): bool {
         if (!$token) {
             return true;
         }
@@ -189,8 +187,7 @@ class AuthMiddleware extends Injectable
     /**
      * Get user role from token
      */
-    private function getUserRole(?string $token): int
-    {
+    private function getUserRole(?string $token): int {
         if (!$token) {
             return -1;
         }
@@ -212,8 +209,7 @@ class AuthMiddleware extends Injectable
     /**
      * Set role context for use in controllers
      */
-    private function setRoleContext(?string $token): void
-    {
+    private function setRoleContext(?string $token): void {
         if (!$token) {
             return;
         }

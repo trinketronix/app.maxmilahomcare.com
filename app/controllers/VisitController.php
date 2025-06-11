@@ -12,10 +12,8 @@ use Phalcon\Mvc\Controller;
 use App\Utils\HttpRequest;
 
 
-class VisitController extends BaseController
-{
-    public function indexAction()
-    {
+class VisitController extends BaseController {
+    public function indexAction() {
 
         $uid = $_GET['hiddenField']; 
 

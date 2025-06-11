@@ -10,8 +10,7 @@ use Phalcon\Mvc\Controller;
  *
  * Handles user authentication using the AuthService
  */
-class LoginController extends Controller
-{
+class LoginController extends Controller {
     /**
      * @var AuthService
      */
@@ -20,8 +19,7 @@ class LoginController extends Controller
     /**
      * Initialize the controller
      */
-    public function initialize()
-    {
+    public function initialize() {
         // Get auth service from DI container
         $this->authService = $this->di->get('auth');
 
@@ -34,39 +32,38 @@ class LoginController extends Controller
      *
      * @return mixed
      */
-    public function indexAction()
-    {
-        // Check if user is already logged in
-        if ($this->authService->isAuthenticated()) {
-            $user = $this->authService->getCurrentUser();
-            $redirectPath = $user['role'] < 2 ? 'main' : 'caregiver';
-            return $this->response->redirect($redirectPath);
-        }
-
-        // Handle POST request (login attempt)
-        if ($this->request->isPost()) {
-            // Get credentials from form
-            $username = $this->request->getPost('username', ['trim', 'email']);
-            $password = $this->request->getPost('password', ['trim', 'string']);
-
-            // Attempt login
-            $result = $this->authService->login($username, $password);
-
-            if ($result['success']) {
-                // Successful login
-                $this->flashSession->success('Welcome back!');
-                return $this->response->redirect($result['data']['redirect']);
-            } else {
-                // Failed login
-                $this->flashSession->error($result['message']);
-
-                // Keep username in form (for user convenience)
-                $this->view->username = $username;
-            }
-        }
-
-        // Set page title
-        $this->view->pageTitle = 'Login - Maxmila Homecare';
+    public function indexAction() {
+//        // Check if user is already logged in
+//        if ($this->authService->isAuthenticated()) {
+//            $user = $this->authService->getCurrentUser();
+//            $redirectPath = $user['role'] < 2 ? 'main' : 'caregiver';
+//            return $this->response->redirect($redirectPath);
+//        }
+//
+//        // Handle POST request (login attempt)
+//        if ($this->request->isPost()) {
+//            // Get credentials from form
+//            $username = $this->request->getPost('username', ['trim', 'email']);
+//            $password = $this->request->getPost('password', ['trim', 'string']);
+//
+//            // Attempt login
+//            $result = $this->authService->signin($username, $password);
+//
+//            if ($result['success']) {
+//                // Successful login
+//                $this->flashSession->success('Welcome back!');
+//                return $this->response->redirect($result['data']['redirect']);
+//            } else {
+//                // Failed login
+//                $this->flashSession->error($result['message']);
+//
+//                // Keep username in form (for user convenience)
+//                $this->view->username = $username;
+//            }
+//        }
+//
+//        // Set page title
+//        $this->view->pageTitle = 'Login - Maxmila Homecare';
     }
 
     /**
@@ -74,9 +71,8 @@ class LoginController extends Controller
      *
      * @return mixed
      */
-    public function logoutAction()
-    {
-        $this->authService->logout();
+    public function logoutAction() {
+        $this->authService->signout();
         $this->flashSession->success('You have been logged out successfully.');
         return $this->response->redirect('login');
     }

@@ -8,10 +8,8 @@ use Exception;
 use App\Utils\Endpoint;
 use App\Utils\HttpRequest;
 
-class AssignpatientController extends BaseController
-{
-    public function indexAction()
-    {
+class AssignpatientController extends BaseController {
+    public function indexAction() {
         $token = $this->session->get('auth-token');
         if (!$token) {
             $this->flashSession->error('Please log in to view patients');
@@ -46,8 +44,7 @@ class AssignpatientController extends BaseController
         }
     }
 
-    public function setSessionAction()
-    {
+    public function setSessionAction() {
         $this->view->disable();
 
         $userId = $this->request->getPost('userId', 'int');
@@ -63,8 +60,7 @@ class AssignpatientController extends BaseController
             ->setJsonContent(['status' => 'error', 'message' => 'Missing parameters']);
     }
 
-    public function viewAction()
-    {
+    public function viewAction() {
         $id = $this->dispatcher->getParam('id');
 
         if (!$id) {
@@ -104,8 +100,7 @@ class AssignpatientController extends BaseController
     }
 
 
-    public function visitAction()
-    {
+    public function visitAction() {
         $id = $this->dispatcher->getParam('id');
 
         if (!$id) {
@@ -118,8 +113,7 @@ class AssignpatientController extends BaseController
     }
 
 
-    public function setPatientAction()
-    {
+    public function setPatientAction() {
         // Only allow POST
         if (!$this->request->isPost()) {
             $this->response->setStatusCode(405, "Method Not Allowed");

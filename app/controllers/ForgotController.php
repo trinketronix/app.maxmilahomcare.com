@@ -11,8 +11,7 @@ use Phalcon\Http\Request;
 use Phalcon\Mvc\Controller;
 use App\Utils\HttpRequest;
 
-class ForgotController extends BaseController
-{
+class ForgotController extends BaseController {
 //    public function indexAction()
 //    {
 //        if ($this->request->isPost()) {

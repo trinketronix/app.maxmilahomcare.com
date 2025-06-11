@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Constants\Auth;
+use App\Constants\Session;
+use App\Constants\User;
 use App\Utils\HttpRequest;
 use App\Utils\Endpoint;
 use Phalcon\Di\Injectable;
@@ -12,16 +15,7 @@ use Exception;
  *
  * Handles all authentication-related operations
  */
-class AuthService extends Injectable
-{
-    /**
-     * Session keys
-     */
-    private const SESSION_TOKEN = 'auth-token';
-    private const SESSION_USER_ID = 'user_id';
-    private const SESSION_USER_NAME = 'user_name';
-    private const SESSION_USER_ROLE = 'user_role';
-    private const SESSION_USER_FULL_NAME = 'user_full_name';
+class AuthService extends Injectable {
 
     /**
      * Attempt to authenticate a user
@@ -30,8 +24,7 @@ class AuthService extends Injectable
      * @param string $password
      * @return array ['success' => bool, 'message' => string, 'data' => array]
      */
-    public function login(string $username, string $password): array
-    {
+    public function signin(string $username, string $password): array {
         try {
             // Validate input
             if (empty($username) || empty($password)) {
@@ -44,8 +37,8 @@ class AuthService extends Injectable
 
             // Prepare login request
             $jsonBody = json_encode([
-                'username' => $username,
-                'password' => $password
+                Auth::USERNAME => $username,
+                Auth::PASSWORD => $password
             ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
 
             // Make API request
@@ -61,8 +54,11 @@ class AuthService extends Injectable
             }
 
             // Extract token and decode it
-            $token = $response['data']['token'];
+            $token = $response['data'][Auth::TOKEN];
             $tokenData = $this->decodeToken($token);
+            
+            //Extract user fullname and photo
+            $userData = $response['data']['user'];
 
             if (!$tokenData) {
                 return [
@@ -82,16 +78,18 @@ class AuthService extends Injectable
             }
 
             // Establish session
-            $this->createUserSession($token, $tokenData);
+            $this->createUserSession($token, $tokenData, $userData);
 
             return [
                 'success' => true,
                 'message' => 'Login successful',
                 'data' => [
-                    'user_id' => $tokenData['id'],
-                    'username' => $tokenData['username'],
-                    'role' => $tokenData['role'],
-                    'redirect' => $this->getRedirectPath($tokenData['role'])
+                    'user_id' => $tokenData[Auth::ID],
+                    'username' => $tokenData[Auth::USERNAME],
+                    'role' => $tokenData[Auth::ROLE],
+                    'fullname' => $userData[User::FULLNAME],
+                    'photo' => $userData[User::PHOTO],
+                    'redirect' => $this->getRedirectPath($tokenData[Auth::ROLE])
                 ]
             ];
 
@@ -111,14 +109,14 @@ class AuthService extends Injectable
      *
      * @return void
      */
-    public function logout(): void
-    {
+    public function signout(): void {
         // Clear all session data
-        $this->session->remove(self::SESSION_TOKEN);
-        $this->session->remove(self::SESSION_USER_ID);
-        $this->session->remove(self::SESSION_USER_NAME);
-        $this->session->remove(self::SESSION_USER_ROLE);
-        $this->session->remove(self::SESSION_USER_FULL_NAME);
+        $this->session->remove(Session::AUTH_TOKEN);
+        $this->session->remove(Session::USER_ID);
+        $this->session->remove(Session::USERNAME);
+        $this->session->remove(Session::USER_ROLE);
+        $this->session->remove(Session::USER_FULLNAME);
+        $this->session->remove(Session::USER_PHOTO);
 
         // Destroy the session
         if ($this->session->exists()) {
@@ -131,17 +129,15 @@ class AuthService extends Injectable
      *
      * @return bool
      */
-    public function isAuthenticated(): bool
-    {
-        if (!$this->session->has(self::SESSION_TOKEN)) {
-            return false;
-        }
+    public function isAuthenticated(): bool {
 
-        $token = $this->session->get(self::SESSION_TOKEN);
+        if (!$this->session->has(Session::AUTH_TOKEN)) return false;
+
+        $token = $this->session->get(Session::AUTH_TOKEN);
         $tokenData = $this->decodeToken($token);
 
         if (!$tokenData || $this->isTokenExpired($tokenData)) {
-            $this->logout(); // Clear invalid session
+            $this->signout(); // Clear invalid session
             return false;
         }
 
@@ -153,18 +149,53 @@ class AuthService extends Injectable
      *
      * @return array|null User data or null if not authenticated
      */
-    public function getCurrentUser(): ?array
-    {
-        if (!$this->isAuthenticated()) {
-            return null;
-        }
+    public function getCurrentUser(): ?array {
+
+        if (!$this->isAuthenticated()) return null;
 
         return [
-            'id' => $this->session->get(self::SESSION_USER_ID),
-            'username' => $this->session->get(self::SESSION_USER_NAME),
-            'role' => $this->session->get(self::SESSION_USER_ROLE),
-            'full_name' => $this->session->get(self::SESSION_USER_FULL_NAME)
+            'id' => $this->session->get(Session::USER_ID),
+            'username' => $this->session->get(Session::USERNAME),
+            'fullname' => $this->session->get(Session::USER_FULLNAME),
+            'photo' => $this->session->get(Session::USER_PHOTO),
+            'role' => $this->session->get(Session::USER_ROLE)
         ];
+    }
+
+    /**
+     * Get the current user's id
+     *
+     * @return int 0 if not authenticated
+     */
+    public function getUserId(): int {
+        return $this->session->get(Session::USER_ID, 0);
+    }
+
+    /**
+     * Get the current user's username
+     *
+     * @return string 'unknown' if not authenticated
+     */
+    public function getUsername(): string {
+        return $this->session->get(Session::USERNAME, 'unknown');
+    }
+
+    /**
+     * Get the current user's fullname
+     *
+     * @return string 'unknown' if not authenticated
+     */
+    public function getUserFullname(): string {
+        return $this->session->get(Session::USER_FULLNAME, 'unknown');
+    }
+
+    /**
+     * Get the current user's photo url
+     *
+     * @return string 'unknown' if not authenticated
+     */
+    public function getUserPhoto(): string {
+        return $this->session->get(Session::USER_PHOTO, 'unknown');
     }
 
     /**
@@ -172,9 +203,8 @@ class AuthService extends Injectable
      *
      * @return int -1 if not authenticated
      */
-    public function getUserRole(): int
-    {
-        return $this->session->get(self::SESSION_USER_ROLE, -1);
+    public function getUserRole(): int {
+        return $this->session->get(Session::USER_ROLE, -1);
     }
 
     /**
@@ -183,8 +213,7 @@ class AuthService extends Injectable
      * @param int $role
      * @return bool
      */
-    public function hasRole(int $role): bool
-    {
+    public function hasRole(int $role): bool {
         return $this->getUserRole() === $role;
     }
 
@@ -194,8 +223,7 @@ class AuthService extends Injectable
      * @param array $roles
      * @return bool
      */
-    public function hasAnyRole(array $roles): bool
-    {
+    public function hasAnyRole(array $roles): bool {
         return in_array($this->getUserRole(), $roles, true);
     }
 
@@ -204,17 +232,16 @@ class AuthService extends Injectable
      *
      * @param string $token
      * @param array $tokenData
+     * @param array $userData
      * @return void
      */
-    private function createUserSession(string $token, array $tokenData): void
-    {
-        $this->session->set(self::SESSION_TOKEN, $token);
-        $this->session->set(self::SESSION_USER_ID, $tokenData['id']);
-        $this->session->set(self::SESSION_USER_NAME, $tokenData['username']);
-        $this->session->set(self::SESSION_USER_ROLE, $tokenData['role']);
-
-        // Try to get user's full name (this might need an additional API call)
-        $this->session->set(self::SESSION_USER_FULL_NAME, $tokenData['username']);
+    private function createUserSession(string $token, array $tokenData, array $userData): void {
+        $this->session->set(Session::AUTH_TOKEN, $token);
+        $this->session->set(Session::USER_ID, $tokenData[Auth::ID]);
+        $this->session->set(Session::USERNAME, $tokenData[Auth::USERNAME]);
+        $this->session->set(Session::USER_ROLE, $tokenData[Auth::ROLE]);
+        $this->session->set(Session::USER_FULLNAME, $userData[User::FULLNAME]);
+        $this->session->set(Session::USER_PHOTO, $userData[User::PHOTO]);
     }
 
     /**
@@ -223,8 +250,7 @@ class AuthService extends Injectable
      * @param string $token
      * @return array|null
      */
-    private function decodeToken(string $token): ?array
-    {
+    private function decodeToken(string $token): ?array {
         try {
             $decoded = base64_decode($token, true);
             if ($decoded === false) {
@@ -251,8 +277,7 @@ class AuthService extends Injectable
      * @param array $tokenData
      * @return bool
      */
-    private function isTokenExpired(array $tokenData): bool
-    {
+    private function isTokenExpired(array $tokenData): bool {
         $currentTime = (int)(microtime(true) * 1000);
         return $tokenData['expiration'] < $currentTime;
     }
@@ -263,10 +288,9 @@ class AuthService extends Injectable
      * @param int $role
      * @return string
      */
-    private function getRedirectPath(int $role): string
-    {
+    private function getRedirectPath(int $role): string {
         // Role 0 = Admin, Role 1 = Manager, Role 2 = Caregiver
-        return $role < 2 ? 'main' : 'caregiver';
+        return $this->roleRedirectService->getRedirectPathByRole($role);
     }
 
     /**
@@ -274,14 +298,13 @@ class AuthService extends Injectable
      *
      * @return bool
      */
-    public function refreshToken(): bool
-    {
+    public function refreshToken(): bool {
         if (!$this->isAuthenticated()) {
             return false;
         }
 
         try {
-            $currentToken = $this->session->get(self::SESSION_TOKEN);
+            $currentToken = $this->session->get(Session::AUTH_TOKEN);
 
             // Call API to refresh token
             $response = HttpRequest::post(Endpoint::RENEW_TOKEN, '', [
@@ -291,9 +314,10 @@ class AuthService extends Injectable
             if (!empty($response['data']['token'])) {
                 $newToken = $response['data']['token'];
                 $tokenData = $this->decodeToken($newToken);
+                $userData = $response['data']['user'];
 
                 if ($tokenData && !$this->isTokenExpired($tokenData)) {
-                    $this->createUserSession($newToken, $tokenData);
+                    $this->createUserSession($newToken, $tokenData, $userData);
                     return true;
                 }
             }
@@ -310,8 +334,7 @@ class AuthService extends Injectable
      * @param string $message
      * @return void
      */
-    private function logError(string $message): void
-    {
+    private function logError(string $message): void {
         error_log('[AuthService] ' . $message);
     }
 }

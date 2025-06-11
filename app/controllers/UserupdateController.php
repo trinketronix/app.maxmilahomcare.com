@@ -8,10 +8,8 @@ use Phalcon\Mvc\Controller;
 use App\Utils\HttpRequest;
 
 
-class UserupdateController extends BaseController
-{
-    public function indexAction()
-    {
+class UserupdateController extends BaseController {
+    public function indexAction() {
 //inicio modificación
 //public function indexAction()
 //{

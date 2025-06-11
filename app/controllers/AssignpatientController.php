@@ -12,15 +12,13 @@ use App\Utils\HttpRequest;
  *
  * Manages the listing and interactions with patient data
  */
-class AssignpatientController extends BaseController
-{
+class AssignpatientController extends BaseController {
     /**
      * Display the list of patients
      *
      * @return void
      */
-    public function indexAction()
-    {
+    public function indexAction() {
         // Check authentication
         $token = $this->session->get('auth-token');
         if (!$token) {
@@ -76,8 +74,7 @@ class AssignpatientController extends BaseController
      */
 
     //Getting sessions variables
-    public function setSessionAction()
-    {
+    public function setSessionAction() {
         $this->view->disable(); // No view is returned
 
         $userId = $this->request->getPost('userId', 'int');
@@ -93,8 +90,7 @@ class AssignpatientController extends BaseController
             ->setJsonContent(['status' => 'error', 'message' => 'Missing parameters']);
     }
 
-    public function viewAction()
-    {
+    public function viewAction() {
         // Get patient ID from route parameter
         $id = $this->dispatcher->getParam('id');
 
@@ -154,8 +150,7 @@ class AssignpatientController extends BaseController
      *
      * @return void
      */
-    public function visitAction()
-    {
+    public function visitAction() {
         // Get patient ID from route parameter
         $id = $this->dispatcher->getParam('id');
 
@@ -172,8 +167,7 @@ class AssignpatientController extends BaseController
     }
 
 
-    public function setPatientAction()
-    {
+    public function setPatientAction() {
         $this->view->disable();
 
 
