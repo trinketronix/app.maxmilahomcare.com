@@ -2,11 +2,11 @@
 
 // Environment configuration
 if (!getenv('APP_ENV')) {
-    putenv('APP_ENV=development');
+    putenv('APP_ENV=dev');
 }
 
 // Error reporting based on environment
-if (getenv('APP_ENV') === 'development') {
+if (getenv('APP_ENV') === 'dev') {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
 } else {
