@@ -93,6 +93,20 @@ class BaseController extends Controller {
     }
 
     /**
+     * Get current user's role
+     *
+     * @return int
+     */
+    protected function getUserRoleText(): string {
+        return match ($this->getUserRole()) {
+            0 => 'Admin',
+            1 => 'Manager',
+            2 => 'Caregiver',
+            default => "unknown",
+        };
+    }
+
+    /**
      * Check if user has a specific role
      *
      * @param int $role
