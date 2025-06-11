@@ -7,6 +7,7 @@ use App\Constants\Role; // It's good practice to use constants
 
 class CaregiverController extends BaseController {
 
+    protected $targetUserId;
     /**
      * Shows a management page for caregivers.
      * Accessible only to Administrators and Managers.
@@ -27,10 +28,10 @@ class CaregiverController extends BaseController {
             'userId' => $this->getUserId(),
             'username' => $this->getUsername(),
             'fullname' => $this->getUserFullname(),
+            'role' => $this->getUserRoleText(),
             'photo' => $this->getUserPhoto(),
             'baseUrl' => $this->getApiBaseUrl(),
-            'token' => $this->getAuthToken()
-            // 'caregivers' => $caregivers
+            'authToken' => $this->getAuthToken()
         ]);
     }
 
@@ -46,22 +47,21 @@ class CaregiverController extends BaseController {
 
         // Get the userId from the URL parameter.
         // If it's not present in the URL, this will be null.
-        $targetUserId = $this->dispatcher->getParam('userId');
+        $this->targetUserId = $this->dispatcher->getParam('userId');
 
         // Determine which user's profile to load
-        if ($targetUserId) {
+        if ($this->targetUserId) {
             // A specific user ID was requested in the URL
             // --- Additional Security Layer ---
             // Only Admins or Managers can view OTHER people's profiles.
-            if ($targetUserId != $this->getUserId() && !$this->hasAnyRole([Role::ADMINISTRATOR, Role::MANAGER])) {
+            if ($this->targetUserId != $this->getUserId() && !$this->hasAnyRole([Role::ADMINISTRATOR, Role::MANAGER])) {
                 $this->flashSession->error("You do not have permission to view this profile.");
                 return $this->response->redirect('/dashboard/caregiver'); // Or their own dashboard
             }
-            $userIdToLoad = $targetUserId;
             $pageTitle = "Caregiver Profile";
         } else {
             // No user ID was provided, so show the currently logged-in user's own profile
-            $userIdToLoad = $this->getUserId();
+            $this->targetUserId = $this->getUserId();
             $pageTitle = "My Profile";
         }
 
@@ -71,9 +71,14 @@ class CaregiverController extends BaseController {
 
         $this->view->setVars([
             'pageTitle' => $pageTitle,
-            'username' => $this->getUsername(), // Logged-in user for header
-            'photo' => $this->getUserPhoto(),    // Logged-in user for header
-            // 'profile' => $profileData
+            'userId' => $this->getUserId(),
+            'targetUserId' => $this->targetUserId,
+            'username' => $this->getUsername(),
+            'fullname' => $this->getUserFullname(),
+            'role' => $this->getUserRoleText(),
+            'photo' => $this->getUserPhoto(),
+            'baseUrl' => $this->getApiBaseUrl(),
+            'authToken' => $this->getAuthToken()
         ]);
     }
 
@@ -96,7 +101,7 @@ class CaregiverController extends BaseController {
             'fullname' => $this->getUserFullname(),
             'photo' => $this->getUserPhoto(),
             'baseUrl' => $this->getApiBaseUrl(),
-            'token' => $this->getAuthToken()
+            'authToken' => $this->getAuthToken()
         ]);
     }
 }
