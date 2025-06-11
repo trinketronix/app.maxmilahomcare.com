@@ -58,7 +58,7 @@ $router->add('/caregiver/management', [
     'action'     => 'management'
 ]);
 
-$router->add('/caregiver/profile', [
+$router->add('/caregiver/profile/{userId:[0-9]+}?', [
     'namespace'  => 'App\Controllers',
     'controller' => 'caregiver',
     'action'     => 'profile'
