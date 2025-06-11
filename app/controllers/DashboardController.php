@@ -12,7 +12,8 @@ class DashboardController extends BaseController {
         parent::initialize();
 
         // Require authentication for all actions in this controller
-        if (!$this->authService->isAuthenticated()) {
+        if (!$this->isAuthenticated()) {
+            $this->signout();
             $this->flashSession->error('Please log in to access this page.');
             return $this->response->redirect('signin');
         }
