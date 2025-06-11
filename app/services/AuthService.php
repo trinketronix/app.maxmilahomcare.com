@@ -35,7 +35,7 @@ class AuthService extends Injectable {
                 ];
             }
 
-            // Prepare login request
+            // Prepare signin request
             $jsonBody = json_encode([
                 Auth::USERNAME => $username,
                 Auth::PASSWORD => $password
@@ -82,7 +82,7 @@ class AuthService extends Injectable {
 
             return [
                 'success' => true,
-                'message' => 'Login successful',
+                'message' => 'Signin successful',
                 'data' => [
                     'user_id' => $tokenData[Auth::ID],
                     'username' => $tokenData[Auth::USERNAME],
@@ -94,11 +94,11 @@ class AuthService extends Injectable {
             ];
 
         } catch (Exception $e) {
-            $this->logError('Login error: ' . $e->getMessage());
+            $this->logError('Signin error: ' . $e->getMessage());
 
             return [
                 'success' => false,
-                'message' => 'An error occurred during login. Please try again.',
+                'message' => 'An error occurred during signin. Please try again.',
                 'data' => null
             ];
         }

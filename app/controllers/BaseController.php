@@ -134,14 +134,14 @@ class BaseController extends Controller {
 
     /**
      * Require authentication to access a page
-     * Will redirect to login if not authenticated
+     * Will redirect to signin if not authenticated
      *
      * @return bool True if authenticated, redirects otherwise
      */
     protected function requireAuth(): bool {
         if (!$this->isAuthenticated()) {
             $this->flashSession->error('Please log in to access this page');
-            $this->response->redirect('login');
+            $this->response->redirect('signin');
             return false;
         }
 

@@ -10,7 +10,7 @@ class RoleRedirectService extends Injectable {
             0 => '/dashboard/admin',      // Administrator
             1 => '/dashboard/manager',    // Manager
             2 => '/dashboard/caregiver',  // Caregiver
-            default => '/signin',         // Unknown role, redirect to login
+            default => '/signin',         // Unknown role, redirect to signin
         };
     }
 

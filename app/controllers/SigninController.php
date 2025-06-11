@@ -14,7 +14,7 @@ class SigninController extends BaseController {
     }
 
     /**
-     * Display signin form and handle login attempts
+     * Display signin form and handle signin attempts
      *
      * @return mixed
      */
@@ -24,17 +24,17 @@ class SigninController extends BaseController {
         if ($this->isAuthenticated())
             return $this->roleRedirectService->redirectToDashboardByRole($this->getUserRole());
 
-        // Handle POST request (login attempt)
+        // Handle POST request (signin attempt)
         if ($this->request->isPost()) {
 
             // Get credentials from form
             $username = $this->request->getPost('username', ['trim', 'email']);
             $password = $this->request->getPost('password', ['trim', 'string']);
 
-            // Attempt login
+            // Attempt signin
             $result = $this->authService->signin($username, $password);
 
-            if ($result['success']) { // Successful login
+            if ($result['success']) { // Successful signin
 
                 $this->view->username = $username;
                 $this->view->pageTitle = 'Maxmila Homecare System';
@@ -42,7 +42,7 @@ class SigninController extends BaseController {
                 $this->flashSession->success('Welcome back! ' . $result['data']['fullname']);
                 return $this->response->redirect($result['data']['redirect']);
 
-            } else { // Failed login
+            } else { // Failed signin
                 $this->flashSession->error($result['message']);
             }
         }
