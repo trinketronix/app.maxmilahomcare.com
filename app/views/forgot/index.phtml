@@ -3,84 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS for Pink Theme -->
+    <title>Maxmila Homecare System</title>
+
+    <!-- Bootstrap 5.1 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
     <style>
-        body {
-            background-color: #f8e1f4; /* Light pink background */
+        html, body {
+            height: 100%;
+            background-color: #f0f2f5; /* Light grey background */
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
         }
-        .container {
-            max-width: 600px;
-            margin-top: 50px;
+
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .login-box {
+            background-color: #ffffff;
+            border: 2px solid #000;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .login-box-title {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .login-box hr {
+            border-top: 2px solid #000;
+            opacity: 1;
+            margin-bottom: 2rem;
+        }
+
+        .input-group-text, .form-control {
+            border: 2px solid #000 !important;
+            height: 50px;
+        }
+
+        .input-group-text {
             background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-right: 0 !important;
+            font-size: 1.2rem;
         }
-        h2 {
-            color: #d85b85; /* Pinkish color for header */
-        }
-        .form-label {
-            color: #333;
-        }
-        .btn-primary {
-            background-color: #e74c3c;
-            border-color: #e74c3c;
-        }
-        .btn-primary:hover {
-            background-color: #c0392b;
-            border-color: #c0392b;
-        }
-        .btn-link {
-            color: #e74c3c; /* Red color for links turned into buttons */
-        }
-        .btn-link:hover {
-            color: #c0392b; /* Darker red for hover */
-        }
+
         .form-control {
-            border-radius: 10px;
-            box-shadow: none;
+            border-left: 0 !important;
         }
-        .card {
-            border: none;
-            background-color: #fce6f5;
-            border-radius: 10px;
-            padding: 20px;
+
+        .form-control:focus {
+            box-shadow: none; /* Remove blue glow on focus */
+            border-left: 0 !important;
         }
-        .card-body {
-            padding: 0;
+
+        .login-btn {
+            border: 2px solid #000;
+            background-color: #f0f0f0;
+            font-weight: bold;
+            color: #000;
+            padding: 0.5rem 2.5rem;
+            margin-top: 1rem;
+            transition: background-color 0.2s;
+        }
+        .login-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .forgot-password-link {
+            display: block;
+            margin-top: 1.5rem;
+            color: #0d6efd;
+            text-decoration: underline;
+        }
+
+        .copyright-text {
+            margin-top: 2.5rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Flash message styles */
+        .flash-messages {
+            width: 100%;
+            max-width: 450px;
+            margin-bottom: 1rem;
+        }
+
+        .alert {
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .main-title {
+                font-size: 3rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2 class="text-center mb-4">Reset Password</h2>
 
-        <form method="POST" action="/forgot">
-            <div class="mb-3">
-                <label for="username" class="form-label">Email</label>
-                <input type="email" class="form-control" id="username" name="username" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="new_password" class="form-label">New Password</label>
-                <input type="password" class="form-control" id="new_password" name="new_password" required>
-            </div>
-
-            <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary">Reset Password</button>
-                <button type="button" class="btn btn-link" onclick="window.location.href='/login';">Back to Login</button>
-                <button type="button" class="btn btn-link" onclick="window.location.href='/logout';">Logout</button>
-                <center style="color:red;"> <?php echo $this->flashSession->output(); ?></center>
-            </div>
-        </form>
+<div class="login-container">
+    <h1 class="main-title"><?= isset($pageTitle) ? $pageTitle : 'Maxmila Homecare Failsafe' ?>></h1>
+    <!-- Flash Messages -->
+    <div class="flash-messages">
+        <?php echo $this->flashSession->output(); ?>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <div class="login-box">
+        <h2 class="login-box-title">Login</h2>
+        <hr/>
+
+        <!-- Login Form -->
+        <form action="/login" method="POST" class="text-center">
+
+            <!-- Username -->
+            <div class="input-group mb-4">
+                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                <input type="text"
+                       class="form-control"
+                       name="username"
+                       placeholder="Username"
+                       value="<?= isset($username) ? $this->escaper->escapeHtml($username) : '' ?>"
+                       required
+                       autofocus>
+            </div>
+
+            <!-- Password -->
+            <div class="input-group mb-4">
+                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                <input type="password"
+                       class="form-control"
+                       name="password"
+                       placeholder="Password"
+                       required>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn login-btn">Login</button>
+
+        </form>
+
+        <div class="text-center">
+            <a href="/forgot" class="forgot-password-link">Forgot password</a>
+        </div>
+
+        <p class="copyright-text">
+            Maxmila Homecare LLC & Trinketronix LLC ® Copyright 2025
+        </p>
+    </div>
+</div>
+
+<!-- jQuery (as requested, not essential for this page's functionality) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap 5.1 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Auto-hide flash messages after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.remove();
+                }, 500);
+            }, 5000);
+        });
+    });
+</script>
+
 </body>
 </html>
