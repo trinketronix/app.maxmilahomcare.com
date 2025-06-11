@@ -46,6 +46,8 @@ jobs:
           exclude: |
             */.git
             */.git/**
+            */.github
+            */.github/**
             */test/*
             test/**
             .gitignore
