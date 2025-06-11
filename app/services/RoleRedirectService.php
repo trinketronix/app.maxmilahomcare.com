@@ -7,10 +7,10 @@ use Phalcon\Di\Injectable;
 class RoleRedirectService extends Injectable {
     public function getRedirectPathByRole(int $role): string {
         return match ($role) {
-            0 => '/dashboard/admin',
-            1 => '/dashboard/manager',
-            2 => '/dashboard/caregiver',
-            default => '/error/unauthorized',
+            0 => '/dashboard/admin',      // Administrator
+            1 => '/dashboard/manager',    // Manager
+            2 => '/dashboard/caregiver',  // Caregiver
+            default => '/signin',         // Unknown role, redirect to login
         };
     }
 
