@@ -112,7 +112,7 @@
         <form id="details-form">
             <div class="details-grid">
                 <div class="avatar-section">
-                    <div class="avatar-img"><i class="fa-solid fa-user-smile"></i></div>
+                    <div class="avatar-img"><img id="photo-view" src="" alt="avatar"></div>
                     <div class="role-text" id="role-text">Caregiver</div>
                 </div>
                 <div class="name-section">
@@ -212,7 +212,11 @@
         $('#role-text').text(getRoleText(data.role));
 
         for (const key in data) {
-            $(`#${key}-view`).text(data[key] || 'N/A');
+            if(key === 'photo') {
+                $(`#${key}-view`).attr('src', data[key]).show();
+            }else {
+                $(`#${key}-view`).text(data[key] || 'N/A');
+            }
         }
     }
 
