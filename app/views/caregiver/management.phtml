@@ -101,7 +101,7 @@
         <h1 class="header-title">Management</h1>
         <h2 class="header-subtitle" style="position: absolute; left: 50%; transform: translateX(-50%); top: 4.5rem; font-size: 1.5rem; color: #555;">Caregivers</h2>
         <div class="profile">
-            <div class="profile-icon"><img id="admin-avatar-img" src="<?=$photo?>" style="display:none;" alt="Admin"></div>
+            <div class="profile-icon"><img src="<?=$photo?>" alt="avatar"></div>
             <span class="profile-username"><?=$fullname?></span>
         </div>
     </header>
@@ -236,18 +236,6 @@
             listContainer.append(cardHtml);
         });
     };
-
-    // --- API & LOGIC FUNCTIONS ---
-    function runInitialCalls() {
-        $.ajax({
-            url: `${baseUrl}/user/photo/${adminId}`,
-            headers: { 'Authorization': token },
-            success: (res) => {
-                if(res.data.photo) $('#admin-avatar-img').attr('src', baseUrl + res.data.photo).show();
-            }
-        });
-        fetchUserList();
-    }
 
     function fetchUserList() {
         return $.ajax({
