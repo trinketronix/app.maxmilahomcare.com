@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Homecare\middleware\models;
 
 use App\utils\HttpRequest;
 use Phalcon\Di\Di;

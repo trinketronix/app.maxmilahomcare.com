@@ -48,6 +48,13 @@ $router->add('/dashboard/caregiver', [
     'action'     => 'caregiver'
 ]);
 
+// Signout route
+$router->add('/signout', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'signout',
+    'action'     => 'index'
+]);
+
 // Test/Debug routes
 $router->add('/test', [
     'namespace'  => 'App\Controllers',

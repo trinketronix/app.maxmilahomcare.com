@@ -12,19 +12,13 @@ class SignoutController extends BaseController {
      * @return void
      */
     public function indexAction() {
-        // Sign out the user
+        // Sign out the user (destroys the session)
         $this->authService->signout();
 
-        // Clear any output buffers
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-
-        // Set flash message for next request
+        // Set a flash message that will be shown on the next page
         $this->flashSession->success('You have been successfully signed out.');
 
-        // Send redirect header directly to avoid dispatcher issues
-        header('Location: /signin');
-        exit();
+        // Use Phalcon's response object to perform the redirect
+        return $this->response->redirect('/signin');
     }
 }

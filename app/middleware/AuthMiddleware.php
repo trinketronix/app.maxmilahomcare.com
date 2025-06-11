@@ -19,6 +19,7 @@ class AuthMiddleware extends Injectable {
     private array $publicRoutes = [
         'signin:index',
         'forgot:index',
+        'signout:index',
         'test:index',
         'error:notFound',
         'error:serverError'
