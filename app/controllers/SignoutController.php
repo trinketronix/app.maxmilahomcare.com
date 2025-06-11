@@ -9,16 +9,22 @@ class SignoutController extends BaseController {
     /**
      * Sign out the user and redirect to signin page
      *
-     * @return mixed
+     * @return void
      */
     public function indexAction() {
         // Sign out the user
         $this->authService->signout();
 
-        // Show success message
+        // Clear any output buffers
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        // Set flash message for next request
         $this->flashSession->success('You have been successfully signed out.');
 
-        // Redirect to signin page
-        return $this->response->redirect('/signin');
+        // Send redirect header directly to avoid dispatcher issues
+        header('Location: /signin');
+        exit();
     }
 }
