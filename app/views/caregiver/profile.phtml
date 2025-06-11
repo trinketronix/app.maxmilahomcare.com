@@ -213,7 +213,7 @@
 
         for (const key in data) {
             if(key === 'photo') {
-                $(`#${key}-view`).attr('src', data[key]).show();
+                $(`#${key}-view`).attr('src', baseUrl + data[key]).show();
             }else {
                 $(`#${key}-view`).text(data[key] || 'N/A');
             }
