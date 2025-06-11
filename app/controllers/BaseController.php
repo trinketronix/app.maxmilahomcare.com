@@ -133,6 +133,16 @@ class BaseController extends Controller {
     }
 
     /**
+     * Check if user has any of the specified roles
+     *
+     * @param array $roles
+     * @return bool
+     */
+    protected function signout(): void {
+        $this->authService->signout();
+    }
+
+    /**
      * Require authentication to access a page
      * Will redirect to signin if not authenticated
      *
