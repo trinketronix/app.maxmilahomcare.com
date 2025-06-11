@@ -31,66 +31,15 @@ class AuthMiddleware extends Injectable {
      * Role 0 = Administrator, Role 1 = Manager, Role 2 = Caregiver
      */
     private array $roleBasedRoutes = [
-        'dashboard:admin' => [0],
-        'dashboard:manager' => [1],
-        'dashboard:caregiver' => [2],
-//        // Dashboard routes
-//        'main:index' => [0, 1],              // Admin/Manager dashboard
-//        'caregiver:index' => [2],            // Caregiver dashboard
-//
-//        // User Management (Admin & Manager)
-//        'users:index' => [0, 1],             // List all users
-//        'users:create' => [0, 1],            // Create new user form
-//        'users:store' => [0, 1],             // Save new user
-//        'users:edit' => [0, 1],              // Edit user form
-//        'users:update' => [0, 1],            // Update user
-//        'users:delete' => [0],               // Delete user (Admin only)
-//        'signup:index' => [0, 1],            // Alternative create user
-//        'userupdate:index' => [0, 1],        // Alternative edit user
-//        'detailsusers:index' => [0, 1],      // View user details
-//        'activate:index' => [0, 1],          // Activate users
-//        'changerole:index' => [0],           // Change user roles (Admin only)
-//
-//        // Patient Management (Admin & Manager)
-//        'patients:index' => [0, 1, 2],       // List patients (all roles, filtered by assignment)
-//        'patients:create' => [0, 1],         // Create new patient form
-//        'patients:store' => [0, 1],          // Save new patient
-//        'patients:edit' => [0, 1],           // Edit patient form
-//        'patients:update' => [0, 1],         // Update patient
-//        'patients:delete' => [0],            // Delete patient (Admin only)
-//        'patients:view' => [0, 1, 2],        // View patient details (all roles)
-//
-//        // Visit Management
-//        'visit:index' => [0, 1, 2],          // List visits (filtered by role)
-//        'visit:create' => [0, 1, 2],         // Create visit form (caregivers only for assigned patients)
-//        'visit:store' => [0, 1, 2],          // Save visit
-//        'visit:edit' => [0, 1],              // Edit visit (Admin/Manager only)
-//        'visit:update' => [0, 1],            // Update visit
-//        'visit:delete' => [0],               // Delete visit (Admin only)
-//        'visit:schedule' => [0, 1, 2],       // Schedule visits
-//        'visit:myvisits' => [2],             // List caregiver's own visits (no underscore in action name)
-//
-//        // Patient Assignment (Admin & Manager)
-//        'assignpatient:index' => [0, 1],     // Patient assignment interface
-//        'assignpatient:assign' => [0, 1],    // Assign patient to user
-//        'assignpatient:unassign' => [0, 1],  // Remove patient assignment
-//        'userpatient:index' => [0, 1],       // User-patient assignment manager
-//        'confirmassign:index' => [0, 1],     // Confirm assignment
-//
-//        // Caregiver-specific routes
-//        'patients:assigned' => [2],          // List only assigned patients
-//        'visit:myvisits' => [2],             // List caregiver's own visits
-//        'visit:myschedule' => [2],           // View caregiver's schedule
-//
-//        // Profile routes (all roles can access their own)
-//        'details:index' => [0, 1, 2],        // View own profile
-//        'profile:edit' => [0, 1, 2],         // Edit own profile
-//        'profile:update' => [0, 1, 2],       // Update own profile
-//
-//        // Reports (Admin & Manager)
-//        'reports:visits' => [0, 1],          // Visit reports
-//        'reports:users' => [0, 1],           // User activity reports
-//        'reports:patients' => [0, 1],        // Patient reports
+        // === DASHBOARD ROUTES TO ADD ===
+        'dashboard:admin' => [0],               // Only Admin
+        'dashboard:manager' => [1],             // Only Manager
+        'dashboard:caregiver' => [2],           // Only Caregiver
+
+        // === CAREGIVER ROUTES TO ADD ===
+        'caregiver:management' => [0, 1],       // Only Admin and Manager
+        'caregiver:profile'    => [0, 1, 2],    // All authenticated users
+        'caregiver:addresses'  => [0, 1, 2],    // All authenticated users
     ];
 
     /**

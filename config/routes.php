@@ -48,6 +48,28 @@ $router->add('/dashboard/caregiver', [
     'action'     => 'caregiver'
 ]);
 
+// ========================================================================
+// CAREGIVER ROUTES
+// ========================================================================
+
+$router->add('/caregiver/management', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'caregiver',
+    'action'     => 'management'
+]);
+
+$router->add('/caregiver/profile', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'caregiver',
+    'action'     => 'profile'
+]);
+
+$router->add('/caregiver/addresses', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'caregiver',
+    'action'     => 'addresses'
+]);
+
 // Signout route
 $router->add('/signout', [
     'namespace'  => 'App\Controllers',
