@@ -45,23 +45,12 @@ class DashboardController extends BaseController {
             return;
         }
 
-        $user = $this->getCurrentUser();
-
-        // Set manager menu items
-        $menuItems = [
-            ['url' => '/details', 'text' => 'My Profile', 'icon' => 'person'],
-            ['url' => '/patients', 'text' => 'Patients', 'icon' => 'people'],
-            ['url' => '/users', 'text' => 'Users', 'icon' => 'person-badge'],
-            ['url' => '/visit', 'text' => 'Visits', 'icon' => 'calendar-check'],
-            ['url' => '/logout', 'text' => 'Logout', 'icon' => 'box-arrow-right'],
-        ];
-
         $this->view->setVars([
-            'user' => $user,
-            'username' => $user['fullname'] ?? $user['username'],
-            'role' => $user['role'],
-            'menuItems' => $menuItems,
-            'pageTitle' => 'Manager Dashboard'
+            'username' => $this->getUsername(),
+            'fullname' => $this->getUserFullname(),
+            'photo' => $this->getUserPhoto(),
+            'role' => $this->getUserRoleText(),
+            'pageTitle' => 'Admin Dashboard'
         ]);
     }
 
