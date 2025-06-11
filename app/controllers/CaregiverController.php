@@ -44,19 +44,35 @@ class CaregiverController extends BaseController {
             return;
         }
 
+        // Get the userId from the URL parameter.
+        // If it's not present in the URL, this will be null.
+        $targetUserId = $this->dispatcher->getParam('userId');
+
+        // Determine which user's profile to load
+        if ($targetUserId) {
+            // A specific user ID was requested in the URL
+            // --- Additional Security Layer ---
+            // Only Admins or Managers can view OTHER people's profiles.
+            if ($targetUserId != $this->getUserId() && !$this->hasAnyRole([Role::ADMINISTRATOR, Role::MANAGER])) {
+                $this->flashSession->error("You do not have permission to view this profile.");
+                return $this->response->redirect('/dashboard/caregiver'); // Or their own dashboard
+            }
+            $userIdToLoad = $targetUserId;
+            $pageTitle = "Caregiver Profile";
+        } else {
+            // No user ID was provided, so show the currently logged-in user's own profile
+            $userIdToLoad = $this->getUserId();
+            $pageTitle = "My Profile";
+        }
+
         // --- Your logic for this page goes here ---
-        // Example: Get user ID from the URL and fetch their data
-        // $userId = $this->dispatcher->getParam('userId');
-        // $profileData = $this->userService->getProfile($userId);
+        // Example: Fetch user data from a service
+        // $profileData = $this->userService->getProfile($userIdToLoad);
 
         $this->view->setVars([
-            'pageTitle' => 'Profile',
-            'userId' => $this->getUserId(),
-            'username' => $this->getUsername(),
-            'fullname' => $this->getUserFullname(),
-            'photo' => $this->getUserPhoto(),
-            'baseUrl' => $this->getApiBaseUrl(),
-            'token' => $this->getAuthToken()
+            'pageTitle' => $pageTitle,
+            'username' => $this->getUsername(), // Logged-in user for header
+            'photo' => $this->getUserPhoto(),    // Logged-in user for header
             // 'profile' => $profileData
         ]);
     }
