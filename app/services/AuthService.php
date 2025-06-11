@@ -56,7 +56,7 @@ class AuthService extends Injectable {
             // Extract token and decode it
             $token = $response['data'][Auth::TOKEN];
             $tokenData = $this->decodeToken($token);
-            
+
             //Extract user fullname and photo
             $userData = $response['data']['user'];
 
@@ -110,6 +110,9 @@ class AuthService extends Injectable {
      * @return void
      */
     public function signout(): void {
+        error_log("=== SIGNOUT DEBUG ===");
+        error_log("Before signout - Session exists: " . ($this->session->exists() ? 'YES' : 'NO'));
+
         // Clear all session data
         $this->session->remove(Session::AUTH_TOKEN);
         $this->session->remove(Session::USER_ID);
@@ -118,10 +121,27 @@ class AuthService extends Injectable {
         $this->session->remove(Session::USER_FULLNAME);
         $this->session->remove(Session::USER_PHOTO);
 
+        // Clear any other session data that might exist
+        if ($this->session->exists()) {
+            // Get all session keys and remove them
+            $keys = $this->session->getKeys();
+            foreach ($keys as $key) {
+                $this->session->remove($key);
+            }
+        }
+
         // Destroy the session
         if ($this->session->exists()) {
             $this->session->destroy();
         }
+
+        // Regenerate session ID to prevent session fixation
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_regenerate_id(true);
+        }
+
+        error_log("After signout - Session exists: " . ($this->session->exists() ? 'YES' : 'NO'));
+        error_log("===================");
     }
 
     /**
@@ -131,12 +151,31 @@ class AuthService extends Injectable {
      */
     public function isAuthenticated(): bool {
 
-        if (!$this->session->has(Session::AUTH_TOKEN)) return false;
+        // First check if session exists
+        if (!$this->session->exists()) {
+            error_log("isAuthenticated: No session exists");
+            return false;
+        }
+
+        // Check if we have the auth token
+        if (!$this->session->has(Session::AUTH_TOKEN)) {
+            error_log("isAuthenticated: No auth token in session");
+            return false;
+        }
 
         $token = $this->session->get(Session::AUTH_TOKEN);
+
+        // Check if token is empty or null
+        if (empty($token)) {
+            error_log("isAuthenticated: Token is empty");
+            $this->signout(); // Clear invalid session
+            return false;
+        }
+
         $tokenData = $this->decodeToken($token);
 
         if (!$tokenData || $this->isTokenExpired($tokenData)) {
+            error_log("isAuthenticated: Token is invalid or expired");
             $this->signout(); // Clear invalid session
             return false;
         }
@@ -168,7 +207,7 @@ class AuthService extends Injectable {
      * @return int 0 if not authenticated
      */
     public function getUserId(): int {
-        return $this->session->get(Session::USER_ID, 0);
+        return (int) $this->session->get(Session::USER_ID, 0);
     }
 
     /**
@@ -204,7 +243,7 @@ class AuthService extends Injectable {
      * @return int -1 if not authenticated
      */
     public function getUserRole(): int {
-        return $this->session->get(Session::USER_ROLE, -1);
+        return (int) $this->session->get(Session::USER_ROLE, -1);
     }
 
     /**
@@ -236,6 +275,13 @@ class AuthService extends Injectable {
      * @return void
      */
     private function createUserSession(string $token, array $tokenData, array $userData): void {
+        // Ensure we start with a clean session
+        if ($this->session->exists()) {
+            $this->session->regenerateId();
+        } else {
+            $this->session->start();
+        }
+
         $this->session->set(Session::AUTH_TOKEN, $token);
         $this->session->set(Session::USER_ID, $tokenData[Auth::ID]);
         $this->session->set(Session::USERNAME, $tokenData[Auth::USERNAME]);

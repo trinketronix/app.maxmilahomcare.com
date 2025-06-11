@@ -8,6 +8,7 @@ use App\Controllers\BaseController;
 class SigninController extends BaseController {
 
     protected $roleRedirectService;
+
     public function initialize() {
         parent::initialize();
         $this->roleRedirectService = $this->di->get('roleRedirectService');
@@ -20,9 +21,22 @@ class SigninController extends BaseController {
      */
     public function indexAction() {
 
+        // Debug: Log session state
+        error_log("=== SIGNIN DEBUG ===");
+        error_log("Session exists: " . ($this->session->exists() ? 'YES' : 'NO'));
+        error_log("Has auth token: " . ($this->session->has('auth-token') ? 'YES' : 'NO'));
+        if ($this->session->has('auth-token')) {
+            error_log("Token value: " . substr($this->session->get('auth-token'), 0, 50) . '...');
+        }
+        error_log("Is authenticated: " . ($this->isAuthenticated() ? 'YES' : 'NO'));
+        error_log("User role: " . $this->getUserRole());
+        error_log("===================");
+
         // Check if user is already logged in
-        if ($this->isAuthenticated())
+        if ($this->isAuthenticated()) {
+            error_log("User is authenticated, redirecting to dashboard");
             return $this->roleRedirectService->redirectToDashboardByRole($this->getUserRole());
+        }
 
         // Handle POST request (signin attempt)
         if ($this->request->isPost()) {
@@ -46,6 +60,8 @@ class SigninController extends BaseController {
                 $this->flashSession->error($result['message']);
             }
         }
-    }
 
+        // Set view variables for the signin form
+        $this->view->pageTitle = 'Maxmila Homecare System';
+    }
 }
