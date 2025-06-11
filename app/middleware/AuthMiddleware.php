@@ -134,7 +134,6 @@ class AuthMiddleware extends Injectable {
                 $this->flashSession->error('You do not have permission to access this page');
 
                 // Redirect to appropriate dashboard based on role
-                $redirectController = $userRole < 2 ? 'admin' : 'caregiver';
                 $action = 'error';
                 switch ($userRole) {
                     case 0:
@@ -147,7 +146,7 @@ class AuthMiddleware extends Injectable {
                         $action = 'caregiver';
                         break;
                     default:
-                        echo "Unknown fruit.";
+                        echo "Unknown";
                 }
 
                 $dispatcher->forward([
@@ -162,24 +161,9 @@ class AuthMiddleware extends Injectable {
             // This ensures new routes must be explicitly added
             $this->flashSession->warning('Access to this page is restricted');
 
-            $userRole = $authService->getUserRole();
-            $action = 'error';
-            switch ($userRole) {
-                case 0:
-                    $action = 'admin';
-                    break;
-                case 1:
-                    $action = 'manager';
-                    break;
-                case 2:
-                    $action = 'caregiver';
-                    break;
-                default:
-                    echo "Unknown fruit.";
-            }
             $dispatcher->forward([
-                'controller' => 'dashboard',
-                'action' => $action
+                'controller' => 'signin',
+                'action' => 'index'
             ]);
 
             return false;
