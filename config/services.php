@@ -11,6 +11,7 @@ use Phalcon\Session\Manager;
 use Phalcon\Session\Adapter\Stream;
 use Phalcon\Flash\Direct as FlashDirect;
 use Phalcon\Flash\Session as FlashSession;
+use Phalcon\Html\Escaper;
 use Phalcon\Cache\Adapter\Stream as CacheStream;
 use Phalcon\Storage\SerializerFactory;
 use Phalcon\Events\Manager as EventsManager;
@@ -26,6 +27,11 @@ $di->setShared('config', function () {
 // Router service
 $di->setShared('router', function () {
     return include __DIR__ . '/routes.php';
+});
+
+// Escaper service (required for Flash services)
+$di->setShared('escaper', function () {
+    return new Escaper();
 });
 
 // Events Manager service
@@ -70,23 +76,29 @@ $di->setShared('session', function () use ($di) {
 });
 
 // Flash messages service
-$di->setShared('flash', function () {
-    return new FlashDirect([
+$di->setShared('flash', function () use ($di) {
+    $escaper = $di->getEscaper();
+    $flash = new FlashDirect($escaper);
+    $flash->setCssClasses([
         'error'   => 'alert alert-danger',
         'success' => 'alert alert-success',
         'notice'  => 'alert alert-info',
         'warning' => 'alert alert-warning',
     ]);
+    return $flash;
 });
 
 // Flash session service
-$di->setShared('flashSession', function () {
-    return new FlashSession([
+$di->setShared('flashSession', function () use ($di) {
+    $escaper = $di->getEscaper();
+    $flash = new FlashSession($escaper);
+    $flash->setCssClasses([
         'error'   => 'alert alert-danger',
         'success' => 'alert alert-success',
         'notice'  => 'alert alert-info',
         'warning' => 'alert alert-warning',
     ]);
+    return $flash;
 });
 
 // Cache service
