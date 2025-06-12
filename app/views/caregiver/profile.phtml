@@ -290,7 +290,24 @@
     }
 
     function changeUserStatus(action) {
-        // ... (no changes needed here)
+        const userId = targetUserData.id;
+        const endpoints = {
+            activate: 'activate', inactivate: 'inactivate',
+            archive: 'archive', delete: 'delete'
+        };
+
+        $.ajax({
+            url: `${baseUrl}/auth/${endpoints[action]}/account`,
+            type: 'PUT',
+            headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
+            data: JSON.stringify({ id: userId.toString() }),
+            success: (response) => {
+                showAlert(`User status changed successfully. ${response.message || ''}`, 'success');
+                $('#statusModal').modal('hide');
+                fetchUserDetails(userId); // Refresh data
+            },
+            error: (err) => showAlert(`Failed to change status. ${err.responseJSON?.message || ''}`, 'danger'),
+        });
     }
 
     // --- NEW PHOTO UPLOAD/UPDATE FUNCTIONALITY ---
