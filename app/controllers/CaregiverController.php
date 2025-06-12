@@ -18,10 +18,6 @@ class CaregiverController extends BaseController {
             return; // Important: Stop processing if the check fails
         }
 
-        // --- Your logic for this page goes here ---
-        // Example: Fetch all caregivers from a service
-        // $caregivers = $this->caregiverService->getAll();
-
         // Set variables for the view
         $this->view->setVars([
             'pageTitle' => 'Caregiver Management',
@@ -65,7 +61,6 @@ class CaregiverController extends BaseController {
 
         // --- Your logic for this page goes here ---
         // Example: Fetch user data from a service
-        // $profileData = $this->userService->getProfile($userIdToLoad);
         $this->view->setVars([
             'pageTitle' => $pageTitle,
             'userId' => $this->getUserId(),
@@ -110,7 +105,51 @@ class CaregiverController extends BaseController {
 
         // --- Your logic for this page goes here ---
         // Example: Fetch user data from a service
-        // $profileData = $this->userService->getProfile($userIdToLoad);
+        $this->view->setVars([
+            'pageTitle' => $pageTitle,
+            'userId' => $this->getUserId(),
+            'targetUserId' => $this->targetUserId,
+            'personType' => 0,
+            'username' => $this->getUsername(),
+            'fullname' => $this->getUserFullname(),
+            'role' => $this->getUserRoleText(),
+            'photo' => $this->getUserPhoto(),
+            'baseUrl' => $this->getApiBaseUrl(),
+            'authToken' => $this->getAuthToken()
+        ]);
+    }
+
+    /**
+     * Shows the patients assigned for a specific user.
+     * Accessible to ALL authenticated users.
+     */
+    public function patientsAction() {
+
+        // SECURITY CHECK: Stop execution if user is not logged in at all
+        if (!$this->requireAuth()) return;
+
+        // Get the userId from the URL parameter.
+        // If it's not present in the URL, this will be null.
+        $this->targetUserId = $this->dispatcher->getParam('userId');
+
+        // Determine which user's profile to load
+        if ($this->targetUserId) {
+            // A specific user ID was requested in the URL
+            // --- Additional Security Layer ---
+            // Only Admins or Managers can view OTHER people's profiles.
+            if ($this->targetUserId != $this->getUserId() && !$this->hasAnyRole([Role::ADMINISTRATOR, Role::MANAGER])) {
+                $this->flashSession->error("You do not have permission to view this profile.");
+                return $this->response->redirect('/signin'); // Or their own dashboard
+            }
+            $pageTitle = "Assigned Patients";
+        } else {
+            // No user ID was provided, so show the currently logged-in user's own profile
+            $this->targetUserId = $this->getUserId();
+            $pageTitle = "My Patients";
+        }
+
+        // --- Your logic for this page goes here ---
+        // Example: Fetch user data from a service
         $this->view->setVars([
             'pageTitle' => $pageTitle,
             'userId' => $this->getUserId(),
