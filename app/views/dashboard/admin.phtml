@@ -44,16 +44,25 @@
             text-align: left;
         }
 
-        /* *** THIS IS THE FIX *** */
         .header-action-right {
             text-align: center; /* Changed from 'right' to 'center' */
         }
 
-        .sign-out-btn {
-            border: 2px solid #000;
-            border-radius: 10px;
+        .sign-out-link {
+            text-decoration: none;
+            color: #333; /* A nice dark grey, not default blue */
             font-weight: 500;
-            padding: 0.4rem 0.8rem;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+
+        .sign-out-link:hover {
+            color: #000; /* Darken on hover */
+            text-decoration: underline; /* Add an underline on hover */
+        }
+
+        .sign-out-link i {
+            margin-right: 0.4rem; /* Adds space between the icon and "Sign Out" */
         }
 
         .user-profile-avatar {
@@ -178,10 +187,11 @@
 
     <!-- Header HTML (No changes needed) -->
     <header class="dashboard-header">
+        <!-- NEW HTML -->
         <div class="header-action-left">
-            <button type="button" class="btn sign-out-btn" data-bs-toggle="modal" data-bs-target="#logoutModal">
+            <a href="#" class="sign-out-link" data-bs-toggle="modal" data-bs-target="#logoutModal">
                 <i class="fa-solid fa-right-from-bracket"></i> Sign Out
-            </button>
+            </a>
         </div>
 
         <h1 class="header-title">Dashboard</h1>
