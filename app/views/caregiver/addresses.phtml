@@ -175,18 +175,17 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const adminId = 3;
-    const targetUserId = 83;
-    const personType = 0; // 0 for Caregiver
-    const baseUrl = "https://api-test.maxmilahomecare.com";
-    const authToken = "eyJpZCI6MywidXNlcm5hbWUiOiJ0b2Rkc2FscGVuQGdtYWlsLmNvbSIsInJvbGUiOjAsImV4cGlyYXRpb24iOjE3NDk5NjI4MDgwODF9";
+    const targetUserId = <?$targetUserId?>;
+    const personType = <?=$personId?>; // 0 for Caregiver
+    const baseUrl = "<?=$baseUrl?>";
+    const authToken = "<?=$authToken?>";
 
     let allAddresses = [];
     let addressFormOffcanvas;
     let confirmEditModal;
     let selectedAddressId = null;
 
-    // --- HELPER FUNCTIONS ---
+    // --- HELPER FUNCTIONS (No changes here) ---
     const showAlert = (message, type = 'success') => {
         const alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
         $('#alert-container').html(alertHtml);
@@ -231,13 +230,21 @@
 
     // --- API CALLS ---
     function runInitialCalls() {
+        // REMOVED: The entire adminPhotoCall AJAX definition is gone.
+
+        // These two calls remain the same.
         const caregiverDetailsCall = $.ajax({
             url: `${baseUrl}/account/${targetUserId}`,
             headers: { 'Authorization': authToken }
         });
         const addressListCall = fetchAddressList();
 
+        // CHANGED: $.when() now only waits for two calls instead of three.
         $.when(caregiverDetailsCall, addressListCall).done(function(caregiverRes) {
+            // CHANGED: The 'adminRes' argument is removed. 'caregiverRes' is now the first argument.
+
+            // REMOVED: All logic related to adminPhotoData is gone.
+
             const caregiverData = caregiverRes[0].data;
             if (caregiverData.photo) {
                 $('#caregiver-avatar-img').attr('src', baseUrl + caregiverData.photo).show();
@@ -250,6 +257,8 @@
             showAlert('Could not load initial page data.', 'danger');
         });
     }
+
+    // --- (The rest of the functions below this have no changes) ---
 
     function fetchAddressList() {
         return $.ajax({
@@ -285,7 +294,7 @@
             state: "MI",
             country: "United States",
             zipcode: $('#form-zipcode').val(),
-            latitude: null, // As per example
+            latitude: null,
             longitude: null
         };
 
@@ -307,20 +316,17 @@
         $.ajax(ajaxConfig);
     }
 
-    // --- PAGE INITIALIZATION AND EVENT LISTENERS ---
     function initializePage() {
         addressFormOffcanvas = new bootstrap.Offcanvas(document.getElementById('addressFormOffcanvas'));
         confirmEditModal = new bootstrap.Modal(document.getElementById('confirmEditModal'));
 
         runInitialCalls();
 
-        // Open Confirmation Modal
         $('#address-list').on('click', '.address-item', function() {
             selectedAddressId = $(this).data('address-id');
             confirmEditModal.show();
         });
 
-        // "Yes" in confirmation opens the edit form
         $('#confirm-yes-btn').on('click', function() {
             const addressToEdit = allAddresses.find(addr => addr.id == selectedAddressId);
             confirmEditModal.hide();
@@ -329,13 +335,11 @@
             }
         });
 
-        // "Add" button opens the add form
         $('#add-address-btn').on('click', function(e){
             e.preventDefault();
             openAddressForm('add');
         });
 
-        // Handle the form submission for both add and edit
         $('#address-form').on('submit', handleFormSubmit);
 
         $('#back-button').on('click', function(e) {
