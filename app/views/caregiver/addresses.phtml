@@ -341,6 +341,11 @@
 
         // Handle the form submission for both add and edit
         $('#address-form').on('submit', handleFormSubmit);
+
+        $('#back-button').on('click', function(e) {
+            e.preventDefault();
+            window.history.back();
+        });
     }
 </script>
 </body>
