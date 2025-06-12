@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?=$pageTitle?></title>
+
+    <!-- Bootstrap 5.1 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+    <style>
+        html, body {
+            height: 100vh;
+            overflow: hidden;
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-left: 1px solid #dcdcdc;
+            border-right: 1px solid #dcdcdc;
+            position: relative;
+        }
+
+        /* --- Header & Fixed Info --- */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; position: relative; flex-shrink: 0; }
+        .back-button { text-decoration: none; color: #333; font-weight: 500; }
+        .header-title { font-size: 2.2rem; font-weight: bold; margin: 0; position: absolute; left: 50%; transform: translateX(-50%); }
+        .profile { text-align: center; }
+        .profile-icon { font-size: 1.5rem; border: 2px solid #000; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; margin: 0 auto; overflow: hidden; }
+        .profile-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-username { font-size: 0.8rem; color: #555; margin-top: 4px; }
+        .target-user-info { display: flex; align-items: center; gap: 1rem; padding: 1rem; flex-shrink: 0; border-bottom: 1px solid #e0e0e0; }
+        .target-user-avatar { width: 60px; height: 60px; border: 2px solid #000; border-radius: 50%; overflow: hidden; }
+        .target-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .target-user-name { font-weight: bold; font-size: 1.25rem; }
+        .controls-section { padding: 1rem; background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0; flex-shrink: 0; }
+        .search-bar .form-control, .search-bar .btn { border-radius: 8px; border: 2px solid #000; }
+
+        /* --- Patient List (Scrollable) --- */
+        .patient-list-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            padding-bottom: 120px; /* Space for FAB */
+        }
+        .patient-item {
+            display: flex; align-items: center; gap: 1rem;
+            border: 2px solid #000; border-radius: 15px;
+            padding: 1rem; margin-bottom: 1rem; cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .patient-item:hover { background-color: #f1f1f1; }
+        .patient-avatar { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #000; overflow: hidden; display:flex; align-items:center; justify-content:center; }
+        .patient-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .patient-name { font-weight: bold; font-size: 1.1rem; }
+
+        /* --- FAB & UI Components --- */
+        .fab { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90px; height: 90px; border-radius: 50%; background-color: #e0e0e0; border: 3px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 500; text-decoration: none; color: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1040; }
+        .fab .plus-icon { font-size: 2rem; line-height: 1; }
+        #alert-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px; }
+        .confirmation-modal-body { text-align: center; }
+        .confirmation-options { display: flex; justify-content: space-around; padding-top: 1.5rem; }
+        .confirmation-option { cursor: pointer; text-decoration: none; color: #000; font-weight: bold; }
+        .confirmation-option:hover { opacity: 0.8; }
+        .confirmation-option i { font-size: 3rem; margin-bottom: 0.5rem; display: block; color: #fff; background-color: #000; border-radius: 15px; padding: 0.5rem; }
+        .offcanvas-body { display: flex; flex-direction: column; }
+
+        @media (min-width: 768px) { .page-container { max-width: 720px; } }
+    </style>
+</head>
+<body onload="initializePage()">
+
+<div id="alert-container"></div>
+
+<div class="page-container">
+    <!-- Header -->
+    <header class="header">
+        <a href="/caregiver/management" class="back-button"><i class="fas fa-chevron-left"></i> Back</a>
+        <h1 class="header-title">Caregiver Patients</h1>
+        <div class="profile">
+            <div class="profile-icon"><img src="<?=$photo?>" alt="avatar"></div>
+            <span class="profile-username"><?=$fullname?></span>
+        </div>
+    </header>
+
+    <!-- Target User Info -->
+    <section class="target-user-info">
+        <div class="target-user-avatar"><img id="target-user-avatar-img" src="" style="display:none;" alt="Caregiver"></div>
+        <div class="target-user-name" id="target-user-name">Loading...</div>
+    </section>
+
+    <!-- Controls -->
+    <section class="controls-section">
+        <div class="input-group search-bar">
+            <input type="text" id="search-input-main" class="form-control" placeholder="Search assigned patients...">
+        </div>
+    </section>
+
+    <!-- Assigned Patient List -->
+    <main class="patient-list-container">
+        <div id="assigned-patient-list">
+            <div class="text-center p-5"><div class="spinner-border"></div></div>
+        </div>
+    </main>
+</div>
+
+<!-- FAB to Assign Patient -->
+<a href="#" class="fab" id="add-patient-btn">
+    <div class="plus-icon">+</div>
+    <div>Patient</div>
+</a>
+
+<!-- Reusable Confirmation Modal for Assign/Unassign -->
+<div class="modal fade" id="confirmationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 1rem; border: 2px solid #000;">
+            <div class="modal-header"><h5 class="modal-title w-100 text-center" id="confirmation-modal-title">Confirm Action</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body confirmation-modal-body">
+                <p id="confirmation-modal-text">Are you sure?</p>
+                <div class="confirmation-options">
+                    <a href="#" class="confirmation-option" id="confirm-yes-btn"><i class="fa-solid fa-check"></i>Yes</a>
+                    <a href="#" class="confirmation-option" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i>No</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Offcanvas for Unassigned Patient List -->
+<div class="offcanvas offcanvas-bottom h-100" tabindex="-1" id="assignPatientOffcanvas">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title w-100 text-center">Assign Patient</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="input-group search-bar mb-3">
+            <input type="text" id="search-input-offcanvas" class="form-control" placeholder="Search unassigned patients...">
+        </div>
+        <div id="unassigned-patient-list-container" class="patient-list-container flex-grow-1 p-0">
+            <div class="text-center p-5"><div class="spinner-border"></div></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const targetUserId = <?=$targetUserId?>;
+    const baseUrl = '<?=$baseUrl?>';
+    const authToken = '<?=$authToken?>';
+
+    let assignedPatients = [];
+    let unassignedPatients = [];
+    let assignPatientOffcanvas;
+    let confirmationModal;
+
+    // --- HELPER FUNCTIONS ---
+    const showAlert = (message, type = 'success') => {
+        $('#alert-container').html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).find('.alert').delay(4000).fadeOut();
+    };
+
+    const renderPatientList = (patients, containerId) => {
+        const listContainer = $(`#${containerId}`);
+        listContainer.empty();
+        if (!patients || patients.length === 0) {
+            const message = containerId.includes('unassigned') ? 'No more patients to assign.' : 'No patients assigned to this user.';
+            listContainer.html(`<p class="text-center text-muted mt-4">${message}</p>`);
+            return;
+        }
+        patients.forEach(patient => {
+            const fullName = `${patient.firstname || ''} ${patient.lastname || ''}`.trim();
+            const photoSrc = (patient.photo && !patient.photo.endsWith('default.jpg')) ? (baseUrl + patient.photo) : 'https://via.placeholder.com/60';
+            const itemHtml = `
+                <div class="patient-item" data-patient-id="${patient.id}">
+                    <div class="patient-avatar"><img src="${photoSrc}" alt="Avatar"></div>
+                    <div class="patient-name">${fullName}</div>
+                </div>`;
+            listContainer.append(itemHtml);
+        });
+    };
+
+    const openConfirmationModal = (action, patientId) => {
+        const patientList = action === 'unassign' ? assignedPatients : unassignedPatients;
+        const patient = patientList.find(p => p.id == patientId);
+        if (!patient) return;
+
+        const targetUserName = $('#target-user-name').text();
+        const patientName = `${patient.firstname} ${patient.lastname}`.trim();
+
+        const title = action === 'unassign' ? 'Unassign Patient' : 'Assign Patient';
+        const text = `You are about to ${action} the patient: <br><strong>${patientName}</strong><br>${action === 'unassign' ? 'From' : 'To'} the user:<br><strong>${targetUserName}</strong>`;
+
+        $('#confirmation-modal-title').text(title);
+        $('#confirmation-modal-text').html(text);
+        $('#confirm-yes-btn').data('action', action).data('patient-id', patientId);
+
+        confirmationModal.show();
+    };
+
+    // --- API CALLS ---
+    function fetchAssignedPatients() {
+        $.ajax({
+            url: `${baseUrl}/assigned/patients/${targetUserId}`,
+            headers: { 'Authorization': authToken },
+            success: (response) => {
+                if (response.status === 'success' && response.data) {
+                    const { user, patients } = response.data;
+                    $('#target-user-name').text(user.fullname);
+                    if (user.photo) $('#target-user-avatar-img').attr('src', baseUrl + user.photo).show();
+
+                    assignedPatients = patients;
+                    renderPatientList(assignedPatients, 'assigned-patient-list');
+                } else { throw new Error('Failed to parse assigned patients'); }
+            },
+            error: () => showAlert('Error fetching assigned patients.', 'danger')
+        });
+    }
+
+    function fetchUnassignedPatients() {
+        $('#unassigned-patient-list-container').html('<div class="text-center p-5"><div class="spinner-border"></div></div>');
+        $.ajax({
+            url: `${baseUrl}/unassigned/patients/${targetUserId}`,
+            headers: { 'Authorization': authToken },
+            success: (response) => {
+                if (response.status === 'success' && response.data) {
+                    unassignedPatients = response.data.patients;
+                    renderPatientList(unassignedPatients, 'unassigned-patient-list-container');
+                } else { throw new Error('Failed to parse unassigned patients'); }
+            },
+            error: () => showAlert('Error fetching unassigned patients.', 'danger')
+        });
+    }
+
+    function handleAssignmentAction() {
+        const action = $(this).data('action');
+        const patientId = $(this).data('patient-id');
+        const url = `${baseUrl}/${action}/patients`; // a or unassign
+
+        const payload = {
+            user_id: targetUserId,
+            patient_ids: [patientId]
+        };
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            contentType: 'application/json',
+            headers: { 'Authorization': authToken },
+            data: JSON.stringify(payload),
+            success: (response) => {
+                showAlert(response.message || `Patient successfully ${action}ed.`, 'success');
+                confirmationModal.hide();
+
+                // Instant UI update
+                if (action === 'unassign') {
+                    assignedPatients = assignedPatients.filter(p => p.id != patientId);
+                    renderPatientList(assignedPatients, 'assigned-patient-list');
+                } else { // assign
+                    unassignedPatients = unassignedPatients.filter(p => p.id != patientId);
+                    renderPatientList(unassignedPatients, 'unassigned-patient-list-container');
+                }
+            },
+            error: (xhr) => showAlert(xhr.responseJSON?.message || 'An error occurred.', 'danger')
+        });
+    }
+
+    // --- INITIALIZATION & EVENT LISTENERS ---
+    function initializePage() {
+        assignPatientOffcanvas = new bootstrap.Offcanvas(document.getElementById('assignPatientOffcanvas'));
+        confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+
+        fetchAssignedPatients();
+
+        // Open unassign confirmation
+        $('#assigned-patient-list').on('click', '.patient-item', function() {
+            openConfirmationModal('unassign', $(this).data('patient-id'));
+        });
+
+        // Open assign confirmation from offcanvas
+        $('#unassigned-patient-list-container').on('click', '.patient-item', function() {
+            openConfirmationModal('assign', $(this).data('patient-id'));
+        });
+
+        // Handle "Yes" click in modal
+        $('#confirm-yes-btn').on('click', handleAssignmentAction);
+
+        // Show offcanvas to assign new patients
+        $('#add-patient-btn').on('click', (e) => {
+            e.preventDefault();
+            fetchUnassignedPatients();
+            assignPatientOffcanvas.show();
+        });
+
+        // Refresh main list when offcanvas closes to show new assignments
+        $('#assignPatientOffcanvas').on('hidden.bs.offcanvas', fetchAssignedPatients);
+
+        // Search filters
+        $('#search-input-main').on('keyup', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            const filtered = assignedPatients.filter(p => `${p.firstname} ${p.lastname}`.toLowerCase().includes(searchTerm));
+            renderPatientList(filtered, 'assigned-patient-list');
+        });
+
+        $('#search-input-offcanvas').on('keyup', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            const filtered = unassignedPatients.filter(p => `${p.firstname} ${p.lastname}`.toLowerCase().includes(searchTerm));
+            renderPatientList(filtered, 'unassigned-patient-list-container');
+        });
+    }
+</script>
+</body>
+</html>

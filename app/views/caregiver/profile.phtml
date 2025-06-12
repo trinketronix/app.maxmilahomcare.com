@@ -160,7 +160,7 @@
 
             <div class="action-buttons">
                 <button type="button" class="btn btn-custom" onclick="window.location.href='/caregiver/addresses/<?=$targetUserId?>'">Addresses</button>
-                <button type="button" class="btn btn-custom">Patients</button>
+                <button type="button" class="btn btn-custom" onclick="window.location.href='/caregiver/patients/<?=$targetUserId?>'">Patients</button>
                 <button type="button" class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#statusModal">Status</button>
                 <button type="button" class="btn btn-custom" id="edit-btn">Edit</button>
             </div>
@@ -237,7 +237,7 @@
     }
 
     // --- API CALLS ---
-    function fetchUserDetails(userId) {
+    function fetchCaregivers(userId) {
         $.ajax({
             url: `${baseUrl}/account/${userId}`,
             type: 'GET',
@@ -252,7 +252,7 @@
         });
     }
 
-    function saveUserDetails(userId) {
+    function saveCaregiver(userId) {
         const updatedFields = {};
         const formData = {
             firstname: $('#firstname-edit').val(), middlename: $('#middlename-edit').val(),
@@ -282,7 +282,7 @@
             data: JSON.stringify(updatedFields),
             success: (response) => {
                 showAlert('User details updated successfully!', 'success');
-                fetchUserDetails(userId);
+                fetchCaregivers(userId);
                 setMode('view');
             },
             error: (err) => showAlert('Failed to update user. ' + (err.responseJSON?.message || ''), 'danger'),
@@ -324,7 +324,7 @@
             contentType: false, // Important for file uploads
             success: (response) => {
                 showAlert(response.message || 'Photo updated successfully!', 'success');
-                fetchUserDetails(targetUserId); // Refresh the page data to show new photo
+                fetchCaregivers(targetUserId); // Refresh the page data to show new photo
             },
             error: (err) => {
                 const errorMsg = err.responseJSON?.message || 'Failed to upload photo.';
@@ -346,10 +346,10 @@
 
     // --- INITIALIZATION & EVENT HANDLERS ---
     function initializePage() {
-        fetchUserDetails(targetUserId);
+        fetchCaregivers(targetUserId);
 
         $('#edit-btn').on('click', () => setMode('edit'));
-        $('#save-btn').on('click', () => saveUserDetails(targetUserData.id));
+        $('#save-btn').on('click', () => saveCaregiver(targetUserData.id));
         $('#back-button').on('click', function(e) {
             e.preventDefault();
             if ($('#page-container').hasClass('edit-mode')) {
