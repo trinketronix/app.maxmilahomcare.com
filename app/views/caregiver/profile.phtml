@@ -262,7 +262,7 @@
         }
 
         $.ajax({
-            url: `${baseUrl}}/user/${userId}`,
+            url: `${baseUrl}/user/${userId}`,
             type: 'PUT',
             headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
             data: JSON.stringify(updatedFields),
