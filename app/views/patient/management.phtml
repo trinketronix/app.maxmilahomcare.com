@@ -47,13 +47,13 @@
         .filter-buttons::-webkit-scrollbar { display: none; }
 
         /* --- User List (Scrollable) --- */
-        .user-list-container {
+        .patient-list-container {
             flex-grow: 1;
             overflow-y: auto;
             padding: 1rem;
             padding-bottom: 120px; /* Space for FAB */
         }
-        .user-item {
+        .patient-item {
             display: grid; grid-template-columns: auto 1fr; gap: 1rem;
             border: 2px solid #000; border-radius: 15px;
             padding: 1rem; margin-bottom: 1rem; cursor: pointer;
@@ -61,15 +61,15 @@
             text-decoration: none; /* Removes the underline */
             color: inherit; /* Makes text color normal, not blue */
         }
-        .user-item:hover {
+        .patient-item:hover {
             background-color: #f1f1f1;
             color: inherit;}
-        .user-avatar { grid-row: 1 / 3; width: 60px; height: 60px; border-radius: 50%; border: 3px solid #000; overflow: hidden; }
-        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .user-info { grid-column: 2 / 3; }
-        .user-name { font-weight: bold; font-size: 1.1rem; }
-        .user-role, .user-phone { color: #555; }
-        .user-status { grid-column: 2 / 3; font-weight: bold; }
+        .patient-avatar { grid-row: 1 / 3; width: 60px; height: 60px; border-radius: 50%; border: 3px solid #000; overflow: hidden; }
+        .patient-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .patient-info { grid-column: 2 / 3; }
+        .patient-name { font-weight: bold; font-size: 1.1rem; }
+        .patient-role, .patient-phone { color: #555; }
+        .patient-status { grid-column: 2 / 3; font-weight: bold; }
         .status-active { color: #198754; }
         .status-inactive { color: #dc3545; }
         .status-not-verified { color: #fd7e14; }
@@ -104,7 +104,7 @@
     <header class="header">
         <a href="/dashboard/admin" class="back-button"><i class="fas fa-chevron-left"></i> Back</a>
         <h1 class="header-title">Management</h1>
-        <h2 class="header-subtitle" style="position: absolute; left: 50%; transform: translateX(-50%); top: 4.5rem; font-size: 1.5rem; color: #555;">Caregivers</h2>
+        <h2 class="header-subtitle" style="position: absolute; left: 50%; transform: translateX(-50%); top: 4.5rem; font-size: 1.5rem; color: #555;">Patients</h2>
         <div class="profile">
             <div class="profile-icon"><img src="<?=$photo?>" alt="avatar"></div>
             <span class="profile-username"><?=$fullname?></span>
@@ -114,7 +114,7 @@
     <!-- Controls -->
     <section class="controls-section">
         <div class="input-group search-bar">
-            <input type="text" id="search-input" class="form-control" placeholder="Search caregiver...">
+            <input type="text" id="search-input" class="form-control" placeholder="Search patient...">
             <button class="btn btn-dark" type="button" id="search-button">Search</button>
         </div>
         <div class="filter-buttons">
@@ -128,27 +128,27 @@
     </section>
 
     <!-- User List -->
-    <main class="user-list-container">
-        <div id="user-list">
+    <main class="patient-list-container">
+        <div id="patient-list">
             <div class="text-center p-5"><div class="spinner-border"></div></div>
         </div>
     </main>
 </div>
 
 <!-- Floating Action Button -->
-<a href="#" class="fab" id="add-caregiver-btn">
+<a href="#" class="fab" id="add-patient-btn">
     <div class="plus-icon">+</div>
-    <div class="plus-text">Caregiver</div>
+    <div class="plus-text">Patient</div>
 </a>
 
-<!-- Offcanvas for Add Caregiver Form -->
-<div class="offcanvas offcanvas-bottom" tabindex="-1" id="addCaregiverOffcanvas" style="height: auto;">
+<!-- Offcanvas for Add Patient Form -->
+<div class="offcanvas offcanvas-bottom" tabindex="-1" id="addPatientOffcanvas" style="height: auto;">
     <div class="offcanvas-header">
-        <h5 class="offcanvas-title w-100 text-center">Add Caregiver</h5>
+        <h5 class="offcanvas-title w-100 text-center">Add Patient</h5>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
-        <form id="add-caregiver-form" class="mx-auto" style="max-width: 400px;">
+        <form id="add-patient-form" class="mx-auto" style="max-width: 400px;">
             <div class="input-group mb-3">
                 <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                 <input type="text" class="form-control" id="form-username" placeholder="Username" required>
@@ -161,7 +161,7 @@
                 <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
                 <input type="password" class="form-control" id="form-confirm-password" placeholder="Confirm Password" required>
             </div>
-            <button type="submit" class="btn w-100" style="border: 2px solid #000; font-weight: 500;">Add Caregiver</button>
+            <button type="submit" class="btn w-100" style="border: 2px solid #000; font-weight: 500;">Add Patient</button>
         </form>
     </div>
 </div>
@@ -192,7 +192,7 @@
     const authToken = '<?=$authToken?>';
 
     let allUsers = [];
-    let addCaregiverOffcanvas;
+    let addPatientOffcanvas;
     let resultModal;
 
     // --- HELPER FUNCTIONS ---
@@ -216,27 +216,25 @@
         return map[status] || { text: 'Unknown', class: '' };
     };
 
-    const renderUserList = (users) => {
-        const listContainer = $('#user-list');
+    const renderUserList = (patients) => {
+        const listContainer = $('#patient-list');
         listContainer.empty();
-        if (!users || users.length === 0) {
-            listContainer.html('<p class="text-center text-muted">No users found.</p>');
+        if (!patients || patients.length === 0) {
+            listContainer.html('<p class="text-center text-muted">No patients found.</p>');
             return;
         }
-        users.forEach(user => {
-            const fullName = `${user.firstname || ''} ${user.lastname || ''}`.trim();
-            const statusInfo = getStatusInfo(user.status);
-            const roleText = getRoleText(user.role);
-            const photoSrc = baseUrl + user.photo;
+        patients.forEach(patient => {
+            const fullName = `${patient.firstname || ''} ${patient.lastname || ''}`.trim();
+            const statusInfo = getStatusInfo(patient.status);
+            const roleText = getRoleText(patient.role);
+            const photoSrc = baseUrl + patient.photo;
             const cardHtml = `
-                    <a href="/caregiver/profile/${user.id}" class="user-item" data-user-id="${user.id}" data-status="${user.status}">
-                        <div class="user-avatar"><img src="${photoSrc}" alt="Avatar"></div>
-                        <div class="user-info">
-                            <div class="user-name">${fullName}</div>
-                            <div class="user-phone">${user.phone || 'No phone'}</div>
-                            <div class="user-role">${roleText}</div>
+                    <a href="/patient/profile/${patient.id}" class="patient-item" data-patient-id="${patient.id}" data-status="${patient.status}">
+                        <div class="patient-avatar"><img src="${photoSrc}" alt="Avatar"></div>
+                        <div class="patient-info">
+                            <div class="patient-name">${fullName}</div>
+                            <div class="patient-phone">${patient.phone || 'No phone'}</div>
                         </div>
-                        <div class="user-status ${statusInfo.class}">${statusInfo.text}</div>
                     </a>`;
             listContainer.append(cardHtml);
         });
@@ -247,13 +245,13 @@
             url: `${baseUrl}/accounts`,
             headers: { 'Authorization': authToken },
             success: (response) => {
-                if (response.status === 'success' && response.data.users) {
-                    allUsers = response.data.users;
+                if (response.status === 'success' && response.data.patients) {
+                    allUsers = response.data.patients;
                     renderUserList(allUsers);
-                    showAlert(`Loaded ${response.data.count} users successfully.`, 'success');
-                } else { throw new Error('Failed to parse users'); }
+                    showAlert(`Loaded ${response.data.count} patients successfully.`, 'success');
+                } else { throw new Error('Failed to parse patients'); }
             },
-            error: () => showAlert('Error fetching user list.', 'danger')
+            error: () => showAlert('Error fetching patient list.', 'danger')
         });
     }
 
@@ -274,13 +272,13 @@
             contentType: 'application/json',
             data: JSON.stringify({ username, password }),
             success: (response) => {
-                showResultModal('Caregiver added successfully!');
-                addCaregiverOffcanvas.hide();
+                showResultModal('Patient added successfully!');
+                addPatientOffcanvas.hide();
                 fetchUserList();
             },
             error: (xhr) => {
                 const errorMsg = xhr.responseJSON?.message || 'An unknown error occurred.';
-                showResultModal(`Failed to add caregiver: ${errorMsg}`, 'danger');
+                showResultModal(`Failed to add patient: ${errorMsg}`, 'danger');
             }
         });
     }
@@ -289,7 +287,7 @@
         const searchTerm = $('#search-input').val().toLowerCase();
         const activeFilterStatus = $('.filter-btn.active').data('filter-status').toString();
 
-        $('.user-item').each(function() {
+        $('.patient-item').each(function() {
             const item = $(this);
             const itemStatus = item.data('status').toString();
             const itemText = item.text().toLowerCase();
@@ -307,7 +305,7 @@
 
     // --- PAGE INITIALIZATION ---
     function initializePage() {
-        addCaregiverOffcanvas = new bootstrap.Offcanvas(document.getElementById('addCaregiverOffcanvas'));
+        addPatientOffcanvas = new bootstrap.Offcanvas(document.getElementById('addPatientOffcanvas'));
         resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
 
         fetchUserList();
@@ -321,9 +319,9 @@
 
         $('#search-button, #search-input').on('click keyup', applyFiltersAndSearch);
 
-        $('#add-caregiver-btn').on('click', (e) => { e.preventDefault(); addCaregiverOffcanvas.show(); });
+        $('#add-patient-btn').on('click', (e) => { e.preventDefault(); addPatientOffcanvas.show(); });
 
-        $('#add-caregiver-form').on('submit', handleRegisterSubmit);
+        $('#add-patient-form').on('submit', handleRegisterSubmit);
     }
 </script>
 </body>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?=$pageTitle?></title>
+
+    <!-- Bootstrap 5.1 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+    <style>
+        html, body {
+            height: 100vh;
+            overflow: hidden;
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-left: 1px solid #dcdcdc;
+            border-right: 1px solid #dcdcdc;
+            position: relative;
+        }
+
+        /* --- Header & User Info (Fixed) --- */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; position: relative; }
+        .back-button { text-decoration: none; color: #333; font-weight: 500; }
+        .header-title { font-size: 2.2rem; font-weight: bold; margin: 0; }
+        .header-title-group { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; }
+        .profile { text-align: center; }
+        .profile-icon { font-size: 1.5rem; border: 2px solid #000; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; margin: 0 auto; overflow: hidden; }
+        .profile-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-username { font-size: 0.8rem; color: #555; margin-top: 4px; }
+
+        .user-info-section { display: flex; padding: 1rem; gap: 1rem; align-items: center; border-bottom: 1px solid #e0e0e0; flex-shrink: 0; }
+        .user-avatar-container { text-align: center; }
+        .user-avatar { width: 80px; height: 80px; border: 2px solid #000; padding: 0.3rem; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .user-avatar img { max-width: 100%; max-height: 100%; }
+        .user-role { font-weight: 500; font-size: 0.9rem; }
+        .user-name-container { font-size: 1.1rem; font-weight: 500; }
+
+        /* --- Address List (Scrollable) --- */
+        .address-list-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            padding-bottom: 120px; /* Space for FAB */
+        }
+        .address-item {
+            display: flex; align-items: center; gap: 1rem;
+            border: 2px solid #000; border-radius: 15px;
+            padding: 1rem; margin-bottom: 1rem; cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .address-item:hover { background-color: #f1f1f1; }
+        .address-icon { font-size: 2.5rem; color: #333; }
+        .address-details { line-height: 1.4; }
+        .address-line-1 { font-weight: bold; }
+
+        /* --- FAB (Fixed) --- */
+        .fab {
+            position: absolute; bottom: 20px; left: 50%;
+            transform: translateX(-50%);
+            width: 80px; height: 80px; border-radius: 50%;
+            background-color: #e0e0e0; border: 3px solid #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-weight: 500; text-decoration: none; color: #000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1040;
+        }
+        .fab .plus-icon { font-size: 2rem; line-height: 1; }
+        .fab .plus-text {  font-size: 0.63em; }
+        /* --- Modals and Offcanvas --- */
+        #alert-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px; }
+        .confirmation-modal-body { display: flex; justify-content: space-around; text-align: center; padding: 1.5rem 0; }
+        .confirmation-option { cursor: pointer; }
+        .confirmation-option:hover { opacity: 0.8; }
+        .confirmation-option i { font-size: 3rem; margin-bottom: 0.5rem; display: block; color: #fff; background-color: #000; border-radius: 15px; padding: 0.5rem; }
+        .offcanvas { border-top: 1px solid #ccc; }
+        .offcanvas-body { padding: 1rem 1rem 2rem 1rem; }
+
+        @media (min-width: 768px) { .page-container { max-width: 720px; } }
+    </style>
+</head>
+<body onload="initializePage()">
+
+<div id="alert-container"></div>
+
+<div class="page-container">
+    <!-- Header -->
+    <header class="header">
+        <a href="#" class="back-button" id="back-button"><i class="fas fa-chevron-left"></i> Back</a>
+        <div class="header-title-group">
+            <h1 class="header-title"><?=$pageTitle?></h1>
+        </div>
+        <div class="profile">
+            <div class="profile-icon"><img src="<?=$photo?>" alt="avatar"></div>
+            <span class="profile-username"><?=$fullname?></span>
+        </div>
+    </header>
+
+    <!-- User Info -->
+    <section class="user-info-section">
+        <div class="user-avatar-container">
+            <div class="user-avatar"><img id="caregiver-avatar-img" src="" style="display:none;" alt="Caregiver"></div>
+            <div class="user-role" id="caregiver-role">Caregiver</div>
+        </div>
+        <div class="user-name-container">
+            <div id="caregiver-firstname">First Name</div>
+            <div id="caregiver-middlename">Middle Name</div>
+            <div id="caregiver-lastname">Last Name</div>
+        </div>
+    </section>
+
+    <!-- Address List -->
+    <main class="address-list-container">
+        <div id="address-list">
+            <div class="text-center p-5"><div class="spinner-border"></div></div>
+        </div>
+    </main>
+</div>
+
+<!-- Floating Action Button -->
+<a href="#" class="fab" id="add-address-btn">
+    <div class="plus-icon">+</div>
+    <div class="plus-text">Address</div>
+</a>
+
+<!-- Confirmation Modal for Edit -->
+<div class="modal fade" id="confirmEditModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Edit Address</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <h4 class="text-center">Confirm to edit the address</h4>
+                <div class="confirmation-modal-body">
+                    <div class="confirmation-option" id="confirm-yes-btn"><i class="fa-solid fa-check"></i>Yes</div>
+                    <div class="confirmation-option" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i>No</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Offcanvas for Add/Edit Form -->
+<div class="offcanvas offcanvas-bottom" tabindex="-1" id="addressFormOffcanvas" style="height: auto;">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title w-100 text-center" id="offcanvas-title">Address Form</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="address-form" class="mx-auto" style="max-width: 400px;">
+            <input type="hidden" id="form-address-id">
+            <div class="mb-3"><label class="form-label">Address</label><input type="text" class="form-control" id="form-address" required></div>
+            <div class="mb-3"><label class="form-label">City</label><input type="text" class="form-control" id="form-city" required></div>
+            <div class="mb-3"><label class="form-label">Zip Code</label><input type="text" class="form-control" id="form-zipcode" required></div>
+            <div class="mb-3"><label class="form-label">Type</label><select class="form-select" id="form-type"><option value="House">House</option><option value="Apartment">Apartment</option><option value="Other">Other</option></select></div>
+            <div class="mb-3"><label class="form-label">County</label><input type="text" class="form-control" id="form-county"></div>
+            <div class="mb-3"><label class="form-label">State</label><input type="text" class="form-control" id="form-state" value="MI" disabled></div>
+            <div class="mb-3"><label class="form-label">Country</label><input type="text" class="form-control" id="form-country" value="United States" disabled></div>
+            <button type="submit" class="btn w-100" style="border: 2px solid #000; font-weight: 500;" id="save-address-btn">Save</button>
+        </form>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const targetUserId = <?=$targetUserId?>;
+    const personType = <?=$personType?>; // 0 for Caregiver
+    const baseUrl = "<?=$baseUrl?>";
+    const authToken = "<?=$authToken?>";
+
+    let allAddresses = [];
+    let addressFormOffcanvas;
+    let confirmEditModal;
+    let selectedAddressId = null;
+
+    // --- HELPER FUNCTIONS (No changes here) ---
+    const showAlert = (message, type = 'success') => {
+        const alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+        $('#alert-container').html(alertHtml);
+    };
+
+    const renderAddressList = (addresses) => {
+        const listContainer = $('#address-list');
+        listContainer.empty();
+        if (!addresses || addresses.length === 0) {
+            listContainer.html('<p class="text-center text-muted">No addresses found for this user.</p>');
+            return;
+        }
+        addresses.forEach(addr => {
+            const iconClass = addr.type === 'Apartment' ? 'fa-building' : 'fa-house';
+            const cardHtml = `
+                    <div class="address-item" data-address-id="${addr.id}">
+                        <i class="fa-solid ${iconClass} address-icon"></i>
+                        <div class="address-details">
+                            <div class="address-line-1">${addr.address}</div>
+                            <div>${addr.city}, ${addr.state} ${addr.zipcode}</div>
+                        </div>
+                    </div>`;
+            listContainer.append(cardHtml);
+        });
+    };
+
+    const openAddressForm = (mode, addressData = null) => {
+        const form = $('#address-form');
+        form.trigger('reset'); // Clear form
+        $('#offcanvas-title').text(mode === 'edit' ? 'Edit Address' : 'Add Address');
+        $('#form-address-id').val(addressData ? addressData.id : '');
+
+        if (mode === 'edit' && addressData) {
+            $('#form-address').val(addressData.address);
+            $('#form-city').val(addressData.city);
+            $('#form-zipcode').val(addressData.zipcode);
+            $('#form-type').val(addressData.type);
+            $('#form-county').val(addressData.county);
+        }
+        addressFormOffcanvas.show();
+    };
+
+    // --- API CALLS ---
+    function runInitialCalls() {
+        // REMOVED: The entire adminPhotoCall AJAX definition is gone.
+
+        // These two calls remain the same.
+        const caregiverDetailsCall = $.ajax({
+            url: `${baseUrl}/account/${targetUserId}`,
+            headers: { 'Authorization': authToken }
+        });
+        const addressListCall = fetchAddressList();
+
+        // CHANGED: $.when() now only waits for two calls instead of three.
+        $.when(caregiverDetailsCall, addressListCall).done(function(caregiverRes) {
+            // CHANGED: The 'adminRes' argument is removed. 'caregiverRes' is now the first argument.
+
+            // REMOVED: All logic related to adminPhotoData is gone.
+
+            const caregiverData = caregiverRes[0].data;
+            if (caregiverData.photo) {
+                $('#caregiver-avatar-img').attr('src', baseUrl + caregiverData.photo).show();
+            }
+            $('#caregiver-firstname').text(caregiverData.firstname);
+            $('#caregiver-middlename').text(caregiverData.middlename || '');
+            $('#caregiver-lastname').text(caregiverData.lastname);
+
+        }).fail(function() {
+            showAlert('Could not load initial page data.', 'danger');
+        });
+    }
+
+    // --- (The rest of the functions below this have no changes) ---
+
+    function fetchAddressList() {
+        return $.ajax({
+            url: `${baseUrl}/address/person/${targetUserId}/${personType}`,
+            headers: { 'Authorization': authToken },
+            success: function(response) {
+                if (response.status === 'success') {
+                    allAddresses = response.data;
+                    renderAddressList(allAddresses);
+                } else {
+                    throw new Error('Failed to fetch addresses');
+                }
+            },
+            error: function() {
+                showAlert('Error fetching address list.', 'danger');
+                $('#address-list').html('<p class="text-center text-danger">Could not load addresses.</p>');
+            }
+        });
+    }
+
+    function handleFormSubmit(event) {
+        event.preventDefault();
+        const addressId = $('#form-address-id').val();
+        const isEditMode = !!addressId;
+
+        const payload = {
+            person_id: targetUserId,
+            person_type: personType,
+            type: $('#form-type').val(),
+            address: $('#form-address').val(),
+            city: $('#form-city').val(),
+            county: $('#form-county').val(),
+            state: "MI",
+            country: "United States",
+            zipcode: $('#form-zipcode').val(),
+            latitude: null,
+            longitude: null
+        };
+
+        const ajaxConfig = {
+            url: isEditMode ? `${baseUrl}/address/${addressId}` : `${baseUrl}/address`,
+            type: isEditMode ? 'PUT' : 'POST',
+            headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
+            data: JSON.stringify(payload),
+            success: function(response) {
+                showAlert(`Address successfully ${isEditMode ? 'updated' : 'added'}!`, 'success');
+                addressFormOffcanvas.hide();
+                fetchAddressList(); // Refresh list
+            },
+            error: function() {
+                showAlert(`Failed to ${isEditMode ? 'update' : 'add'} address.`, 'danger');
+            }
+        };
+
+        $.ajax(ajaxConfig);
+    }
+
+    function initializePage() {
+        addressFormOffcanvas = new bootstrap.Offcanvas(document.getElementById('addressFormOffcanvas'));
+        confirmEditModal = new bootstrap.Modal(document.getElementById('confirmEditModal'));
+
+        runInitialCalls();
+
+        $('#address-list').on('click', '.address-item', function() {
+            selectedAddressId = $(this).data('address-id');
+            confirmEditModal.show();
+        });
+
+        $('#confirm-yes-btn').on('click', function() {
+            const addressToEdit = allAddresses.find(addr => addr.id == selectedAddressId);
+            confirmEditModal.hide();
+            if (addressToEdit) {
+                openAddressForm('edit', addressToEdit);
+            }
+        });
+
+        $('#add-address-btn').on('click', function(e){
+            e.preventDefault();
+            openAddressForm('add');
+        });
+
+        $('#address-form').on('submit', handleFormSubmit);
+
+        $('#back-button').on('click', function(e) {
+            e.preventDefault();
+            window.history.back();
+        });
+    }
+</script>
+</body>
+</html>
