@@ -70,6 +70,12 @@ $router->add('/caregiver/addresses/{userId:[0-9]+}?', [
     'action'     => 'addresses'
 ]);
 
+$router->add('/caregiver/patients/{userId:[0-9]+}?', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'caregiver',
+    'action'     => 'patients'
+]);
+
 // Signout route
 $router->add('/signout', [
     'namespace'  => 'App\Controllers',
