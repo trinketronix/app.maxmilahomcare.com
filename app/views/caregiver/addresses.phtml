@@ -237,7 +237,7 @@
         });
         const addressListCall = fetchAddressList();
 
-        $.when(caregiverDetailsCall, addressListCall).done(function(adminRes, caregiverRes) {
+        $.when(caregiverDetailsCall, addressListCall).done(function(caregiverRes) {
             const caregiverData = caregiverRes[0].data;
             if (caregiverData.photo) {
                 $('#caregiver-avatar-img').attr('src', baseUrl + caregiverData.photo).show();
