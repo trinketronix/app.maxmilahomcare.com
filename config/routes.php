@@ -8,7 +8,9 @@ $router = new Router();
 // Remove extra slashes automatically
 $router->removeExtraSlashes(true);
 
-// Set default route (when accessing /)
+// ========================================================================
+// AUTHENTICATION ROUTES
+// ========================================================================
 $router->add('/', [
     'namespace'  => 'App\Controllers',
     'controller' => 'signin',
@@ -21,11 +23,22 @@ $router->addPost('/signin', [
     'action'     => 'index'
 ]);
 
+// Signout route
+$router->add('/signout', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'signout',
+    'action'     => 'index'
+]);
+
 $router->add('/forgot', [
     'namespace'  => 'App\Controllers',
     'controller' => 'forgot',
     'action'     => 'index'
 ]);
+
+// ========================================================================
+// DASHBOARD ROUTES FOR ADMINISTRATORS, MANAGERS AND CAREGIVERS
+// ========================================================================
 
 // Main dashboard (Admin) role=0
 $router->add('/dashboard/admin', [
@@ -76,18 +89,71 @@ $router->add('/caregiver/patients/{userId:[0-9]+}?', [
     'action'     => 'patients'
 ]);
 
-// Signout route
-$router->add('/signout', [
+// ========================================================================
+// PATIENT ROUTES
+// ========================================================================
+
+$router->add('/patient/management', [
     'namespace'  => 'App\Controllers',
-    'controller' => 'signout',
-    'action'     => 'index'
+    'controller' => 'patient',
+    'action'     => 'management'
 ]);
 
-// Test/Debug routes
-$router->add('/test', [
+$router->add('/patient/profile/{userId:[0-9]+}?', [
     'namespace'  => 'App\Controllers',
-    'controller' => 'test',
-    'action'     => 'index'
+    'controller' => 'patient',
+    'action'     => 'profile'
+]);
+
+$router->add('/patient/addresses/{userId:[0-9]+}?', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'patient',
+    'action'     => 'addresses'
+]);
+
+$router->add('/patient/caregivers/{userId:[0-9]+}?', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'patient',
+    'action'     => 'caregivers'
+]);
+
+// ========================================================================
+// VISIT ROUTES
+// ========================================================================
+
+$router->add('/visit/management', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'patient',
+    'action'     => 'management'
+]);
+
+$router->add('/visit/profile/{userId:[0-9]+}?', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'patient',
+    'action'     => 'profile'
+]);
+
+$router->add('/visit/addresses/{userId:[0-9]+}?', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'patient',
+    'action'     => 'addresses'
+]);
+
+$router->add('/visit/caregivers/{userId:[0-9]+}?', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'patient',
+    'action'     => 'caregivers'
+]);
+
+// ========================================================================
+// HTTP AND SERVER ERROR RESPONSES
+// ========================================================================
+
+// Set the 404 not found page
+$router->notFound([
+    'namespace'  => 'App\Controllers',
+    'controller' => 'error',
+    'action'     => 'notFound'
 ]);
 
 // 404 Not Found route
@@ -105,14 +171,14 @@ $router->add('/500', [
 ]);
 
 // ========================================================================
-// CATCH-ALL AND 404 HANDLING
+// TESTING RESPONSES
 // ========================================================================
 
-// Set the 404 not found page
-$router->notFound([
+// Test/Debug routes
+$router->add('/test', [
     'namespace'  => 'App\Controllers',
-    'controller' => 'error',
-    'action'     => 'notFound'
+    'controller' => 'test',
+    'action'     => 'index'
 ]);
 
 return $router;
