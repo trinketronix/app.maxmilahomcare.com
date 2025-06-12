@@ -40,6 +40,7 @@ class AuthMiddleware extends Injectable {
         'caregiver:management' => [0, 1],       // Only Admin and Manager
         'caregiver:profile'    => [0, 1, 2],    // All authenticated users
         'caregiver:addresses'  => [0, 1, 2],    // All authenticated users
+        'caregiver:patients'   => [0, 1, 2],    // All authenticated users
     ];
 
     /**
