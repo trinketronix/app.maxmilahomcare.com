@@ -179,7 +179,7 @@
         }
         patients.forEach(patient => {
             const fullName = `${patient.firstname || ''} ${patient.lastname || ''}`.trim();
-            const photoSrc = (patient.photo && !patient.photo.endsWith('default.jpg')) ? (baseUrl + patient.photo) : 'https://via.placeholder.com/60';
+            const photoSrc = baseUrl + patient.photo;
             const itemHtml = `
                 <div class="patient-item" data-patient-id="${patient.id}">
                     <div class="patient-avatar"><img src="${photoSrc}" alt="Avatar"></div>
