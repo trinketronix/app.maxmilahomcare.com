@@ -21,20 +21,12 @@ class SigninController extends BaseController {
      */
     public function indexAction() {
 
-        // Debug: Log session state
-        error_log("=== SIGNIN DEBUG ===");
-        error_log("Session exists: " . ($this->session->exists() ? 'YES' : 'NO'));
-        error_log("Has auth token: " . ($this->session->has('auth-token') ? 'YES' : 'NO'));
         if ($this->session->has('auth-token')) {
             error_log("Token value: " . substr($this->session->get('auth-token'), 0, 50) . '...');
         }
-        error_log("Is authenticated: " . ($this->isAuthenticated() ? 'YES' : 'NO'));
-        error_log("User role: " . $this->getUserRole());
-        error_log("===================");
 
         // Check if user is already logged in
         if ($this->isAuthenticated()) {
-            error_log("User is authenticated, redirecting to dashboard");
             return $this->roleRedirectService->redirectToDashboardByRole($this->getUserRole());
         }
 
@@ -51,7 +43,7 @@ class SigninController extends BaseController {
             if ($result['success']) { // Successful signin
 
                 $this->view->username = $username;
-                $this->view->pageTitle = 'Maxmila Homecare System';
+                $this->view->pageTitle = 'Maxmila Homecare';
 
                 $this->flashSession->success('Welcome back! ' . $result['data']['fullname']);
                 return $this->response->redirect($result['data']['redirect']);
@@ -62,6 +54,6 @@ class SigninController extends BaseController {
         }
 
         // Set view variables for the signin form
-        $this->view->pageTitle = 'Maxmila Homecare System';
+        $this->view->pageTitle = 'Maxmila Homecare";
     }
 }
