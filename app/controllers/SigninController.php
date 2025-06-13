@@ -52,7 +52,6 @@ class SigninController extends BaseController {
                 $this->flashSession->error($result['message']);
             }
         }
-
         // Set view variables for the signin form
         $this->view->pageTitle = 'Maxmila Homecare';
     }
