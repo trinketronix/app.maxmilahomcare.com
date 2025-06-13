@@ -54,6 +54,6 @@ class SigninController extends BaseController {
         }
 
         // Set view variables for the signin form
-        $this->view->pageTitle = 'Maxmila Homecare";
+        $this->view->pageTitle = 'Maxmila Homecare';
     }
 }
