@@ -99,19 +99,19 @@ $router->add('/patient/management', [
     'action'     => 'management'
 ]);
 
-$router->add('/patient/profile/{userId:[0-9]+}?', [
+$router->add('/patient/profile/{patientId:[0-9]+}?', [
     'namespace'  => 'App\Controllers',
     'controller' => 'patient',
     'action'     => 'profile'
 ]);
 
-$router->add('/patient/addresses/{userId:[0-9]+}?', [
+$router->add('/patient/addresses/{patientId:[0-9]+}?', [
     'namespace'  => 'App\Controllers',
     'controller' => 'patient',
     'action'     => 'addresses'
 ]);
 
-$router->add('/patient/caregivers/{userId:[0-9]+}?', [
+$router->add('/patient/caregivers/{patientId:[0-9]+}?', [
     'namespace'  => 'App\Controllers',
     'controller' => 'patient',
     'action'     => 'caregivers'
