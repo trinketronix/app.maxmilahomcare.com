@@ -295,7 +295,7 @@
             success: (response) => {
                 showAlert(`User status changed successfully. ${response.message || ''}`, 'success');
                 $('#statusModal').modal('hide');
-                fetchPatient(userId); // Refresh data
+                fetchPatient(patientId); // Refresh data
             },
             error: (err) => showAlert(`Failed to change status. ${err.responseJSON?.message || ''}`, 'danger'),
         });
