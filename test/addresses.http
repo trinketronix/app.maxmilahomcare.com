@@ -1,0 +1,6 @@
+### Get all addresses for a user
+GET {{baseUrl}}/address/person/{{personId}}/{personType}
+Authorization: {{token}}
+
+#### Este servicio puede ser consultado por el propio usuario dueño del TOken actual o Administrador o manager
+#### PersonID puede ser un UserId o PatientId y se diferencia con PersonType = 0  es User y PersonType = 1 es Pacient
