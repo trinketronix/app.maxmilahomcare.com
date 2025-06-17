@@ -59,7 +59,7 @@ class PatientController extends BaseController {
         $this->view->setVars([
             'pageTitle' => 'Patient Profile',
             'userId' => $this->getUserId(),
-            'targetUserId' => $this->targetPatientId,
+            'targetPatientId' => $this->targetPatientId,
             'username' => $this->getUsername(),
             'fullname' => $this->getUserFullname(),
             'role' => $this->getUserRoleText(),
