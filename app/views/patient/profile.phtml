@@ -169,10 +169,10 @@
         <div class="modal-content">
             <div class="modal-header"><h5 class="modal-title">Change Status</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
             <div class="modal-body status-modal-body">
-                <div class="status-option" onclick="changeUserStatus('activate')"><i class="fa-solid fa-user-plus"></i>Activate</div>
-                <div class="status-option" onclick="changeUserStatus('inactivate')"><i class="fa-solid fa-user-slash"></i>Inactivate</div>
-                <div class="status-option" onclick="changeUserStatus('archive')"><i class="fa-solid fa-user-minus"></i>Archive</div>
-                <div class="status-option" onclick="changeUserStatus('delete')"><i class="fa-solid fa-folder-closed"></i>Delete</div>
+                <div class="status-option" onclick="changePatientStatus('activate')"><i class="fa-solid fa-user-plus"></i>Activate</div>
+                <div class="status-option" onclick="changePatientStatus('inactivate')"><i class="fa-solid fa-user-slash"></i>Inactivate</div>
+                <div class="status-option" onclick="changePatientStatus('archivate')"><i class="fa-solid fa-user-minus"></i>Archive</div>
+                <div class="status-option" onclick="changePatientStatus('delete')"><i class="fa-solid fa-folder-closed"></i>Delete</div>
             </div>
         </div>
     </div>
@@ -181,9 +181,9 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    let targetUserData = {};
+    let patientData = {};
     const loggedInUserId = <?=$userId?>; /* IMPORTANT: Assumes your controller provides the logged-in user's ID as $id */
-    const targetUserId = <?=$targetUserId?>;
+    const patientId = <?=$targetPatientId?>;
     const baseUrl = '<?=$baseUrl?>';
     const authToken = '<?=$authToken?>';
 
@@ -229,22 +229,22 @@
     }
 
     // --- API CALLS ---
-    function fetchCaregivers(userId) {
+    function fetchPatient(patientId) {
         $.ajax({
-            url: `${baseUrl}/account/${userId}`,
+            url: `${baseUrl}/patient/${patientId}`,
             type: 'GET',
             headers: { 'Authorization': authToken },
             success: (response) => {
                 if (response.status === 'success' && response.data) {
-                    targetUserData = response.data;
-                    populateView(targetUserData);
+                    patientData = response.data;
+                    populateView(patientData);
                 }
             },
-            error: (err) => showAlert('Failed to load user details.', 'danger'),
+            error: (err) => showAlert('Failed to load patients details.', 'danger'),
         });
     }
 
-    function saveCaregiver(userId) {
+    function savePatient(patientId) {
         const updatedFields = {};
         const formData = {
             firstname: $('#firstname-edit').val(), middlename: $('#middlename-edit').val(),
@@ -256,7 +256,7 @@
         };
 
         for (const key in formData) {
-            if (formData[key] !== (targetUserData[key] || '')) {
+            if (formData[key] !== (patientData[key] || '')) {
                 updatedFields[key] = formData[key];
             }
         }
@@ -268,35 +268,34 @@
         }
 
         $.ajax({
-            url: `${baseUrl}/user/${userId}`, // Fixed typo here (removed extra brace)
+            url: `${baseUrl}/patient/${patientId}`, // Fixed typo here (removed extra brace)
             type: 'PUT',
             headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
             data: JSON.stringify(updatedFields),
             success: (response) => {
-                showAlert('User details updated successfully!', 'success');
-                fetchCaregivers(userId);
+                showAlert('Patient details updated successfully!', 'success');
+                fetchPatient(patientId);
                 setMode('view');
             },
             error: (err) => showAlert('Failed to update user. ' + (err.responseJSON?.message || ''), 'danger'),
         });
     }
 
-    function changeUserStatus(action) {
-        const userId = targetUserData.id;
+    function changePatientStatus(action) {
+        const userId = patientData.id;
         const endpoints = {
             activate: 'activate', inactivate: 'inactivate',
-            archive: 'archive', delete: 'delete'
+            archivate: 'archivate', delete: 'delete'
         };
 
         $.ajax({
-            url: `${baseUrl}/auth/${endpoints[action]}/account`,
+            url: `${baseUrl}/patient/${patientId}/${endpoints[action]}`,
             type: 'PUT',
             headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
-            data: JSON.stringify({ id: userId.toString() }),
             success: (response) => {
                 showAlert(`User status changed successfully. ${response.message || ''}`, 'success');
                 $('#statusModal').modal('hide');
-                fetchUserDetails(userId); // Refresh data
+                fetchPatient(userId); // Refresh data
             },
             error: (err) => showAlert(`Failed to change status. ${err.responseJSON?.message || ''}`, 'danger'),
         });
@@ -307,15 +306,15 @@
         if (!file) return;
 
         // 1. Determine method (POST for new, PUT for update)
-        const isDefaultPhoto = targetUserData.photo.endsWith('default.jpg');
+        const isDefaultPhoto = patientData.photo.endsWith('default.jpg');
         const httpMethod = isDefaultPhoto ? 'POST' : 'PUT';
 
         // 2. Determine URL (if admin is editing someone else vs. editing self)
-        const isEditingSelf = loggedInUserId === targetUserId;
+        const isEditingSelf = loggedInUserId === patientId;
         let endpoint = isDefaultPhoto ? 'upload/photo' : 'update/photo';
         let finalUrl = isEditingSelf
-            ? `${baseUrl}/user/${endpoint}`
-            : `${baseUrl}/user/${targetUserId}/${endpoint}`;
+            ? `${baseUrl}/patient/${endpoint}`
+            : `${baseUrl}/patient/${patientId}/${endpoint}`;
 
         // 3. Prepare FormData
         const formData = new FormData();
@@ -333,7 +332,7 @@
             contentType: false, // Important for file uploads
             success: (response) => {
                 showAlert(response.message || 'Photo updated successfully!', 'success');
-                fetchCaregivers(targetUserId); // Refresh the page data to show new photo
+                fetchPatient(patientId); // Refresh the page data to show new photo
             },
             error: (err) => {
                 const errorMsg = err.responseJSON?.message || 'Failed to upload photo.';
@@ -346,7 +345,7 @@
     function setMode(mode) {
         const container = $('#page-container');
         if (mode === 'edit') {
-            populateEdit(targetUserData);
+            populateEdit(patientData);
             container.removeClass('view-mode').addClass('edit-mode');
         } else {
             container.removeClass('edit-mode').addClass('view-mode');
@@ -355,10 +354,10 @@
 
     // --- INITIALIZATION & EVENT HANDLERS ---
     function initializePage() {
-        fetchCaregivers(targetUserId);
+        fetchPatient(patientId);
 
         $('#edit-btn').on('click', () => setMode('edit'));
-        $('#save-btn').on('click', () => saveCaregiver(targetUserData.id));
+        $('#save-btn').on('click', () => savePatient(patientData.id));
         $('#back-button').on('click', function(e) {
             e.preventDefault();
             if ($('#page-container').hasClass('edit-mode')) {
