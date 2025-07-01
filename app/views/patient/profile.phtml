@@ -145,8 +145,6 @@
                         <div class="detail-item"><span class="label">HHaex Patient</span><span class="value" id="patient-view"></span><input type="text" class="form-control" id="patient-edit"></div>
                         <div class="detail-item"><span class="label">HHaex Admission</span><span class="value" id="admission-view"></span><input type="text" class="form-control" id="admission-edit"></div>
                     </div>
-                    <div class="detail-item"><span class="label">Languages</span><span class="value" id="languages-view"></span><input type="text" class="form-control" id="languages-edit"></div>
-                    <div class="detail-item"><span class="label">Description</span><span class="value" id="description-view"></span><textarea class="form-control" id="description-edit"></textarea></div>
                 </div>
             </div>
 
@@ -248,11 +246,9 @@
         const updatedFields = {};
         const formData = {
             firstname: $('#firstname-edit').val(), middlename: $('#middlename-edit').val(),
-            lastname: $('#lastname-edit').val(), birthdate: $('#birthdate-edit').val(),
-            phone: $('#phone-edit').val(), phone2: $('#phone2-edit').val(),
-            email: $('#email-edit').val(), email2: $('#email2-edit').val(),
-            ssn: $('#ssn-edit').val(), code: $('#code-edit').val(),
-            languages: $('#languages-edit').val(), description: $('#description-edit').val()
+            lastname: $('#lastname-edit').val(),
+            phone: $('#phone-edit').val(),
+            ssn: $('#patient-edit').val(), code: $('#admission-edit').val()
         };
 
         for (const key in formData) {
