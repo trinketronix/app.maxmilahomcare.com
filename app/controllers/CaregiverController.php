@@ -151,7 +151,7 @@ class CaregiverController extends BaseController {
         // --- Your logic for this page goes here ---
         // Example: Fetch user data from a service
         $this->view->setVars([
-            'pageTitle' => $pageTitle,
+            'pageTitle' => "Assigned Patients",
             'userId' => $this->getUserId(),
             'targetUserId' => $this->targetUserId,
             'personType' => 0,
