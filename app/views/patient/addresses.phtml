@@ -175,7 +175,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const targetUserId = <?=$targetUserId?>;
+    const userId = <?=$userId?>;
+    const targetPatientId = <?=$targetPatientId?>;
     const personType = <?=$personType?>; // 0 for Caregiver
     const baseUrl = "<?=$baseUrl?>";
     const authToken = "<?=$authToken?>";
@@ -234,7 +235,7 @@
 
         // These two calls remain the same.
         const caregiverDetailsCall = $.ajax({
-            url: `${baseUrl}/account/${targetUserId}`,
+            url: `${baseUrl}/patient/${targetPatientId}`,
             headers: { 'Authorization': authToken }
         });
         const addressListCall = fetchAddressList();
@@ -262,7 +263,7 @@
 
     function fetchAddressList() {
         return $.ajax({
-            url: `${baseUrl}/address/person/${targetUserId}/${personType}`,
+            url: `${baseUrl}/address/person/${targetPatientId}/${personType}`,
             headers: { 'Authorization': authToken },
             success: function(response) {
                 if (response.status === 'success') {
@@ -285,7 +286,7 @@
         const isEditMode = !!addressId;
 
         const payload = {
-            person_id: targetUserId,
+            person_id: targetPatientId,
             person_type: personType,
             type: $('#form-type').val(),
             address: $('#form-address').val(),
