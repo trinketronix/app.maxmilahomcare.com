@@ -46,30 +46,47 @@
         .filter-btn.active { background-color: #000; color: #fff; }
         .filter-buttons::-webkit-scrollbar { display: none; }
 
-        /* --- User List (Scrollable) --- */
+        /* --- Patient List (Scrollable) --- */
         .patient-list-container {
             flex-grow: 1;
             overflow-y: auto;
             padding: 1rem;
             padding-bottom: 120px; /* Space for FAB */
         }
+
+        /* CORRECTED: Simplified .patient-item layout with flexbox */
         .patient-item {
-            display: grid; grid-template-columns: auto 1fr; gap: 1rem;
+            display: flex; /* Use flexbox for simple alignment */
+            align-items: center; /* Vertically center content */
+            gap: 1rem;
             border: 2px solid #000; border-radius: 15px;
             padding: 1rem; margin-bottom: 1rem; cursor: pointer;
             transition: background-color 0.2s;
-            text-decoration: none; /* Removes the underline */
-            color: inherit; /* Makes text color normal, not blue */
+            text-decoration: none;
+            color: inherit;
         }
         .patient-item:hover {
             background-color: #f1f1f1;
-            color: inherit;}
-        .patient-avatar { grid-row: 1 / 3; width: 60px; height: 60px; border-radius: 50%; border: 3px solid #000; overflow: hidden; }
+            color: inherit;
+        }
+        .patient-avatar {
+            width: 60px; height: 60px;
+            min-width: 60px; /* Prevent shrinking */
+            border-radius: 50%; border: 3px solid #000;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
         .patient-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .patient-info { grid-column: 2 / 3; }
+        .patient-info {
+            display: grid; /* Use grid for the text block */
+            grid-template-columns: 1fr auto; /* Name takes space, status aligns to the right */
+            width: 100%;
+            align-items: center;
+        }
+        .patient-name-block { grid-column: 1 / 2; }
         .patient-name { font-weight: bold; font-size: 1.1rem; }
-        .patient-role, .patient-phone { color: #555; }
-        .patient-status { grid-column: 2 / 3; font-weight: bold; }
+        .patient-phone { color: #555; }
+        .patient-status { grid-column: 2 / 3; font-weight: bold; justify-self: end; }
+
         .status-active { color: #198754; }
         .status-inactive { color: #dc3545; }
         .status-not-verified { color: #fd7e14; }
@@ -77,17 +94,9 @@
         .status-deleted { color: #6c757d; }
 
         /* --- FAB & Offcanvas --- */
-        .fab {
-            position: absolute; bottom: 20px; left: 50%;
-            transform: translateX(-50%);
-            width: 90px; height: 90px; border-radius: 50%;
-            background-color: #e0e0e0; border: 3px solid #000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-weight: 500; text-decoration: none; color: #000;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1040;
-        }
+        .fab { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90px; height: 90px; border-radius: 50%; background-color: #e0e0e0; border: 3px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 500; text-decoration: none; color: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1040; }
         .fab .plus-icon { font-size: 2rem; line-height: 1; }
-        .fab .plus-text {  font-size: 0.63em; }
+        .fab .plus-text { font-size: 0.8em; } /* Adjusted for better look */
         .offcanvas-header { border-bottom: 1px solid #dee2e6; }
         #resultModal .modal-footer { border-top: 0; }
         #resultModal .close-btn { background: #000; color: #fff; border-radius: 50%; width: 50px; height: 50px; border: 0; }
@@ -95,7 +104,7 @@
         @media (min-width: 768px) { .page-container { max-width: 720px; } }
     </style>
 </head>
-<body onpageshow="initializePage()">
+<body onload="initializePage()"> <!-- Changed to onload for consistency -->
 
 <div id="alert-container" style="position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px;"></div>
 
@@ -119,15 +128,15 @@
         </div>
         <div class="filter-buttons">
             <button class="btn filter-btn active" data-filter-status="all">All</button>
-            <button class="btn filter-btn" data-filter-status="-1">Not Verified</button>
             <button class="btn filter-btn" data-filter-status="1">Active</button>
             <button class="btn filter-btn" data-filter-status="0">Inactive</button>
+            <button class="btn filter-btn" data-filter-status="-1">Not Verified</button>
             <button class="btn filter-btn" data-filter-status="2">Archived</button>
             <button class="btn filter-btn" data-filter-status="3">Deleted</button>
         </div>
     </section>
 
-    <!-- User List -->
+    <!-- Patient List -->
     <main class="patient-list-container">
         <div id="patient-list">
             <div class="text-center p-5"><div class="spinner-border"></div></div>
@@ -149,22 +158,10 @@
     </div>
     <div class="offcanvas-body">
         <form id="add-patient-form" class="mx-auto" style="max-width: 400px;">
-            <div class="input-group mb-3">
-                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                <input type="text" class="form-control" id="form-firstname" placeholder="First name" required>
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text"><i class="fa-regular fa-user"></i></span>
-                <input type="text" class="form-control" id="form-middlename" placeholder="Middle name">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                <input type="text" class="form-control" id="form-lastname" placeholder="Last name" required>
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
-                <input type="text" class="form-control" id="form-phone" placeholder="Phone" required>
-            </div>
+            <div class="input-group mb-3"><span class="input-group-text"><i class="fa-solid fa-user"></i></span><input type="text" class="form-control" id="form-firstname" placeholder="First name" required></div>
+            <div class="input-group mb-3"><span class="input-group-text"><i class="fa-regular fa-user"></i></span><input type="text" class="form-control" id="form-middlename" placeholder="Middle name (optional)"></div>
+            <div class="input-group mb-3"><span class="input-group-text"><i class="fa-solid fa-user"></i></span><input type="text" class="form-control" id="form-lastname" placeholder="Last name" required></div>
+            <div class="input-group mb-3"><span class="input-group-text"><i class="fa-solid fa-phone"></i></span><input type="text" class="form-control" id="form-phone" placeholder="Phone" required></div>
             <button type="submit" class="btn w-100" style="border: 2px solid #000; font-weight: 500;">Add Patient</button>
         </form>
     </div>
@@ -174,16 +171,9 @@
 <div class="modal fade" id="resultModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 15px;">
-            <div class="modal-header">
-                <h5 class="modal-title w-100 text-center">Message</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center fs-5 py-4" id="result-modal-message">
-                <!-- Message will be injected here -->
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="close-btn" data-bs-dismiss="modal"><i class="fa-solid fa-xmark fs-4"></i></button>
-            </div>
+            <div class="modal-header"><h5 class="modal-title w-100 text-center">Message</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body text-center fs-5 py-4" id="result-modal-message"></div>
+            <div class="modal-footer justify-content-center"><button type="button" class="close-btn" data-bs-dismiss="modal"><i class="fa-solid fa-xmark fs-4"></i></button></div>
         </div>
     </div>
 </div>
@@ -191,7 +181,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const adminId = <?=$userId?>;
     const baseUrl = '<?=$baseUrl?>';
     const authToken = '<?=$authToken?>';
 
@@ -228,23 +217,28 @@
         }
         patients.forEach(patient => {
             const fullName = `${patient.firstname || ''} ${patient.lastname || ''}`.trim();
-            const photoSrc = baseUrl + patient.photo;
+            // CORRECTED: Check for truthy photo path and use a placeholder if needed
+            const photoSrc = (patient.photo && !patient.photo.endsWith('default.jpg'))
+                ? (baseUrl + patient.photo)
+                : 'https://via.placeholder.com/60';
             const statusInfo = getStatusInfo(patient.status);
             const cardHtml = `
                     <a href="/patient/profile/${patient.id}" class="patient-item" data-patient-id="${patient.id}" data-status="${patient.status}">
                         <div class="patient-avatar"><img src="${photoSrc}" alt="Avatar"></div>
                         <div class="patient-info">
-                            <div class="patient-name">${fullName}</div>
-                            <div class="patient-phone">${patient.phone || 'No phone'}</div>
+                            <div class="patient-name-block">
+                                <div class="patient-name">${fullName}</div>
+                                <div class="patient-phone">${patient.phone || 'No phone'}</div>
+                            </div>
+                            <div class="patient-status ${statusInfo.class}">${statusInfo.text}</div>
                         </div>
-                        <div class="patient-status ${statusInfo.class}">${statusInfo.text}</div>
                     </a>`;
             listContainer.append(cardHtml);
         });
     };
 
     function fetchPatientsList() {
-        return $.ajax({
+        $.ajax({
             url: `${baseUrl}/patients`,
             headers: { 'Authorization': authToken },
             success: (response) => {
@@ -254,26 +248,38 @@
                     showAlert(`Loaded ${response.data.count} patients successfully.`, 'success');
                 } else { throw new Error('Failed to parse patients'); }
             },
-            error: () => showAlert('Error fetching patient list.', 'danger')
+            error: () => {
+                showAlert('Error fetching patient list.', 'danger');
+                $('#patient-list').html('<p class="text-center text-danger">Could not load patients.</p>');
+            }
         });
     }
 
     function handleNewPatientSubmit(event) {
         event.preventDefault();
-        const firstname = $('#form-firstname').val();
+
+        // CORRECTED: Build the payload conditionally
+        const payload = {
+            firstname: $('#form-firstname').val(),
+            lastname: $('#form-lastname').val(),
+            phone: $('#form-phone').val()
+        };
+
         const middlename = $('#form-middlename').val();
-        const lastname = $('#form-lastname').val();
-        const phone = $('#form-phone').val();
+        if (middlename && middlename.trim() !== '') {
+            payload.middlename = middlename;
+        }
 
         $.ajax({
             url: `${baseUrl}/patient`,
             type: 'POST',
             headers: { 'Authorization': authToken },
             contentType: 'application/json',
-            data: JSON.stringify({ firstname, middlename, lastname, phone }),
+            data: JSON.stringify(payload), // Send the conditionally built payload
             success: (response) => {
                 showResultModal('Patient added successfully!');
                 addPatientOffcanvas.hide();
+                $('#add-patient-form').trigger('reset'); // Reset form after successful submission
                 fetchPatientsList();
             },
             error: (xhr) => {
@@ -287,20 +293,14 @@
         const searchTerm = $('#search-input').val().toLowerCase();
         const activeFilterStatus = $('.filter-btn.active').data('filter-status').toString();
 
-        $('.patient-item').each(function() {
-            const item = $(this);
-            const itemStatus = item.data('status').toString();
-            const itemText = item.text().toLowerCase();
-
-            const statusMatch = (activeFilterStatus === 'all' || itemStatus === activeFilterStatus);
-            const searchMatch = (searchTerm === '' || itemText.includes(searchTerm));
-
-            if (statusMatch && searchMatch) {
-                item.show();
-            } else {
-                item.hide();
-            }
+        const filteredPatients = allPatients.filter(patient => {
+            const statusMatch = (activeFilterStatus === 'all' || patient.status.toString() === activeFilterStatus);
+            const fullName = `${patient.firstname || ''} ${patient.lastname || ''}`.toLowerCase();
+            const searchMatch = (searchTerm === '' || fullName.includes(searchTerm));
+            return statusMatch && searchMatch;
         });
+
+        renderPatientsList(filteredPatients);
     }
 
     // --- PAGE INITIALIZATION ---
@@ -317,7 +317,7 @@
             applyFiltersAndSearch();
         });
 
-        $('#search-button, #search-input').on('click keyup', applyFiltersAndSearch);
+        $('#search-button, #search-input').on('keyup', applyFiltersAndSearch); // Changed to keyup for live search
 
         $('#add-patient-btn').on('click', (e) => { e.preventDefault(); addPatientOffcanvas.show(); });
 
