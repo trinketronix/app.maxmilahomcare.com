@@ -95,7 +95,7 @@
         @media (min-width: 768px) { .page-container { max-width: 720px; } }
     </style>
 </head>
-<body onload="initializePage()">
+<body onpageshow="initializePage()">
 
 <div id="alert-container" style="position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px;"></div>
 
@@ -154,15 +154,15 @@
                 <input type="text" class="form-control" id="form-firstname" placeholder="First name" required>
             </div>
             <div class="input-group mb-3">
-                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                <input type="text" class="form-control" id="form-middlename" placeholder="Middle name" required>
+                <span class="input-group-text"><i class="fa-regular fa-user"></i></span>
+                <input type="text" class="form-control" id="form-middlename" placeholder="Middle name">
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                 <input type="text" class="form-control" id="form-lastname" placeholder="Last name" required>
             </div>
             <div class="input-group mb-3">
-                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
                 <input type="text" class="form-control" id="form-phone" placeholder="Phone" required>
             </div>
             <button type="submit" class="btn w-100" style="border: 2px solid #000; font-weight: 500;">Add Patient</button>
