@@ -87,27 +87,21 @@ class PatientController extends BaseController {
             // A specific user ID was requested in the URL
             // --- Additional Security Layer ---
             // Only Admins or Managers can view OTHER people's profiles.
-            if ($this->targetPatientId != $this->getUserId() && !$this->hasAnyRole([Role::ADMINISTRATOR, Role::MANAGER])) {
+            if (!$this->hasAnyRole([Role::ADMINISTRATOR, Role::MANAGER])) {
                 $this->flashSession->error("You do not have permission to view this profile.");
                 return $this->response->redirect('/signin'); // Or their own dashboard
             }
-            $pageTitle = "Caregiver Addresses";
-        } else {
-            // No user ID was provided, so show the currently logged-in user's own profile
-            $this->targetPatientId = $this->getUserId();
-            $pageTitle = "My Addresses";
         }
 
         // --- Your logic for this page goes here ---
         // Example: Fetch user data from a service
         $this->view->setVars([
-            'pageTitle' => $pageTitle,
+            'pageTitle' => "Patient Addresses",
             'userId' => $this->getUserId(),
-            'targetUserId' => $this->targetPatientId,
-            'personType' => 0,
+            'targetPatientId' => $this->targetPatientId,
+            'personType' => 1,
             'username' => $this->getUsername(),
             'fullname' => $this->getUserFullname(),
-            'role' => $this->getUserRoleText(),
             'photo' => $this->getUserPhoto(),
             'baseUrl' => $this->getApiBaseUrl(),
             'authToken' => $this->getAuthToken()
