@@ -130,7 +130,7 @@ class PatientController extends BaseController {
                 $this->flashSession->error("You do not have permission to view this profile.");
                 return $this->response->redirect('/signin'); // Or their own dashboard
             }
-            $pageTitle = "Assigned Patients";
+            $pageTitle = "Assigned Caregivers";
         } else {
             // No user ID was provided, so show the currently logged-in user's own profile
             $this->targetPatientId = $this->getUserId();
@@ -140,7 +140,7 @@ class PatientController extends BaseController {
         // --- Your logic for this page goes here ---
         // Example: Fetch user data from a service
         $this->view->setVars([
-            'pageTitle' => $pageTitle,
+            'pageTitle' => "Assigned Caregivers",
             'userId' => $this->getUserId(),
             'targetUserId' => $this->targetPatientId,
             'personType' => 0,
