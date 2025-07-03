@@ -53,11 +53,9 @@
             padding: 1rem;
             padding-bottom: 120px; /* Space for FAB */
         }
-
-        /* CORRECTED: Simplified .patient-item layout with flexbox */
         .patient-item {
-            display: flex; /* Use flexbox for simple alignment */
-            align-items: center; /* Vertically center content */
+            display: flex;
+            align-items: center;
             gap: 1rem;
             border: 2px solid #000; border-radius: 15px;
             padding: 1rem; margin-bottom: 1rem; cursor: pointer;
@@ -71,14 +69,14 @@
         }
         .patient-avatar {
             width: 60px; height: 60px;
-            min-width: 60px; /* Prevent shrinking */
+            min-width: 60px;
             border-radius: 50%; border: 3px solid #000;
             overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
         .patient-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .patient-info {
-            display: grid; /* Use grid for the text block */
-            grid-template-columns: 1fr auto; /* Name takes space, status aligns to the right */
+            display: grid;
+            grid-template-columns: 1fr auto;
             width: 100%;
             align-items: center;
         }
@@ -86,7 +84,6 @@
         .patient-name { font-weight: bold; font-size: 1.1rem; }
         .patient-phone { color: #555; }
         .patient-status { grid-column: 2 / 3; font-weight: bold; justify-self: end; }
-
         .status-active { color: #198754; }
         .status-inactive { color: #dc3545; }
         .status-not-verified { color: #fd7e14; }
@@ -96,7 +93,7 @@
         /* --- FAB & Offcanvas --- */
         .fab { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90px; height: 90px; border-radius: 50%; background-color: #e0e0e0; border: 3px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 500; text-decoration: none; color: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1040; }
         .fab .plus-icon { font-size: 2rem; line-height: 1; }
-        .fab .plus-text { font-size: 0.8em; } /* Adjusted for better look */
+        .fab .plus-text { font-size: 0.8em; }
         .offcanvas-header { border-bottom: 1px solid #dee2e6; }
         #resultModal .modal-footer { border-top: 0; }
         #resultModal .close-btn { background: #000; color: #fff; border-radius: 50%; width: 50px; height: 50px; border: 0; }
@@ -104,7 +101,7 @@
         @media (min-width: 768px) { .page-container { max-width: 720px; } }
     </style>
 </head>
-<body onload="initializePage()"> <!-- Changed to onload for consistency -->
+<body onload="initializePage()">
 
 <div id="alert-container" style="position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px;"></div>
 
@@ -217,7 +214,6 @@
         }
         patients.forEach(patient => {
             const fullName = `${patient.firstname || ''} ${patient.lastname || ''}`.trim();
-            // CORRECTED: Check for truthy photo path and use a placeholder if needed
             const photoSrc = baseUrl + patient.photo;
             const statusInfo = getStatusInfo(patient.status);
             const cardHtml = `
@@ -236,6 +232,7 @@
     };
 
     function fetchPatientsList() {
+        $('#patient-list').html('<div class="text-center p-5"><div class="spinner-border"></div></div>');
         $.ajax({
             url: `${baseUrl}/patients`,
             headers: { 'Authorization': authToken },
@@ -256,7 +253,6 @@
     function handleNewPatientSubmit(event) {
         event.preventDefault();
 
-        // CORRECTED: Build the payload conditionally
         const payload = {
             firstname: $('#form-firstname').val(),
             lastname: $('#form-lastname').val(),
@@ -269,15 +265,15 @@
         }
 
         $.ajax({
-            url: `${baseUrl}/patient/new`,
+            url: `${baseUrl}/patient`, // FIXED: Changed from /patient/new
             type: 'POST',
             headers: { 'Authorization': authToken },
             contentType: 'application/json',
-            data: JSON.stringify(payload), // Send the conditionally built payload
+            data: JSON.stringify(payload),
             success: (response) => {
                 showResultModal('Patient added successfully!');
                 addPatientOffcanvas.hide();
-                $('#add-patient-form').trigger('reset'); // Reset form after successful submission
+                $('#add-patient-form').trigger('reset');
                 fetchPatientsList();
             },
             error: (xhr) => {
@@ -315,12 +311,21 @@
             applyFiltersAndSearch();
         });
 
-        $('#search-button, #search-input').on('keyup', applyFiltersAndSearch); // Changed to keyup for live search
+        $('#search-button, #search-input').on('keyup', applyFiltersAndSearch);
 
         $('#add-patient-btn').on('click', (e) => { e.preventDefault(); addPatientOffcanvas.show(); });
 
         $('#add-patient-form').on('submit', handleNewPatientSubmit);
     }
+
+    // *** THE FIX: This event listener handles back navigation ***
+    window.addEventListener('pageshow', function(event) {
+        // The event.persisted property is true if the page is being loaded from the bfcache (back/forward cache).
+        if (event.persisted) {
+            console.log('Page loaded from cache. Re-fetching patient list.');
+            fetchPatientsList(); // Re-run the data fetch function
+        }
+    });
 </script>
 </body>
 </html>

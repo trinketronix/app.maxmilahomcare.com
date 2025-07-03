@@ -243,6 +243,8 @@
     };
 
     function fetchUserList() {
+        // Show a spinner while fetching
+        $('#user-list').html('<div class="text-center p-5"><div class="spinner-border"></div></div>');
         return $.ajax({
             url: `${baseUrl}/accounts`,
             headers: { 'Authorization': authToken },
@@ -253,7 +255,10 @@
                     showAlert(`Loaded ${response.data.count} users successfully.`, 'success');
                 } else { throw new Error('Failed to parse users'); }
             },
-            error: () => showAlert('Error fetching user list.', 'danger')
+            error: () => {
+                showAlert('Error fetching user list.', 'danger');
+                $('#user-list').html('<p class="text-center text-danger">Could not load users.</p>');
+            }
         });
     }
 
@@ -289,20 +294,14 @@
         const searchTerm = $('#search-input').val().toLowerCase();
         const activeFilterStatus = $('.filter-btn.active').data('filter-status').toString();
 
-        $('.user-item').each(function() {
-            const item = $(this);
-            const itemStatus = item.data('status').toString();
-            const itemText = item.text().toLowerCase();
-
-            const statusMatch = (activeFilterStatus === 'all' || itemStatus === activeFilterStatus);
-            const searchMatch = (searchTerm === '' || itemText.includes(searchTerm));
-
-            if (statusMatch && searchMatch) {
-                item.show();
-            } else {
-                item.hide();
-            }
+        const filteredUsers = allUsers.filter(user => {
+            const statusMatch = (activeFilterStatus === 'all' || user.status.toString() === activeFilterStatus);
+            const fullName = `${user.firstname || ''} ${user.lastname || ''}`.toLowerCase();
+            const searchMatch = (searchTerm === '' || fullName.includes(searchTerm));
+            return statusMatch && searchMatch;
         });
+
+        renderUserList(filteredUsers);
     }
 
     // --- PAGE INITIALIZATION ---
@@ -319,12 +318,21 @@
             applyFiltersAndSearch();
         });
 
-        $('#search-button, #search-input').on('click keyup', applyFiltersAndSearch);
+        $('#search-button, #search-input').on('keyup', applyFiltersAndSearch);
 
         $('#add-caregiver-btn').on('click', (e) => { e.preventDefault(); addCaregiverOffcanvas.show(); });
 
         $('#add-caregiver-form').on('submit', handleRegisterSubmit);
     }
+
+    // *** NEW: Add this event listener to handle back navigation ***
+    window.addEventListener('pageshow', function(event) {
+        // The event.persisted property is true if the page is being loaded from the bfcache.
+        if (event.persisted) {
+            console.log('Page loaded from cache. Re-fetching user list.');
+            fetchUserList();
+        }
+    });
 </script>
 </body>
 </html>
