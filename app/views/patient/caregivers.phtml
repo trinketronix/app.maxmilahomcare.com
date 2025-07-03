@@ -180,7 +180,7 @@
         }
         users.forEach(user => {
             const fullName = `${user.firstname || ''} ${user.lastname || ''}`.trim();
-            const photoSrc = (user.photo && !user.photo.endsWith('default.jpg')) ? (baseUrl + user.photo) : 'https://via.placeholder.com/60';
+            const photoSrc = baseUrl + user.photo;
             const itemHtml = `
                 <div class="list-item" data-user-id="${user.id}">
                     <div class="item-avatar"><img src="${photoSrc}" alt="Avatar"></div>
