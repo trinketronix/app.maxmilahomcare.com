@@ -218,9 +218,7 @@
         patients.forEach(patient => {
             const fullName = `${patient.firstname || ''} ${patient.lastname || ''}`.trim();
             // CORRECTED: Check for truthy photo path and use a placeholder if needed
-            const photoSrc = (patient.photo && !patient.photo.endsWith('default.jpg'))
-                ? (baseUrl + patient.photo)
-                : 'https://via.placeholder.com/60';
+            const photoSrc = baseUrl + patient.photo;
             const statusInfo = getStatusInfo(patient.status);
             const cardHtml = `
                     <a href="/patient/profile/${patient.id}" class="patient-item" data-patient-id="${patient.id}" data-status="${patient.status}">
