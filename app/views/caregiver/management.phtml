@@ -234,9 +234,8 @@
                         <div class="user-info">
                             <div class="user-name">${fullName}</div>
                             <div class="user-phone">${user.phone || 'No phone'}</div>
-                            <div class="user-role">${roleText}</div>
+                            <div class="user-status ${statusInfo.class}">${statusInfo.text}</div>
                         </div>
-                        <div class="user-status ${statusInfo.class}">${statusInfo.text}</div>
                     </a>`;
             listContainer.append(cardHtml);
         });
