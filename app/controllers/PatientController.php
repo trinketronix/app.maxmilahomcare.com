@@ -133,7 +133,7 @@ class PatientController extends BaseController {
             $pageTitle = "Assigned Caregivers";
         } else {
             // No user ID was provided, so show the currently logged-in user's own profile
-            $this->targetPatientId = $this->getUserId();
+            //$this->targetPatientId = $this->getUserId();
             $pageTitle = "My Patients";
         }
 
@@ -142,7 +142,7 @@ class PatientController extends BaseController {
         $this->view->setVars([
             'pageTitle' => "Assigned Caregivers",
             'userId' => $this->getUserId(),
-            'targetUserId' => $this->targetPatientId,
+            'targetPatientId' => $this->targetPatientId,
             'personType' => 0,
             'username' => $this->getUsername(),
             'fullname' => $this->getUserFullname(),
