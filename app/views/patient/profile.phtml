@@ -186,14 +186,14 @@
     const authToken = '<?=$authToken?>';
 
     // --- HELPER FUNCTIONS ---
-    const getRoleText = role => ({ 0: 'Administrator', 1: 'Manager', 2: 'Caregiver' }[role] || 'Unknown Role');
+    const getRoleText = role => ({ 0: 'Administrator', 1: 'Manager', 2: 'Caregiver' }[role] || 'Patient');
     const getStatusInfo = status => {
         const s = parseInt(status);
         const map = {
-            '-1': { text: 'The user is Not Verified', class: 'status-not-verified' },
-            '0': { text: 'The user is currently Inactive', class: 'status-inactive' },
-            '1': { text: 'The user is currently Active', class: 'status-active' },
-            '2': { text: 'The user is Archived', class: 'status-archived' },
+            '-1': { text: 'The patient is Not Verified', class: 'status-not-verified' },
+            '0': { text: 'The patient is currently Inactive', class: 'status-inactive' },
+            '1': { text: 'The patient is currently Active', class: 'status-active' },
+            '2': { text: 'The patient is Archived', class: 'status-archived' },
         };
         return map[s] || { text: 'Unknown Status', class: '' };
     };
