@@ -38,30 +38,30 @@
         .profile-icon { font-size: 1.5rem; border: 2px solid #000; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; margin: 0 auto; overflow: hidden; }
         .profile-icon img { width: 100%; height: 100%; object-fit: cover; }
         .profile-username { font-size: 0.8rem; color: #555; margin-top: 4px; }
-        .target-user-info { display: flex; align-items: center; gap: 1rem; padding: 1rem; flex-shrink: 0; border-bottom: 1px solid #e0e0e0; }
-        .target-user-avatar { width: 60px; height: 60px; border: 2px solid #000; border-radius: 50%; overflow: hidden; }
-        .target-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .target-user-name { font-weight: bold; font-size: 1.25rem; }
+        .target-patient-info { display: flex; align-items: center; gap: 1rem; padding: 1rem; flex-shrink: 0; border-bottom: 1px solid #e0e0e0; }
+        .target-patient-avatar { width: 60px; height: 60px; border: 2px solid #000; border-radius: 50%; overflow: hidden; }
+        .target-patient-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .target-patient-name { font-weight: bold; font-size: 1.25rem; }
         .controls-section { padding: 1rem; background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0; flex-shrink: 0; }
         .search-bar .form-control, .search-bar .btn { border-radius: 8px; border: 2px solid #000; }
 
         /* --- Patient List (Scrollable) --- */
-        .patient-list-container {
+        .user-list-container {
             flex-grow: 1;
             overflow-y: auto;
             padding: 1rem;
             padding-bottom: 120px; /* Space for FAB */
         }
-        .patient-item {
+        .user-item {
             display: flex; align-items: center; gap: 1rem;
             border: 2px solid #000; border-radius: 15px;
             padding: 1rem; margin-bottom: 1rem; cursor: pointer;
             transition: background-color 0.2s;
         }
-        .patient-item:hover { background-color: #f1f1f1; }
-        .patient-avatar { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #000; overflow: hidden; display:flex; align-items:center; justify-content:center; }
-        .patient-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .patient-name { font-weight: bold; font-size: 1.1rem; }
+        .user-item:hover { background-color: #f1f1f1; }
+        .user-avatar { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #000; overflow: hidden; display:flex; align-items:center; justify-content:center; }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-name { font-weight: bold; font-size: 1.1rem; }
 
         /* --- FAB & UI Components --- */
         .fab { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90px; height: 90px; border-radius: 50%; background-color: #e0e0e0; border: 3px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 500; text-decoration: none; color: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1040; }
@@ -84,7 +84,7 @@
 <div class="page-container">
     <!-- Header -->
     <header class="header">
-        <a href="/caregiver/management" class="back-button"><i class="fas fa-chevron-left"></i> Back</a>
+        <a href="/patient/management" class="back-button"><i class="fas fa-chevron-left"></i> Back</a>
         <h1 class="header-title"><?=$pageTitle?>
             <div class="profile-icon"><img src="<?=$photo?>" alt="avatar"></div>
             <span class="profile-username"><?=$fullname?></span>
@@ -92,9 +92,9 @@
     </header>
 
     <!-- Target User Info -->
-    <section class="target-user-info">
-        <div class="target-user-avatar"><img id="target-user-avatar-img" src="" style="display:none;" alt="Caregiver"></div>
-        <div class="target-user-name" id="target-user-name">Loading...</div>
+    <section class="target-patient-info">
+        <div class="target-patient-avatar"><img id="target-patient-avatar-img" src="" style="display:none;" alt="Caregiver"></div>
+        <div class="target-patient-name" id="target-patient-name">Loading...</div>
     </section>
 
     <!-- Controls -->
@@ -104,18 +104,18 @@
         </div>
     </section>
 
-    <!-- Assigned Patient List -->
-    <main class="patient-list-container">
-        <div id="assigned-patient-list">
+    <!-- Assigned User List -->
+    <main class="user-list-container">
+        <div id="assigned-user-list">
             <div class="text-center p-5"><div class="spinner-border"></div></div>
         </div>
     </main>
 </div>
 
-<!-- FAB to Assign Patient -->
-<a href="#" class="fab" id="add-patient-btn">
+<!-- FAB to Assign User -->
+<a href="#" class="fab" id="add-user-btn">
     <div class="plus-icon">+</div>
-    <div>Patient</div>
+    <div>Caregiver</div>
 </a>
 
 <!-- Reusable Confirmation Modal for Assign/Unassign -->
@@ -135,17 +135,17 @@
 </div>
 
 
-<!-- Offcanvas for Unassigned Patient List -->
-<div class="offcanvas offcanvas-bottom h-100" tabindex="-1" id="assignPatientOffcanvas">
+<!-- Offcanvas for Unassigned User List -->
+<div class="offcanvas offcanvas-bottom h-100" tabindex="-1" id="assignUserOffcanvas">
     <div class="offcanvas-header">
         <h5 class="offcanvas-title w-100 text-center">Assign Patient</h5>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
         <div class="input-group search-bar mb-3">
-            <input type="text" id="search-input-offcanvas" class="form-control" placeholder="Search unassigned patients...">
+            <input type="text" id="search-input-offcanvas" class="form-control" placeholder="Search unassigned caregivers...">
         </div>
-        <div id="unassigned-patient-list-container" class="patient-list-container flex-grow-1 p-0">
+        <div id="unassigned-user-list-container" class="user-list-container flex-grow-1 p-0">
             <div class="text-center p-5"><div class="spinner-border"></div></div>
         </div>
     </div>
@@ -154,13 +154,13 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const targetUserId = <?=$targetUserId?>;
+    const targetPatientId = <?=targetPatientId?>;
     const baseUrl = '<?=$baseUrl?>';
     const authToken = '<?=$authToken?>';
 
-    let assignedPatients = [];
-    let unassignedPatients = [];
-    let assignPatientOffcanvas;
+    let assignedCaregivers = [];
+    let unassignedCaregivers = [];
+    let assignCaregiverOffcanvas;
     let confirmationModal;
 
     // --- HELPER FUNCTIONS ---
@@ -168,48 +168,48 @@
         $('#alert-container').html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).find('.alert').delay(4000).fadeOut();
     };
 
-    const renderPatientList = (patients, containerId) => {
+    const renderCaregiverList = (caregivers, containerId) => {
         const listContainer = $(`#${containerId}`);
         listContainer.empty();
-        if (!patients || patients.length === 0) {
+        if (!caregivers || caregivers.length === 0) {
             const message = containerId.includes('unassigned') ? 'No more patients to assign.' : 'No patients assigned to this user.';
             listContainer.html(`<p class="text-center text-muted mt-4">${message}</p>`);
             return;
         }
-        patients.forEach(patient => {
-            const fullName = `${patient.firstname || ''} ${patient.lastname || ''}`.trim();
-            const photoSrc = baseUrl + patient.photo;
+        caregivers.forEach(caregiver => {
+            const fullName = `${caregiver.firstname || ''} ${caregiver.lastname || ''}`.trim();
+            const photoSrc = baseUrl + caregiver.photo;
             const itemHtml = `
-                <div class="patient-item" data-patient-id="${patient.id}">
-                    <div class="patient-avatar"><img src="${photoSrc}" alt="Avatar"></div>
-                    <div class="patient-name">${fullName}</div>
+                <div class="user-item" data-caregiver-id="${caregiver.id}">
+                    <div class="user-avatar"><img src="${photoSrc}" alt="Avatar"></div>
+                    <div class="user-name">${fullName}</div>
                 </div>`;
             listContainer.append(itemHtml);
         });
     };
 
-    const openConfirmationModal = (action, patientId) => {
-        const patientList = action === 'unassign' ? assignedPatients : unassignedPatients;
-        const patient = patientList.find(p => p.id == patientId);
-        if (!patient) return;
+    const openConfirmationModal = (action, caregiverId) => {
+        const caregiverList = action === 'unassign' ? assignedCaregivers : unassignedCaregivers;
+        const caregiver = caregiverList.find(p => p.id == caregiverId);
+        if (!caregiver) return;
 
         const targetUserName = $('#target-user-name').text();
-        const patientName = `${patient.firstname} ${patient.lastname}`.trim();
+        const patientName = `${caregiver.firstname} ${caregiver.lastname}`.trim();
 
         const title = action === 'unassign' ? 'Unassign Patient' : 'Assign Patient';
         const text = `You are about to ${action} the patient: <br><strong>${patientName}</strong><br>${action === 'unassign' ? 'From' : 'To'} the user:<br><strong>${targetUserName}</strong>`;
 
         $('#confirmation-modal-title').text(title);
         $('#confirmation-modal-text').html(text);
-        $('#confirm-yes-btn').data('action', action).data('patient-id', patientId);
+        $('#confirm-yes-btn').data('action', action).data('caregiver-id', caregiverId);
 
         confirmationModal.show();
     };
 
     // --- API CALLS ---
-    function fetchAssignedPatients() {
+    function fetchAssignedCaregivers() {
         $.ajax({
-            url: `${baseUrl}/assigned/patients/${targetUserId}`,
+            url: `${baseUrl}/assigned/users/${targetPatientId}`,
             headers: { 'Authorization': authToken },
             success: (response) => {
                 if (response.status === 'success' && response.data) {
@@ -217,23 +217,23 @@
                     $('#target-user-name').text(user.fullname);
                     if (user.photo) $('#target-user-avatar-img').attr('src', baseUrl + user.photo).show();
 
-                    assignedPatients = patients;
-                    renderPatientList(assignedPatients, 'assigned-patient-list');
+                    assignedCaregivers = patients;
+                    renderCaregiverList(assignedCaregivers, 'assigned-caregiver-list');
                 } else { throw new Error('Failed to parse assigned patients'); }
             },
             error: () => showAlert('Error fetching assigned patients.', 'danger')
         });
     }
 
-    function fetchUnassignedPatients() {
-        $('#unassigned-patient-list-container').html('<div class="text-center p-5"><div class="spinner-border"></div></div>');
+    function fetchUnassignedCaregivers() {
+        $('#unassigned-caregiver-list-container').html('<div class="text-center p-5"><div class="spinner-border"></div></div>');
         $.ajax({
-            url: `${baseUrl}/unassigned/patients/${targetUserId}`,
+            url: `${baseUrl}/unassigned/users/${targetPatientId}`,
             headers: { 'Authorization': authToken },
             success: (response) => {
                 if (response.status === 'success' && response.data) {
-                    unassignedPatients = response.data.patients;
-                    renderPatientList(unassignedPatients, 'unassigned-patient-list-container');
+                    unassignedCaregivers = response.data.patients;
+                    renderCaregiverList(unassignedCaregivers, 'unassigned-caregiver-list-container');
                 } else { throw new Error('Failed to parse unassigned patients'); }
             },
             error: () => showAlert('Error fetching unassigned patients.', 'danger')
@@ -242,12 +242,12 @@
 
     function handleAssignmentAction() {
         const action = $(this).data('action');
-        const patientId = $(this).data('patient-id');
+        const caregiverId = $(this).data('caregiver-id');
         const url = `${baseUrl}/${action}/patients`; // a or unassign
 
         const payload = {
-            user_id: targetUserId,
-            patient_ids: [patientId]
+            user_id: caregiverId,
+            patient_ids: [targetPatientId]
         };
 
         $.ajax({
@@ -257,16 +257,16 @@
             headers: { 'Authorization': authToken },
             data: JSON.stringify(payload),
             success: (response) => {
-                showAlert(response.message || `Patient successfully ${action}ed.`, 'success');
+                showAlert(response.message || `Caregiver successfully ${action}ed.`, 'success');
                 confirmationModal.hide();
 
                 // Instant UI update
                 if (action === 'unassign') {
-                    assignedPatients = assignedPatients.filter(p => p.id != patientId);
-                    renderPatientList(assignedPatients, 'assigned-patient-list');
+                    assignedCaregivers = assignedCaregivers.filter(p => p.id != caregiverId);
+                    renderCaregiverList(assignedCaregivers, 'assigned-caregiver-list');
                 } else { // assign
-                    unassignedPatients = unassignedPatients.filter(p => p.id != patientId);
-                    renderPatientList(unassignedPatients, 'unassigned-patient-list-container');
+                    unassignedCaregivers = unassignedCaregivers.filter(p => p.id != caregiverId);
+                    renderCaregiverList(unassignedCaregivers, 'unassigned-caregiver-list-container');
                 }
             },
             error: (xhr) => showAlert(xhr.responseJSON?.message || 'An error occurred.', 'danger')
@@ -275,45 +275,45 @@
 
     // --- INITIALIZATION & EVENT LISTENERS ---
     function initializePage() {
-        assignPatientOffcanvas = new bootstrap.Offcanvas(document.getElementById('assignPatientOffcanvas'));
+        assignCaregiverOffcanvas = new bootstrap.Offcanvas(document.getElementById('assignPatientOffcanvas'));
         confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
 
-        fetchAssignedPatients();
+        fetchAssignedCaregivers();
 
         // Open unassign confirmation
-        $('#assigned-patient-list').on('click', '.patient-item', function() {
-            openConfirmationModal('unassign', $(this).data('patient-id'));
+        $('#assigned-caregiver-list').on('click', '.patient-item', function() {
+            openConfirmationModal('unassign', $(this).data('caregiver-id'));
         });
 
         // Open assign confirmation from offcanvas
-        $('#unassigned-patient-list-container').on('click', '.patient-item', function() {
-            openConfirmationModal('assign', $(this).data('patient-id'));
+        $('#unassigned-caregiver-list-container').on('click', '.patient-item', function() {
+            openConfirmationModal('assign', $(this).data('caregiver-id'));
         });
 
         // Handle "Yes" click in modal
         $('#confirm-yes-btn').on('click', handleAssignmentAction);
 
-        // Show offcanvas to assign new patients
-        $('#add-patient-btn').on('click', (e) => {
+        // Show offcanvas to assign new user
+        $('#add-user-btn').on('click', (e) => {
             e.preventDefault();
-            fetchUnassignedPatients();
-            assignPatientOffcanvas.show();
+            fetchUnassignedCaregivers();
+            assignCaregiverOffcanvas.show();
         });
 
         // Refresh main list when offcanvas closes to show new assignments
-        $('#assignPatientOffcanvas').on('hidden.bs.offcanvas', fetchAssignedPatients);
+        $('#assignPatientOffcanvas').on('hidden.bs.offcanvas', fetchAssignedCaregivers);
 
         // Search filters
         $('#search-input-main').on('keyup', function() {
             const searchTerm = $(this).val().toLowerCase();
-            const filtered = assignedPatients.filter(p => `${p.firstname} ${p.lastname}`.toLowerCase().includes(searchTerm));
-            renderPatientList(filtered, 'assigned-patient-list');
+            const filtered = assignedCaregivers.filter(p => `${p.firstname} ${p.lastname}`.toLowerCase().includes(searchTerm));
+            renderCaregiverList(filtered, 'assigned-caregiver-list');
         });
 
         $('#search-input-offcanvas').on('keyup', function() {
             const searchTerm = $(this).val().toLowerCase();
-            const filtered = unassignedPatients.filter(p => `${p.firstname} ${p.lastname}`.toLowerCase().includes(searchTerm));
-            renderPatientList(filtered, 'unassigned-patient-list-container');
+            const filtered = unassignedCaregivers.filter(p => `${p.firstname} ${p.lastname}`.toLowerCase().includes(searchTerm));
+            renderCaregiverList(filtered, 'unassigned-caregiver-list-container');
         });
     }
 </script>
