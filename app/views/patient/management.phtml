@@ -47,7 +47,7 @@
         .filter-buttons::-webkit-scrollbar { display: none; }
 
         /* --- Patient List (Scrollable) --- */
-        .user-list-container {
+        .patient-list-container {
             flex-grow: 1;
             overflow-y: auto;
             padding: 1rem;
@@ -55,7 +55,7 @@
         }
 
         /* CORRECTED: Simplified .patient-item layout with flexbox */
-        .user-item {
+        .patient-item {
             display: flex; /* Use flexbox for simple alignment */
             align-items: center; /* Vertically center content */
             gap: 1rem;
@@ -65,17 +65,17 @@
             text-decoration: none;
             color: inherit;
         }
-        .user-item:hover {
+        .patient-item:hover {
             background-color: #f1f1f1;
             color: inherit;
         }
-        .user-avatar {
+        .patient-avatar {
             width: 60px; height: 60px;
             min-width: 60px; /* Prevent shrinking */
             border-radius: 50%; border: 3px solid #000;
             overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
-        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .patient-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .patient-info {
             display: grid; /* Use grid for the text block */
             grid-template-columns: 1fr auto; /* Name takes space, status aligns to the right */
@@ -83,7 +83,7 @@
             align-items: center;
         }
         .patient-name-block { grid-column: 1 / 2; }
-        .user-name { font-weight: bold; font-size: 1.1rem; }
+        .patient-name { font-weight: bold; font-size: 1.1rem; }
         .patient-phone { color: #555; }
         .patient-status { grid-column: 2 / 3; font-weight: bold; justify-self: end; }
 
