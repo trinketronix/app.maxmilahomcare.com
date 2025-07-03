@@ -123,26 +123,32 @@ $router->add('/patient/caregivers/{patientId:[0-9]+}?', [
 
 $router->add('/visit/management', [
     'namespace'  => 'App\Controllers',
-    'controller' => 'patient',
+    'controller' => 'visit',
     'action'     => 'management'
 ]);
 
-$router->add('/visit/profile/{userId:[0-9]+}?', [
+$router->add('/visit/detail/{visitId:[0-9]+}?', [
     'namespace'  => 'App\Controllers',
-    'controller' => 'patient',
-    'action'     => 'profile'
+    'controller' => 'visit',
+    'action'     => 'detail'
 ]);
 
-$router->add('/visit/addresses/{userId:[0-9]+}?', [
+$router->add('/visit/addresses/{addressId:[0-9]+}?', [
     'namespace'  => 'App\Controllers',
-    'controller' => 'patient',
+    'controller' => 'visit',
     'action'     => 'addresses'
 ]);
 
-$router->add('/visit/caregivers/{userId:[0-9]+}?', [
+$router->add('/visit/caregivers/{visitId:[0-9]+}?', [
     'namespace'  => 'App\Controllers',
-    'controller' => 'patient',
+    'controller' => 'visit',
     'action'     => 'caregivers'
+]);
+
+$router->add('/visit/patients/{visitId:[0-9]+}?', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'visit',
+    'action'     => 'patients'
 ]);
 
 // ========================================================================
