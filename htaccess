@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+    RewriteRule  ^$ public/    [L]
+    RewriteRule  (.*) public/$1 [L]
+</IfModule>
+
+# Always keep this file in the .gitignore
+# This file need to be inside the execution folder for the app in the server for testing
+# Set environment flavor
+SetEnv APP_ENV dev
+SetEnv BASE_URL_API https://api-test.maxmilahomecare.com
+SetEnv BASE_URL_APP https://app-test.maxmilahomecare.com

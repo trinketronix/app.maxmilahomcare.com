@@ -91,16 +91,20 @@
             <li class="nav-item" role="presentation"><button class="nav-link disabled" id="patient-tab-btn" data-bs-toggle="tab" data-bs-target="#patient-tab" type="button">Patient</button></li>
             <li class="nav-item" role="presentation"><button class="nav-link disabled" id="address-tab-btn" data-bs-toggle="tab" data-bs-target="#address-tab" type="button">Address</button></li>
             <li class="nav-item" role="presentation"><button class="nav-link" id="date-tab-btn" data-bs-toggle="tab" data-bs-target="#date-tab" type="button">Date</button></li>
-            <li class="nav-item" role="presentation"><button class="nav-link" id="start-tab-btn" data-bs-toggle="tab" data-bs-target="#start-tab" type="button">Start</button></li>
-            <li class="nav-item" role="presentation"><button class="nav-link" id="end-tab-btn" data-bs-toggle="tab" data-bs-target="#end-tab" type="button">End</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="start-tab-btn" data-bs-toggle="tab" data-bs-target="#start-tab" type="button">Time</button></li>
+          
         </ul>
         <div class="tab-content flex-grow-1" id="visit-tabs-content">
             <div class="tab-pane fade show active" id="caregiver-tab"><div class="input-group search-bar"><input type="text" id="caregiver-search" class="form-control" placeholder="Search caregiver..."></div><div class="selection-list" id="caregiver-selection-list"></div></div>
             <div class="tab-pane fade" id="patient-tab"><div id="patient-selection-placeholder" class="text-center text-muted mt-5">Please select a caregiver first.</div><div id="patient-selection-content" style="display:none;"><div class="input-group search-bar"><input type="text" id="patient-search" class="form-control" placeholder="Search patient..."></div><div class="selection-list" id="patient-selection-list"></div></div></div>
             <div class="tab-pane fade" id="address-tab"><div id="address-selection-placeholder" class="text-center text-muted mt-5">Please select a patient first.</div><div id="address-selection-content" style="display:none;"><div class="input-group search-bar"><input type="text" id="address-search" class="form-control" placeholder="Search address..."></div><div class="selection-list" id="address-selection-list"></div></div></div>
-            <div class="tab-pane fade" id="date-tab"><div id="datepicker-container" class="pt-3"></div></div>
-            <div class="tab-pane fade d-flex justify-content-center align-items-center" id="start-tab"><div id="start-time-picker"></div></div>
-            <div class="tab-pane fade d-flex justify-content-center align-items-center" id="end-tab"><div id="end-time-picker"></div></div>
+           <div class="tab-pane fade d-flex justify-content-center align-items-center" id="date-tab"><div id="datepicker-container" class="pt-3"></div></div> 
+            <div class="tab-pane fade d-flex justify-content-center align-items-center" id="start-tab">
+            <div class="d-flex flex-column align-items-center gap-3">
+                Start time: <div id="start-time-picker"></div>
+                End time: <div id="end-time-picker"></div>
+            </div>
+</div>
         </div>
         <button type="button" class="btn btn-primary" id="create-visit-btn" style="display:none;">Create Visit</button>
     </div>
