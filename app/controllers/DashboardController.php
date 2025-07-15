@@ -63,24 +63,16 @@ class DashboardController extends BaseController {
         if (!$this->requireRole(2)) {
             return;
         }
-
-        $user = $this->getCurrentUser();
-
-        // Set caregiver menu items
-        $menuItems = [
-            ['url' => '/details', 'text' => 'My Profile', 'icon' => 'person'],
-            ['url' => '/patients', 'text' => 'My Patients', 'icon' => 'people'],
-            ['url' => '/visit', 'text' => 'Schedule Visit', 'icon' => 'calendar-plus'],
-            ['url' => '/visit/my-visits', 'text' => 'My Visits', 'icon' => 'calendar-check'],
-            ['url' => '/logout', 'text' => 'Logout', 'icon' => 'box-arrow-right'],
-        ];
-
+        // Set variables for the view
         $this->view->setVars([
-            'user' => $user,
-            'username' => $user['fullname'] ?? $user['username'],
-            'role' => $user['role'],
-            'menuItems' => $menuItems,
-            'pageTitle' => 'Caregiver Dashboard'
+            'pageTitle' => 'Caregiver',
+            'userId' => $this->getUserId(),
+            'username' => $this->getUsername(),
+            'fullname' => $this->getUserFullname(),
+            'role' => $this->getUserRoleText(),
+            'photo' => $this->getUserPhoto(),
+            'baseUrl' => $this->getApiBaseUrl(),
+            'authToken' => $this->getAuthToken()
         ]);
     }
 }
