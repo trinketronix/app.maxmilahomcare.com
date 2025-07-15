@@ -217,7 +217,14 @@
 
         // --- EVENT LISTENERS ---
         $('#edit-btn').on('click', () => setMode('edit'));
-        $('#back-button').on('click', (e) => { e.preventDefault(); if ($('#page-container').hasClass('edit-mode')) setMode('view'); else window.history.back(); });
+        $('#back-button').on('click', (e) => {
+            e.preventDefault(); // Always prevent the default link action
+            if ($('#page-container').hasClass('edit-mode')) {
+                setMode('view'); // If in edit mode, just switch back to view mode
+            } else {
+                window.history.back(); // If in view mode, go to the previous page
+            }
+        });
 
         $('#save-btn').on('click', () => {
             const totalHours = parseInt($('#total_hours-edit').val());
