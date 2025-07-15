@@ -72,7 +72,7 @@
 <div class="page-container">
     <header class="header">
         <a href="/dashboard/caregiver" class="back-button"><i class="fas fa-chevron-left"></i> Exit</a>
-        <h1 class="header-title">Visits</h1>
+        <h1 class="header-title">Caregiver Visits</h1>
         <div class="profile"><div class="profile-icon"><img src="<?=$photo?>" alt="avatar"></div><span class="profile-username"><?=$fullname?></span></div>
     </header>
     <section class="controls-section">
@@ -263,7 +263,7 @@
             const { patientId, addressId, visitDate, startTime, totalHours } = newVisitState;
             const payload = { user_id: caregiverId, patient_id: patientId, address_id: addressId, visit_date: new Date(visitDate).toISOString().slice(0, 10), total_hours: totalHours };
             if (startTime) { const startDatetime = new Date(visitDate); startDatetime.setHours(startTime.h, startTime.m, 0, 0); payload.start_time = startDatetime.toISOString().slice(0, 19).replace('T', ' '); }
-            $.ajax({ url: `${baseUrl}/visit`, type: 'POST', headers: { 'Authorization': authToken, 'Content-Type': 'application/json' }, data: JSON.stringify(payload),
+            $.ajax({ url: `${baseUrl}/visit/schedule`, type: 'POST', headers: { 'Authorization': authToken, 'Content-Type': 'application/json' }, data: JSON.stringify(payload),
                 success: () => { showAlert('Visit created!', 'success'); visitConfirmationModal.hide(); assignVisitOffcanvas.hide(); fetchMyVisits(); },
                 error: (xhr) => showAlert(xhr.responseJSON?.message || 'Failed to create visit.', 'danger')
             });
