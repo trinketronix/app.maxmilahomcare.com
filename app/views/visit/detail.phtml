@@ -39,7 +39,8 @@
         .address-box-icon { font-size: 2rem; }
 
         .details-list { list-style: none; padding: 0; margin-top: 1.5rem; }
-        .details-list li { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee; align-items: center; }
+        .details-list li { display: flex; flex-direction: column; padding: 0.5rem 0; border-bottom: 1px solid #eee; }
+        .details-list .list-item-row { display: flex; justify-content: space-between; align-items: center; width: 100%;}
         .details-list .label { font-weight: bold; }
         .details-list .value { color: #555; text-align: right; }
         .details-list .note-value { text-align: left; white-space: pre-wrap; width: 100%; margin-top: 0.25rem; }
@@ -80,22 +81,35 @@
                 <div class="participant"><div class="participant-avatar"><img id="patient-avatar" src=""></div><div class="participant-role">Patient</div><div id="patient-name" class="participant-name"></div></div>
             </div>
             <div id="address-box" class="address-box"><div class="address-box-header"><i id="address-icon" class="fa-solid"></i> Address</div><div id="address-text" class="address-text"></div></div>
+
+            <!-- MODIFIED: Details list structure for View/Edit modes -->
             <ul class="details-list">
-                <li><span class="label">Start time:</span><span class="value read-only-value" id="start_time-view"></span><input type="datetime-local" class="form-control editable-field" id="start_time-edit"></li>
-                <li><span class="label">Total Hours:</span><span class="value read-only-value" id="duration-view"></span><input type="number" class="form-control editable-field" id="total_hours-edit" min="1" max="12" placeholder="e.g., 4"></li>
-                <li id="scheduled_by-item" style="display:none;"><span class="label">Scheduled by:</span> <span class="value" id="scheduled_by-view"></span></li>
-                <li id="checkin_by-item" style="display:none;"><span class="label">Check-in by:</span> <span class="value" id="checkin_by-view"></span></li>
-                <li id="checkout_by-item" style="display:none;"><span class="label">Check-out by:</span> <span class="value" id="checkout_by-view"></span></li>
-                <li id="canceled_by-item" style="display:none;"><span class="label">Canceled by:</span> <span class="value" id="canceled_by-view"></span></li>
-                <li style="flex-direction: column; align-items: flex-start;"><span class="label">Note:</span> <span class="value note-value read-only-value" id="note-view"></span> <textarea class="form-control editable-field" id="note-edit"></textarea></li>
+                <!-- Editable fields -->
+                <li class="view-mode"><div class="list-item-row"><span class="label">Start time:</span> <span class="value" id="start_time-view"></span></div></li>
+                <li class="edit-mode"><div class="list-item-row"><span class="label">Visit Date:</span> <span class="value" id="visit_date-edit"></span></div></li>
+                <li class="edit-mode"><div class="list-item-row"><span class="label">Start time:</span> <input type="time" class="form-control" id="start_time-edit"></div></li>
+
+                <li class="view-mode"><div class="list-item-row"><span class="label">Total Hours:</span> <span class="value" id="duration-view"></span></div></li>
+                <li class="edit-mode"><div class="list-item-row"><span class="label">Total Hours:</span> <input type="number" class="form-control" id="total_hours-edit" min="1" max="12" placeholder="e.g., 4"></div></li>
+
+                <!-- Read-only fields (always visible) -->
+                <li><div class="list-item-row"><span class="label">Scheduled by:</span> <span class="value" id="scheduled_by-view"></span></div></li>
+                <li><div class="list-item-row"><span class="label">Check-in by:</span> <span class="value" id="checkin_by-view"></span></div></li>
+                <li><div class="list-item-row"><span class="label">Check-out by:</span> <span class="value" id="checkout_by-view"></span></div></li>
+                <li><div class="list-item-row"><span class="label">Approved by:</span> <span class="value" id="approved_by-view"></span></div></li>
+                <li><div class="list-item-row"><span class="label">Canceled by:</span> <span class="value" id="canceled_by-view"></span></div></li>
+
+                <!-- Note field -->
+                <li><span class="label">Note:</span> <span class="value note-value read-only-value" id="note-view"></span> <textarea class="form-control editable-field" id="note-edit"></textarea></li>
             </ul>
+
             <div class="action-buttons"><button type="button" class="btn btn-custom" id="progress-btn">Progress</button><button type="button" class="btn btn-custom" id="status-btn">Status</button><button type="button" class="btn btn-custom" id="edit-btn">Edit</button></div>
             <div class="save-button"><button type="button" class="btn btn-custom main-action" id="save-btn">Save Changes</button></div>
         </div>
     </main>
 </div>
 
-<!-- Modals & Offcanvas -->
+<!-- Modals & Offcanvas are unchanged -->
 <div class="modal fade" id="progressModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Change Progress</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="d-grid gap-2"><button class="btn btn-outline-info" data-action="checkin">Check-in</button><button class="btn btn-outline-secondary" data-action="checkout">Check-out</button><button class="btn btn-outline-success" data-action="approve">Approved</button><button class="btn btn-outline-danger" data-action="cancel">Cancel</button></div><div id="cancel-note-group" class="mt-3" style="display:none;"><label for="cancel-note" class="form-label">Cancellation Note (Required)</label><textarea class="form-control" id="cancel-note" rows="3"></textarea><button class="btn btn-danger w-100 mt-2" id="confirm-cancel-btn">Confirm Cancellation</button></div></div></div></div></div>
 <div class="modal fade" id="statusModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Change Status</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="d-grid gap-2"><button class="btn btn-outline-primary" data-action="status/visible">Visible</button><button class="btn btn-outline-warning" data-action="status/archived">Archived</button><button class="btn btn-outline-danger" data-action="status/deleted">Deleted</button></div></div></div></div></div>
 <div class="modal fade" id="confirmAddressModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Edit Address</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body text-center">Do you want to edit the Address?<div class="d-flex justify-content-center gap-2 mt-3"><button class="btn btn-primary" id="confirm-address-yes">Yes</button><button class="btn btn-secondary" data-bs-dismiss="modal">No</button></div></div></div></div></div>
@@ -121,56 +135,12 @@
         const getProgressText = (p) => ({ '-1': "Canceled", '0': "Scheduled", '1': "Check-in", '2': "Check-out", '3': "Approved" }[p] || 'Unknown');
         const getFormattedDateTime = (dateStr) => { const d = new Date(dateStr); return d.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }); };
         const getRelativeTime = (dateStr) => { const n=new Date(),v=new Date(dateStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/(1e3*60*60*24));if(d<0)return"Past visit";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`; };
-        const toLocalISOString = (date) => { const z = n => (n<10?'0':'')+n; return date.getFullYear()+'-'+z(date.getMonth()+1)+'-'+z(date.getDate())+'T'+z(date.getHours())+':'+z(date.getMinutes()); };
-
-        // --- RENDER FUNCTION ---
-        function renderVisitDetails(data) {
-            if (!data || !data.user || !data.patient) { showAlert('Incomplete visit data received.', 'danger'); return; }
-            $('#visit-progress-text').text(getProgressText(data.progress));
-            $('#visit-date-text').text(new Date(data.start_time).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }));
-            $('#visit-duration').text(`${Math.floor(data.duration_minutes / 60)} hrs total`);
-            $('#visit-relative-time').text(getRelativeTime(data.start_time));
-            $('#caregiver-avatar').attr('src', data.user.photo ? baseUrl + data.user.photo : 'https://via.placeholder.com/70');
-            $('#caregiver-name').text(`${data.user.firstname} ${data.user.lastname}`);
-            $('#patient-avatar').attr('src', data.patient.photo ? baseUrl + data.patient.photo : 'https://via.placeholder.com/70');
-            $('#patient-name').text(`${data.patient.firstname} ${data.patient.lastname}`);
-            if (data.address) {
-                $('#address-text').html(`${data.address.address}<br>${data.address.city}, ${data.address.state} ${data.address.zipcode}`);
-                $('#address-icon').attr('class', data.address.type === 'Apartment' ? 'fa-solid fa-building' : 'fa-solid fa-house');
-            }
-            const details = ['start_time', 'scheduled_by', 'checkin_by', 'checkout_by', 'canceled_by', 'note'];
-            details.forEach(key => {
-                const el = $(`#${key}-item`);
-                const viewEl = $(`#${key}-view`);
-                // *** THE FIX IS HERE ***
-                if (data[key] && (typeof data[key] !== 'object' || data[key].fullname)) {
-                    let value = '';
-                    if (key.endsWith('_by') && data[key].fullname) {
-                        value = data[key].fullname;
-                    } else if (key.includes('time')) {
-                        value = getFormattedDateTime(data[key]);
-                    } else {
-                        value = data[key]; // For 'note'
-                    }
-                    viewEl.text(value);
-                    el.show();
-                } else {
-                    el.hide();
-                }
-            });
-            $('#duration-view').text(`${Math.floor(data.duration_minutes / 60)} Hours`);
-            $('#visit-content-placeholder').hide();
-            $('#visit-content').show();
-        }
 
         // --- API CALLS ---
         function fetchVisitDetails() {
             $.ajax({ url: `${baseUrl}/visit/${visitId}`, headers: { 'Authorization': authToken },
                 success: (res) => { if (res.status === 'success') { currentVisitData = res.data; renderVisitDetails(currentVisitData); } },
-                error: () => {
-                    showAlert('Failed to load visit details.', 'danger');
-                    $('#visit-content-placeholder').html('<p class="text-center text-danger">Could not load visit. Please try again.</p>');
-                }
+                error: () => { $('#visit-content-placeholder').html('<p class="text-center text-danger">Could not load visit details.</p>'); }
             });
         }
         function updateVisit(payload) {
@@ -187,12 +157,56 @@
             if (dataPayload) { ajaxConfig.contentType = 'application/json'; ajaxConfig.data = JSON.stringify(dataPayload); }
             $.ajax(ajaxConfig);
         }
+        function fetchAccountName(userId, elementId) {
+            $.ajax({ url: `${baseUrl}/account/${userId}`, headers: { 'Authorization': authToken },
+                success: (res) => { if (res.status === 'success' && res.data) { $(`#${elementId}`).text(`${res.data.firstname} ${res.data.lastname}`); } },
+                error: () => $(`#${elementId}`).text('Unknown User')
+            });
+        }
+
+        // --- RENDER FUNCTION ---
+        function renderVisitDetails(data) {
+            if (!data || !data.user || !data.patient) { showAlert('Incomplete visit data.', 'danger'); return; }
+            $('#visit-progress-text').text(getProgressText(data.progress));
+            $('#visit-date-text').text(new Date(data.start_time).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }));
+            $('#visit-duration').text(`${Math.floor(data.duration_minutes / 60)} hrs total`);
+            $('#visit-relative-time').text(getRelativeTime(data.start_time));
+            $('#caregiver-avatar').attr('src', data.user.photo ? baseUrl + data.user.photo : 'https://via.placeholder.com/70');
+            $('#caregiver-name').text(`${data.user.firstname} ${data.user.lastname}`);
+            $('#patient-avatar').attr('src', data.patient.photo ? baseUrl + data.patient.photo : 'https://via.placeholder.com/70');
+            $('#patient-name').text(`${data.patient.firstname} ${data.patient.lastname}`);
+            if (data.address) {
+                $('#address-text').html(`${data.address.address}<br>${data.address.city}, ${data.address.state} ${data.address.zipcode}`);
+                $('#address-icon').attr('class', data.address.type === 'Apartment' ? 'fa-solid fa-building' : 'fa-solid fa-house');
+            }
+
+            // Render static details and fetch names for dynamic ones
+            $('#start_time-view').text(getFormattedDateTime(data.start_time));
+            $('#duration-view').text(`${Math.floor(data.duration_minutes / 60)} Hours`);
+            $('#note-view').text(data.note || 'N/A');
+
+            const byFields = ['scheduled_by', 'checkin_by', 'checkout_by', 'approved_by', 'canceled_by'];
+            byFields.forEach(key => {
+                const viewEl = $(`#${key}-view`);
+                if (data[key] !== null) {
+                    viewEl.text('Loading...'); // Placeholder
+                    fetchAccountName(data[key], `${key}-view`);
+                } else {
+                    viewEl.text('TBD');
+                }
+            });
+
+            $('#visit-content-placeholder').hide();
+            $('#visit-content').show();
+        }
 
         // --- UI MODE MANAGEMENT ---
         function setMode(mode) {
             const container = $('#page-container');
             if (mode === 'edit') {
-                $('#start_time-edit').val(toLocalISOString(new Date(currentVisitData.start_time)));
+                const startDate = new Date(currentVisitData.start_time);
+                $('#visit_date-edit').text(startDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'}));
+                $('#start_time-edit').val(String(startDate.getHours()).padStart(2,'0') + ':' + String(startDate.getMinutes()).padStart(2,'0'));
                 $('#total_hours-edit').val(Math.floor(currentVisitData.duration_minutes / 60));
                 $('#note-edit').val(currentVisitData.note || '');
                 container.removeClass('view-mode').addClass('edit-mode');
@@ -204,17 +218,28 @@
         // --- EVENT LISTENERS ---
         $('#edit-btn').on('click', () => setMode('edit'));
         $('#back-button').on('click', (e) => { e.preventDefault(); if ($('#page-container').hasClass('edit-mode')) setMode('view'); else window.history.back(); });
+
         $('#save-btn').on('click', () => {
             const totalHours = parseInt($('#total_hours-edit').val());
-            if (isNaN(totalHours) || totalHours <= 0) { showAlert('Total Hours must be a positive number.', 'warning'); return; }
-            const payload = { start_time: $('#start_time-edit').val(), total_hours: totalHours, note: $('#note-edit').val() };
+            if (isNaN(totalHours) || totalHours <= 0) { showAlert('Total Hours must be > 0.', 'warning'); return; }
+
+            // Reconstruct the start_time from the fixed date and new time
+            const visitDate = new Date(currentVisitData.start_time);
+            const timeParts = $('#start_time-edit').val().split(':');
+            visitDate.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), 0, 0);
+
+            const payload = {
+                start_time: visitDate.toISOString().slice(0, 19).replace('T', ' '),
+                total_hours: totalHours,
+                note: $('#note-edit').val()
+            };
             updateVisit(payload);
             setMode('view');
         });
 
+        // Other listeners (progress, status, address) are unchanged...
         $('#progress-btn').on('click', () => progressModal.show());
         $('#status-btn').on('click', () => statusModal.show());
-
         $('#progressModal button[data-action]').on('click', function() {
             const action = $(this).data('action');
             if (action === 'cancel') { $('#cancel-note-group').show(); } else { performVisitAction(action); progressModal.hide(); }
@@ -226,7 +251,6 @@
             progressModal.hide(); $('#cancel-note').val(''); $('#cancel-note-group').hide();
         });
         $('#statusModal button[data-action]').on('click', function() { performVisitAction($(this).data('action')); statusModal.hide(); });
-
         $('#address-box').on('click', () => { if ($('#page-container').hasClass('edit-mode')) confirmAddressModal.show(); });
         $('#confirm-address-yes').on('click', () => {
             confirmAddressModal.hide();
@@ -242,7 +266,7 @@
         });
         $('#address-selection-list').on('click', '.selection-item', function() { updateVisit({ address_id: $(this).data('id') }); addressOffcanvas.hide(); });
 
-        // --- INITIAL DATA FETCH ---
+        // Initial data fetch
         fetchVisitDetails();
     });
 </script>
