@@ -180,7 +180,7 @@
             });
         }
         function performVisitAction(actionEndpoint, dataPayload = null) {
-            const ajaxConfig = { url: `${baseUrl}/visit/${visitId}/${actionEndpoint}`, type: 'PUT', headers: { 'Authorization': authToken },
+            const ajaxConfig = { url: `${baseUrl}/visit/${visitId}/${actionEndpoint}`, type: 'PUT', headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
                 success: (res) => { showAlert(res.message || 'Action completed!', 'success'); fetchVisitDetails(); },
                 error: (xhr) => showAlert(xhr.responseJSON?.message || 'Action failed.', 'danger')
             };
