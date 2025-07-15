@@ -154,8 +154,27 @@
         container.append($('<div class="time-picker-wrapper"><label class="form-label me-2">Start Time (Optional):</label></div>').append(hourSelect, ':', minuteSelect));
     };
 
-    const renderVisitList = (visits) => { /* Unchanged from your last correct version */ };
-    const renderSelectionList = (items, containerId, type) => { /* Unchanged from your last correct version */ };
+    const renderVisitList = (visits) => {
+        const listContainer = $('#visit-list'); listContainer.empty();
+        if (!visits || visits.length === 0) { listContainer.html('<p class="text-center text-muted mt-4">No visits found.</p>'); return; }
+        visits.forEach(v => {
+            const caregiverName = `${v.user.firstname} ${v.user.lastname}`, patientName = `${v.patient.firstname} ${v.patient.lastname}`;
+            const caregiverPhoto = baseUrl + v.user.photo;
+            const patientPhoto = baseUrl + v.patient.photo;
+            const progressText = getProgressText(v.progress);
+            listContainer.append(`<a href="/visit/detail/${v.id}" class="visit-card" data-record-status="${v.status}" data-visit-progress="${v.progress}"><div class="visit-person"><div class="visit-person-avatar"><img src="${caregiverPhoto}" alt="Caregiver"></div><div class="visit-person-name">${caregiverName}</div></div><div class="visit-details"><div class="visit-date">${getFormattedDate(v.start_time)}</div><div class="visit-relative-time">${getRelativeTime(v.start_time)}</div><div class="visit-progress ${progressText === 'Canceled' ? 'visit-progress-canceled' : ''}">${progressText}</div></div><div class="visit-person"><div class="visit-person-avatar"><img src="${patientPhoto}" alt="Patient"></div><div class="visit-person-name">${patientName}</div></div></a>`);
+        });
+    };
+    const renderSelectionList = (items, containerId, type) => {
+        const listContainer = $(`#${containerId}`); listContainer.empty();
+        if (!items || items.length === 0) { listContainer.html(`<p class="text-center text-muted mt-3">No ${type}s found.</p>`); return; }
+        items.forEach(item => {
+            let id, name, photo, iconClass = 'fa-user';
+            if(type === 'caregiver' || type === 'patient') { id = item.id; name = `${item.firstname || ''} ${item.lastname || ''}`.trim(); photo = baseUrl + item.photo; }
+            else { id = item.id; name = `${item.address}, ${item.city}, ${item.state} ${item.zipcode}`; photo = null; iconClass = item.type === 'Apartment' ? 'fa-building' : 'fa-house'; }
+            listContainer.append(`<div class="selection-item" data-id="${id}" data-name="${name}"><div class="item-avatar">${photo ? `<img src="${photo}" class="rounded-circle w-100 h-100" style="object-fit:cover;" alt="Avatar">` : `<i class="fa-solid ${iconClass} fs-3"></i>`}</div><div>${name}</div></div>`);
+        });
+    };
 
     // MODIFIED: Validation logic updated
     const checkFormCompleteness = () => {
@@ -168,12 +187,18 @@
     };
 
     // --- API CALLS ---
-    const fetchAllVisits = () => { /* Unchanged */ };
+    const fetchAllVisits = () => { $('#visit-list').html('<div class="text-center p-5"><div class="spinner-border"></div></div>'); $.ajax({ url: `${baseUrl}/visits`, headers: { 'Authorization': authToken }, success: (r) => { if (r.status === 'success') { allVisits = r.data.visits; applyFilters(); }}, error: () => showAlert('Error fetching visits.', 'danger') }); };
     const fetchCaregivers = () => $.ajax({ url: `${baseUrl}/accounts`, headers: { 'Authorization': authToken } });
     const fetchAssignedPatients = (caregiverId) => $.ajax({ url: `${baseUrl}/assigned/patients/${caregiverId}`, headers: { 'Authorization': authToken } });
     const fetchPatientAddresses = (patientId) => $.ajax({ url: `${baseUrl}/address/person/${patientId}/1`, headers: { 'Authorization': authToken } });
 
-    function applyFilters() { /* Unchanged */ }
+    function applyFilters() {
+        const recordStatus = $('button[data-filter-type="recordStatus"].active').data('filter-value');
+        const visitProgress = $('button[data-filter-type="visitProgress"].active').data('filter-value');
+        const searchTerm = $('#search-input-main').val().toLowerCase();
+        const filtered = allVisits.filter(v => (recordStatus === 'all' || v.status == recordStatus) && (visitProgress === 'all' || v.progress == visitProgress) && (searchTerm === '' || `${v.user.firstname} ${v.user.lastname}`.toLowerCase().includes(searchTerm) || `${v.patient.firstname} ${v.patient.lastname}`.toLowerCase().includes(searchTerm)));
+        renderVisitList(filtered);
+    }
 
     function resetFormState() {
         Object.keys(newVisitState).forEach(k => newVisitState[k] = null);
@@ -220,7 +245,13 @@
         });
 
         // Tab switching logic (unchanged)
-        $('button[data-bs-toggle="tab"]').on('show.bs.tab', function(e) { /* ... unchanged ... */ });
+        $('button[data-bs-toggle="tab"]').on('show.bs.tab', function(e) {
+            const targetTab = e.target.id;
+            if (targetTab === 'patient-tab-btn' && !newVisitState.caregiverId) return false;
+            if (targetTab === 'patient-tab-btn') { $('#patient-selection-content').show(); $('#patient-selection-placeholder').hide(); fetchAssignedPatients(newVisitState.caregiverId).done(res => { allAssignedPatients = res.data.patients; renderSelectionList(allAssignedPatients, 'patient-selection-list', 'patient'); }); }
+            if (targetTab === 'address-tab-btn' && !newVisitState.patientId) return false;
+            if (targetTab === 'address-tab-btn') { $('#address-selection-content').show(); $('#address-selection-placeholder').hide(); fetchPatientAddresses(newVisitState.patientId).done(res => { allPatientAddresses = res.data; renderSelectionList(allPatientAddresses, 'address-selection-list', 'address'); }); }
+        });
 
         // MODIFIED: "Create Visit" button logic updated
         $('#create-visit-btn').on('click', function() {
@@ -256,7 +287,7 @@
             }
 
             $.ajax({
-                url: `${baseUrl}/visit`, type: 'POST',
+                url: `${baseUrl}/visit/schedule`, type: 'POST',
                 headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
                 data: JSON.stringify(payload),
                 success: () => {
