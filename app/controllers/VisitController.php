@@ -37,9 +37,9 @@ class VisitController extends BaseController {
      */
     public function detailAction() {
         // SECURITY CHECK: Stop execution if user is not Admin or Manager
-        if (!$this->requireAnyRole([Role::ADMINISTRATOR, Role::MANAGER])) {
-            return; // Important: Stop processing if the check fails
-        }
+//        if (!$this->requireAnyRole([Role::ADMINISTRATOR, Role::MANAGER])) {
+//            return; // Important: Stop processing if the check fails
+//        }
 
         // Get the userId from the URL parameter.
         // If it's not present in the URL, this will be null.
