@@ -181,7 +181,7 @@
         const fetchAssignedPatients = () => $.ajax({ url: `${baseUrl}/assigned/patients/${caregiverId}`, headers: { 'Authorization': authToken } });
         const fetchPatientAddresses = (patientId) => $.ajax({ url: `${baseUrl}/address/person/${patientId}/1`, headers: { 'Authorization': authToken } });
         const performVisitAction = (action, visitId) => {
-            $.ajax({ url: `${baseUrl}/visit/${visitId}/${action}`, type: 'PUT', headers: { 'Authorization': authToken },
+            $.ajax({ url: `${baseUrl}/visit/${visitId}/${action}`, type: 'PUT', headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
                 success: (res) => { showAlert(res.message || `Visit ${action} successful.`, 'success'); fetchMyVisits(); },
                 error: (xhr) => showAlert(xhr.responseJSON?.message || `Failed to ${action} visit.`, 'danger')
             });
@@ -260,7 +260,7 @@
             const { patientId, addressId, visitDate, startTime, totalHours } = newVisitState;
             const payload = { user_id: caregiverId, patient_id: patientId, address_id: addressId, visit_date: new Date(visitDate).toISOString().slice(0, 10), total_hours: totalHours };
             if (startTime) { const startDatetime = new Date(visitDate); startDatetime.setHours(startTime.h, startTime.m, 0, 0); payload.start_time = startDatetime.toISOString().slice(0, 19).replace('T', ' '); }
-            $.ajax({ url: `${baseUrl}/visit`, type: 'POST', headers: { 'Authorization': authToken, 'Content-Type': 'application/json' }, data: JSON.stringify(payload),
+            $.ajax({ url: `${baseUrl}/visit/schedule`, type: 'POST', headers: { 'Authorization': authToken, 'Content-Type': 'application/json' }, data: JSON.stringify(payload),
                 success: () => { showAlert('Visit created!', 'success'); visitConfirmationModal.hide(); assignVisitOffcanvas.hide(); fetchMyVisits(); },
                 error: (xhr) => showAlert(xhr.responseJSON?.message || 'Failed to create visit.', 'danger')
             });
