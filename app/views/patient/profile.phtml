@@ -245,10 +245,12 @@
     function savePatient(patientId) {
         const updatedFields = {};
         const formData = {
-            firstname: $('#firstname-edit').val(), middlename: $('#middlename-edit').val(),
+            firstname: $('#firstname-edit').val(),
+            middlename: $('#middlename-edit').val(),
             lastname: $('#lastname-edit').val(),
             phone: $('#phone-edit').val(),
-            ssn: $('#patient-edit').val(), code: $('#admission-edit').val()
+            patient: $('#patient-edit').val(),
+            admission: $('#admission-edit').val()
         };
 
         for (const key in formData) {
