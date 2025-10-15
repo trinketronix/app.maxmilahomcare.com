@@ -75,7 +75,21 @@
     <header class="header">
         <a href="/signout" class="back-button"><i class="fas fa-chevron-left"></i> sign out</a>
         <h1 class="header-title">My Visits</h1>
-        <div class="profile"><div class="profile-icon"><img src="<?=$photo?>" alt="avatar"></div><span class="profile-username"><?=$fullname?></span></div>
+        <!--<div class="profile"><div class="profile-icon"><img src="<?=$photo?>" alt="avatar"></div><span class="profile-username"><?=$fullname?></span></div> -->
+        <div class="profile" id="profile-link" style="cursor:pointer;">
+            <div class="profile-icon">
+                <img src="<?=$photo?>" alt="avatar">
+            </div>
+            <span class="profile-username"><?=$fullname?></span>
+        </div>
+
+        <script>
+            document.getElementById('profile-link').addEventListener('click', () => {
+                // Redirect to caregiver’s own profile
+                window.location.href = '/caregiver/profile/<?=$userId?>';
+            });
+        </script>
+
     </header>
     <section class="controls-section">
         <div class="input-group search-bar mb-3"><input type="text" id="search-input-main" class="form-control" placeholder="Search by patient name..."><button class="btn btn-dark" type="button" id="main-search-btn">Search</button></div>
