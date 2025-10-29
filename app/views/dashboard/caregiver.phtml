@@ -358,8 +358,8 @@
 
                 // Visit actions
                 this.elements.visitList.on('click', '.visit-card', this.handlers.onVisitCardClick.bind(this));
-                this.elements.actionCheckinBtn.on('click', () => this.handlers.onPerformAction('checkin'));
-                this.elements.actionCheckoutBtn.on('click', () => this.handlers.onPerformAction('checkout'));
+                this.elements.actionCheckinBtn.on('click', this.handlers.onPerformAction.bind(this, 'checkin'));
+                this.elements.actionCheckoutBtn.on('click', this.handlers.onPerformAction.bind(this, 'checkout'));
 
                 // New visit creation flow
                 this.elements.addVisitBtn.on('click', this.handlers.onAddVisitClick.bind(this));
