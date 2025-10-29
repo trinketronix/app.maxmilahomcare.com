@@ -269,7 +269,7 @@
 <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/datepicker-full.min.js"></script>
 
 <script>
-    $(document).ready(function() {
+    $(document.ready(function() {
         /**
          * Encapsulates the entire functionality for the Caregiver Visits page
          * to improve readability, maintainability, and organization.
@@ -323,17 +323,16 @@
                 actions: null,
                 visitConfirmation: null,
                 assignVisit: null,
+                datepicker: null // Property to store the datepicker instance
             },
 
             // Initialization function
             init() {
-                // Prevent execution if essential data is missing
                 if (!this.state.caregiverId) {
                     console.error("Caregiver ID is not available.");
                     return;
                 }
 
-                this.cacheDOM();
                 this.initComponents();
                 this.bindEvents();
                 this.resetNewVisitState();
@@ -341,15 +340,13 @@
                 this.api.fetchVisits();
             },
 
-            // Cache dynamic selectors not defined in 'elements'
-            cacheDOM() {},
-
             // Initialize Bootstrap and other third-party components
             initComponents() {
                 this.modals.actions = new bootstrap.Modal(document.getElementById('actionsModal'));
                 this.modals.visitConfirmation = new bootstrap.Modal(document.getElementById('visitConfirmationModal'));
                 this.modals.assignVisit = new bootstrap.Offcanvas(this.elements.assignVisitOffcanvas[0]);
-                new Datepicker(this.elements.datepickerContainer, { format: 'yyyy-mm-dd', autohide: true, todayHighlight: true });
+                // Store the created instance in our state
+                this.modals.datepicker = new Datepicker(this.elements.datepickerContainer, { format: 'yyyy-mm-dd', autohide: true, todayHighlight: true });
             },
 
             // Centralized event listeners
@@ -465,9 +462,11 @@
                 },
 
                 onDateChange(e) {
+                    // When a date is picked, this.state.newVisit is updated
                     this.state.newVisit.visitDate = e.detail.date;
                     this.checkFormCompleteness();
                 },
+
 
                 onTimeChange() {
                     const h = $('#start-time-picker-hour').val();
@@ -585,7 +584,7 @@
                     const visitCardsHTML = visits.map(v => {
                         const h = CaregiverApp.helpers;
                         const patientName = `${v.patient.firstname} ${v.patient.lastname}`;
-                        const patientPhoto = (v.patient.photo && !v.patient.photo.endsWith('default.jpg')) ? `${h.config.baseUrl}${v.patient.photo}` : 'https://via.placeholder.com/60';
+                        const patientPhoto = (v.patient.photo && !v.patient.photo.endsWith('default.jpg')) ? `${CaregiverApp.state.baseUrl}${v.patient.photo}` : 'https://via.placeholder.com/60';
                         const progressText = h.getProgressText(v.progress);
                         const duration = v.duration_minutes ? Math.floor(v.duration_minutes / 60) : (v.total_hours || 0);
                         const isCanceled = progressText === 'Canceled' ? 'visit-progress-canceled' : '';
@@ -614,15 +613,12 @@
                         return;
                     }
 
-                    // Use CaregiverApp.state.baseUrl directly for correct access
                     const baseUrl = CaregiverApp.state.baseUrl;
-
                     const itemsHTML = items.map(item => {
                         let id, name, photo, iconClass;
                         if (type === 'patient') {
                             id = item.id;
                             name = `${item.firstname || ''} ${item.lastname || ''}`.trim();
-                            // THIS LINE IS NOW CORRECT
                             photo = (item.photo && !item.photo.endsWith('default.jpg')) ? `${baseUrl}${item.photo}` : null;
                             iconClass = 'fa-user';
                         } else { // address
@@ -637,13 +633,13 @@
                             : `<i class="fa-solid ${iconClass} fs-3"></i>`;
 
                         return `
-                <div class="selection-item" data-id="${id}" data-name="${name}">
-                    <div class="item-avatar">${avatarHTML}</div>
-                    <div>${name}</div>
-                </div>`;
+                            <div class="selection-item" data-id="${id}" data-name="${name}">
+                                <div class="item-avatar">${avatarHTML}</div>
+                                <div>${name}</div>
+                            </div>`;
                     }).join('');
                     listContainer.html(itemsHTML);
-                }, // <-- Notice the comma and the removal of .bind()
+                },
 
                 timePicker(containerId) {
                     const container = $(`#${containerId}`); container.empty();
@@ -707,8 +703,10 @@
                 this.elements.totalHoursSelect.val('');
                 this.render.timePicker('start-time-picker');
 
-                const datepicker = Datepicker.getInstance(this.elements.datepickerContainer);
-                if (datepicker) datepicker.setDate({ clear: true });
+                // Use the stored instance to clear the date
+                if (this.modals.datepicker) {
+                    this.modals.datepicker.setDate({ clear: true });
+                }
 
                 const patientTab = bootstrap.Tab.getOrCreateInstance(this.elements.patientTabBtn);
                 if(patientTab) patientTab.show();
@@ -718,6 +716,5 @@
         CaregiverApp.init();
     });
 </script>
-
 </body>
 </html>
