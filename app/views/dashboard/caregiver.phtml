@@ -614,12 +614,16 @@
                         return;
                     }
 
+                    // Use CaregiverApp.state.baseUrl directly for correct access
+                    const baseUrl = CaregiverApp.state.baseUrl;
+
                     const itemsHTML = items.map(item => {
                         let id, name, photo, iconClass;
                         if (type === 'patient') {
                             id = item.id;
                             name = `${item.firstname || ''} ${item.lastname || ''}`.trim();
-                            photo = (item.photo && !item.photo.endsWith('default.jpg')) ? `${this.config.baseUrl}${item.photo}` : null;
+                            // THIS LINE IS NOW CORRECT
+                            photo = (item.photo && !item.photo.endsWith('default.jpg')) ? `${baseUrl}${item.photo}` : null;
                             iconClass = 'fa-user';
                         } else { // address
                             id = item.id;
@@ -633,13 +637,13 @@
                             : `<i class="fa-solid ${iconClass} fs-3"></i>`;
 
                         return `
-                            <div class="selection-item" data-id="${id}" data-name="${name}">
-                                <div class="item-avatar">${avatarHTML}</div>
-                                <div>${name}</div>
-                            </div>`;
+                <div class="selection-item" data-id="${id}" data-name="${name}">
+                    <div class="item-avatar">${avatarHTML}</div>
+                    <div>${name}</div>
+                </div>`;
                     }).join('');
                     listContainer.html(itemsHTML);
-                }.bind({ config: this.state }), // Bind context for baseUrl
+                }, // <-- Notice the comma and the removal of .bind()
 
                 timePicker(containerId) {
                     const container = $(`#${containerId}`); container.empty();
