@@ -584,7 +584,7 @@
                     const visitCardsHTML = visits.map(v => {
                         const h = CaregiverApp.helpers;
                         const patientName = `${v.patient.firstname} ${v.patient.lastname}`;
-                        const patientPhoto = (v.patient.photo && !v.patient.photo.endsWith('default.jpg')) ? `${CaregiverApp.state.baseUrl}${v.patient.photo}` : 'https://via.placeholder.com/60';
+                        const patientPhoto = v.patient.photo;
                         const progressText = h.getProgressText(v.progress);
                         const duration = v.duration_minutes ? Math.floor(v.duration_minutes / 60) : (v.total_hours || 0);
                         const isCanceled = progressText === 'Canceled' ? 'visit-progress-canceled' : '';
@@ -619,7 +619,7 @@
                         if (type === 'patient') {
                             id = item.id;
                             name = `${item.firstname || ''} ${item.lastname || ''}`.trim();
-                            photo = (item.photo && !item.photo.endsWith('default.jpg')) ? `${baseUrl}${item.photo}` : null;
+                            photo = item.photo;
                             iconClass = 'fa-user';
                         } else { // address
                             id = item.id;
