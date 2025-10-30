@@ -18,8 +18,6 @@
     <style>
         html, body { height: 100vh; overflow: hidden; background-color: #f0f2f5; font-family: 'Segoe UI', 'Roboto', sans-serif; }
         .page-container { display: flex; flex-direction: column; height: 100vh; max-width: 500px; margin: 0 auto; background-color: #ffffff; border-left: 1px solid #dcdcdc; border-right: 1px solid #dcdcdc; position: relative; }
-
-        /* Header & User Info */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; position: relative; }
         .back-button { text-decoration: none; color: #333; font-weight: 500; }
         .header-title-group { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; }
@@ -27,23 +25,18 @@
         .profile-icon { font-size: 1.5rem; border: 2px solid #000; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; margin: 0 auto; overflow: hidden; }
         .profile-icon img { width: 100%; height: 100%; object-fit: cover; }
         .profile-username { font-size: 0.8rem; color: #555; margin-top: 4px; }
-
         .user-info-section { display: flex; padding: 1rem; gap: 1rem; align-items: center; border-bottom: 1px solid #e0e0e0; flex-shrink: 0; }
         .user-avatar-container { text-align: center; }
         .user-avatar { width: 80px; height: 80px; border: 2px solid #000; padding: 0.3rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; }
         .user-avatar img { max-width: 100%; max-height: 100%; object-fit: cover; }
         .user-role { font-weight: 500; font-size: 0.9rem; }
         .user-name-container { font-size: 1.1rem; font-weight: 500; }
-
-        /* Address List */
         .address-list-container { flex-grow: 1; overflow-y: auto; padding: 1rem; padding-bottom: 120px; }
         .address-item { display: flex; align-items: center; gap: 1rem; border: 2px solid #000; border-radius: 15px; padding: 1rem; margin-bottom: 1rem; cursor: pointer; transition: background-color 0.2s; }
         .address-item:hover { background-color: #f1f1f1; }
         .address-icon { font-size: 2.5rem; color: #333; }
         .address-details { line-height: 1.4; }
         .address-line-1 { font-weight: bold; }
-
-        /* FAB, Modals & Alerts */
         .fab { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; border-radius: 50%; background-color: #e0e0e0; border: 3px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 500; text-decoration: none; color: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1040; }
         .fab .plus-icon { font-size: 2rem; line-height: 1; }
         #alert-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px; }
@@ -69,6 +62,7 @@
 
     <section class="user-info-section">
         <div class="user-avatar-container">
+            <!-- *** MODIFICATION 1 of 2: src="" and style="display: none;" *** -->
             <div class="user-avatar"><img id="patient-avatar-img" src="" alt="Patient" style="display: none;"></div>
             <div class="user-role">Patient</div>
         </div>
@@ -87,23 +81,7 @@
 <a href="#" class="fab" id="add-address-btn"><div class="plus-icon">+</div><div>Address</div></a>
 
 <div class="modal fade" id="confirmEditModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Edit Address</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><h4 class="text-center">Confirm to edit this address?</h4><div class="confirmation-modal-body"><div class="confirmation-option" id="confirm-yes-btn"><i class="fa-solid fa-check"></i>Yes</div><div class="confirmation-option" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i>No</div></div></div></div></div></div>
-
-<div class="offcanvas offcanvas-bottom" tabindex="-1" id="addressFormOffcanvas" style="height: auto;">
-    <div class="offcanvas-header"><h5 class="offcanvas-title w-100 text-center" id="offcanvas-title"></h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button></div>
-    <div class="offcanvas-body">
-        <form id="address-form" class="mx-auto" style="max-width: 400px;" onsubmit="return false;">
-            <input type="hidden" id="form-address-id">
-            <div class="mb-3"><label class="form-label">Address</label><input type="text" class="form-control" id="form-address" required></div>
-            <div class="mb-3"><label class="form-label">City</label><input type="text" class="form-control" id="form-city" required></div>
-            <div class="mb-3"><label class="form-label">Zip Code</label><input type="text" class="form-control" id="form-zipcode" required></div>
-            <div class="mb-3"><label class="form-label">Type</label><select class="form-select" id="form-type"><option value="House">House</option><option value="Apartment">Apartment</option><option value="Other">Other</option></select></div>
-            <div class="mb-3"><label class="form-label">County</label><input type="text" class="form-control" id="form-county"></div>
-            <div class="mb-3"><label class="form-label">State</label><input type="text" class="form-control" id="form-state" value="MI" disabled></div>
-            <div class="mb-3"><label class="form-label">Country</label><input type="text" class="form-control" id="form-country" value="United States" disabled></div>
-            <button type="submit" class="btn w-100" style="border: 2px solid #000; font-weight: 500;" id="save-address-btn">Save</button>
-        </form>
-    </div>
-</div>
+<div class="offcanvas offcanvas-bottom" tabindex="-1" id="addressFormOffcanvas" style="height: auto;"><div class="offcanvas-header"><h5 class="offcanvas-title w-100 text-center" id="offcanvas-title"></h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button></div><div class="offcanvas-body"><form id="address-form" class="mx-auto" style="max-width: 400px;" onsubmit="return false;"><input type="hidden" id="form-address-id"><div class="mb-3"><label class="form-label">Address</label><input type="text" class="form-control" id="form-address" required></div><div class="mb-3"><label class="form-label">City</label><input type="text" class="form-control" id="form-city" required></div><div class="mb-3"><label class="form-label">Zip Code</label><input type="text" class="form-control" id="form-zipcode" required></div><div class="mb-3"><label class="form-label">Type</label><select class="form-select" id="form-type"><option value="House">House</option><option value="Apartment">Apartment</option><option value="Other">Other</option></select></div><div class="mb-3"><label class="form-label">County</label><input type="text" class="form-control" id="form-county"></div><div class="mb-3"><label class="form-label">State</label><input type="text" class="form-control" id="form-state" value="MI" disabled></div><div class="mb-3"><label class="form-label">Country</label><input type="text" class="form-control" id="form-country" value="United States" disabled></div><button type="submit" class="btn w-100" style="border: 2px solid #000; font-weight: 500;" id="save-address-btn">Save</button></form></div></div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -112,24 +90,19 @@
         const PatientAddressesApp = {
             state: {
                 patientId: <?= json_encode($targetPatientId ?? null) ?>,
-                personType: <?= json_encode($personType ?? 1) ?>, // Assuming 1 for patient
+                personType: <?= json_encode($personType ?? 1) ?>,
                 baseUrl: <?= json_encode($baseUrl ?? '') ?>,
                 authToken: <?= json_encode($authToken ?? '') ?>,
-                allAddresses: [],
-                selectedAddressId: null,
+                allAddresses: [], selectedAddressId: null,
             },
-
             elements: {
-                alertContainer: $('#alert-container'),
-                patientAvatar: $('#patient-avatar-img'), patientFirstname: $('#patient-firstname'),
+                alertContainer: $('#alert-container'), patientAvatar: $('#patient-avatar-img'), patientFirstname: $('#patient-firstname'),
                 patientMiddlename: $('#patient-middlename'), patientLastname: $('#patient-lastname'),
                 addressList: $('#address-list'), addAddressBtn: $('#add-address-btn'),
                 backBtn: $('#back-button'), confirmYesBtn: $('#confirm-yes-btn'),
                 offcanvasTitle: $('#offcanvas-title'), addressForm: $('#address-form'),
             },
-
             modals: { offcanvas: null, confirmation: null },
-
             init() {
                 if (!this.state.patientId) { this.helpers.showAlert('Patient ID is missing.', 'danger'); return; }
                 this.modals.offcanvas = new bootstrap.Offcanvas('#addressFormOffcanvas');
@@ -137,7 +110,6 @@
                 this.bindEvents();
                 this.api.fetchInitialData();
             },
-
             bindEvents() {
                 this.elements.backBtn.on('click', e => { e.preventDefault(); window.history.back(); });
                 this.elements.addAddressBtn.on('click', e => { e.preventDefault(); this.handlers.openForm('add'); });
@@ -145,12 +117,8 @@
                 this.elements.confirmYesBtn.on('click', this.handlers.onConfirmEdit);
                 this.elements.addressForm.on('submit', this.handlers.onFormSubmit);
             },
-
             handlers: {
-                onAddressClick(e) {
-                    PatientAddressesApp.state.selectedAddressId = $(e.currentTarget).data('address-id');
-                    PatientAddressesApp.modals.confirmation.show();
-                },
+                onAddressClick(e) { PatientAddressesApp.state.selectedAddressId = $(e.currentTarget).data('address-id'); PatientAddressesApp.modals.confirmation.show(); },
                 onConfirmEdit() {
                     const app = PatientAddressesApp;
                     const address = app.state.allAddresses.find(addr => addr.id == app.state.selectedAddressId);
@@ -162,11 +130,7 @@
                     app.elements.addressForm[0].reset();
                     app.elements.offcanvasTitle.text(mode === 'edit' ? 'Edit Address' : 'Add New Address');
                     $('#form-address-id').val(data ? data.id : '');
-                    if (data) {
-                        $('#form-address').val(data.address); $('#form-city').val(data.city);
-                        $('#form-zipcode').val(data.zipcode); $('#form-type').val(data.type);
-                        $('#form-county').val(data.county);
-                    }
+                    if (data) { $('#form-address').val(data.address); $('#form-city').val(data.city); $('#form-zipcode').val(data.zipcode); $('#form-type').val(data.type); $('#form-county').val(data.county); }
                     app.modals.offcanvas.show();
                 },
                 onFormSubmit(e) {
@@ -182,36 +146,24 @@
                     app.api.saveAddress(payload, addressId);
                 }
             },
-
             api: {
-                _ajax: settings => $.ajax({ ...settings, headers: { 'Authorization': PatientAddressesApp.state.authToken }, dataType: 'json' })
-                    .fail(err => PatientAddressesApp.helpers.showAlert(err.responseJSON?.message || 'API request failed.', 'danger')),
-
-                // *** THIS IS THE CORRECTED FUNCTION ***
+                _ajax: settings => $.ajax({ ...settings, headers: { 'Authorization': PatientAddressesApp.state.authToken }, dataType: 'json' }).fail(err => PatientAddressesApp.helpers.showAlert(err.responseJSON?.message || 'API request failed.', 'danger')),
                 fetchInitialData() {
                     $.when(
                         this._ajax({ url: `${PatientAddressesApp.state.baseUrl}/patient/${PatientAddressesApp.state.patientId}` }),
                         this._ajax({ url: `${PatientAddressesApp.state.baseUrl}/address/person/${PatientAddressesApp.state.patientId}/${PatientAddressesApp.state.personType}` })
                     ).done((patientApiResponse, addressApiResponse) => {
-                        // Correctly access the data object, which is the first element of the response array
                         const patientData = patientApiResponse[0].data;
                         const addressesData = addressApiResponse[0].data;
-
                         PatientAddressesApp.render.patientHeader(patientData);
                         PatientAddressesApp.state.allAddresses = addressesData;
                         PatientAddressesApp.render.addressList(addressesData);
-
                     }).fail(() => PatientAddressesApp.helpers.showAlert('Could not load initial page data.', 'danger'));
                 },
-
                 fetchAddresses() {
                     return this._ajax({ url: `${PatientAddressesApp.state.baseUrl}/address/person/${PatientAddressesApp.state.patientId}/${PatientAddressesApp.state.personType}` })
-                        .done(res => {
-                            PatientAddressesApp.state.allAddresses = res.data;
-                            PatientAddressesApp.render.addressList(res.data);
-                        });
+                        .done(res => { PatientAddressesApp.state.allAddresses = res.data; PatientAddressesApp.render.addressList(res.data); });
                 },
-
                 saveAddress(payload, addressId = null) {
                     const isEdit = !!addressId;
                     this._ajax({
@@ -222,40 +174,30 @@
                     }).done(() => {
                         PatientAddressesApp.helpers.showAlert(`Address successfully ${isEdit ? 'updated' : 'added'}!`, 'success');
                         PatientAddressesApp.modals.offcanvas.hide();
-                        this.fetchAddresses(); // Re-fetch the list to show changes
+                        this.fetchAddresses();
                     });
                 }
             },
-
             render: {
+                // *** MODIFICATION 2 of 2: The updated rendering logic ***
                 patientHeader(data) {
                     if (!data) return;
-                    if (data.photo) PatientAddressesApp.elements.patientAvatar.attr('src', PatientAddressesApp.state.baseUrl + data.photo);
+                    const photoUrl = PatientAddressesApp.state.baseUrl + data.photo;
+                    PatientAddressesApp.elements.patientAvatar.attr('src', photoUrl).fadeIn();
                     PatientAddressesApp.elements.patientFirstname.text(data.firstname || '');
                     PatientAddressesApp.elements.patientMiddlename.text(data.middlename || '');
                     PatientAddressesApp.elements.patientLastname.text(data.lastname || '');
                 },
                 addressList(addresses) {
                     const listContainer = PatientAddressesApp.elements.addressList.empty();
-                    if (!addresses?.length) {
-                        listContainer.html('<p class="text-center text-muted mt-4">No addresses found for this patient.</p>');
-                        return;
-                    }
+                    if (!addresses?.length) { listContainer.html('<p class="text-center text-muted mt-4">No addresses for this patient.</p>'); return; }
                     const itemsHTML = addresses.map(addr => {
                         const icon = addr.type === 'Apartment' ? 'fa-building' : 'fa-house';
-                        return `
-                            <div class="address-item" data-address-id="${addr.id}">
-                                <i class="fa-solid ${icon} address-icon"></i>
-                                <div class="address-details">
-                                    <div class="address-line-1">${addr.address}</div>
-                                    <div>${addr.city}, ${addr.state} ${addr.zipcode}</div>
-                                </div>
-                            </div>`;
+                        return `<div class="address-item" data-address-id="${addr.id}"><i class="fa-solid ${icon} address-icon"></i><div class="address-details"><div class="address-line-1">${addr.address}</div><div>${addr.city}, ${addr.state} ${addr.zipcode}</div></div></div>`;
                     }).join('');
                     listContainer.html(itemsHTML);
                 }
             },
-
             helpers: {
                 showAlert(message, type = 'success') {
                     const alertHTML = `<div class="alert alert-${type} alert-dismissible fade show">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
@@ -263,7 +205,6 @@
                 },
             }
         };
-
         PatientAddressesApp.init();
     });
 </script>
