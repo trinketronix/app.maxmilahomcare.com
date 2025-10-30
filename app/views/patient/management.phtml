@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?=$pageTitle?></title>
+    <title><?=$pageTitle ?? 'Patient Management'?></title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="../img/fav/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../img/fav/favicon-32x32.png">
@@ -11,119 +11,68 @@
     <link rel="manifest" href="../site.webmanifest">
     <link rel="shortcut icon" href="../img/fav/favicon.ico">
 
-    <!-- Bootstrap 5.1 CSS -->
+    <!-- Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Font Awesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
     <style>
-        html, body {
-            height: 100vh;
-            overflow: hidden;
-            background-color: #f0f2f5;
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
-        }
+        html, body { height: 100vh; overflow: hidden; background-color: #f0f2f5; font-family: 'Segoe UI', 'Roboto', sans-serif; }
+        .page-container { display: flex; flex-direction: column; height: 100vh; max-width: 500px; margin: 0 auto; background-color: #ffffff; border-left: 1px solid #dcdcdc; border-right: 1px solid #dcdcdc; position: relative; }
 
-        .page-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            max-width: 500px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            border-left: 1px solid #dcdcdc;
-            border-right: 1px solid #dcdcdc;
-            position: relative;
-        }
-
-        /* --- Header & Controls (Fixed) --- */
+        /* Header & Controls */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; position: relative; flex-shrink: 0; }
         .back-button { text-decoration: none; color: #333; font-weight: 500; }
         .header-title { font-size: 1.8rem; font-weight: bold; margin: 0; position: absolute; left: 50%; transform: translateX(-50%); }
-        .profile { text-align: center; }
+        .header-subtitle { position: absolute; left: 50%; transform: translateX(-50%); top: 4.5rem; font-size: 1.5rem; color: #555; }
         .profile-icon { font-size: 1.5rem; border: 2px solid #000; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; margin: 0 auto; overflow: hidden; }
         .profile-icon img { width: 100%; height: 100%; object-fit: cover; }
         .profile-username { font-size: 0.8rem; color: #555; margin-top: 4px; }
+
         .controls-section { padding: 1rem; background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0; flex-shrink: 0; }
         .search-bar .form-control, .search-bar .btn { border-radius: 8px; border: 2px solid #000; }
         .filter-buttons { display: flex; overflow-x: auto; padding-top: 1rem; gap: 0.5rem; }
+        .filter-buttons::-webkit-scrollbar { display: none; }
         .filter-btn { border: 2px solid #000; border-radius: 8px; background-color: #fff; color: #000; font-weight: 500; white-space: nowrap; }
         .filter-btn.active { background-color: #000; color: #fff; }
-        .filter-buttons::-webkit-scrollbar { display: none; }
 
-        /* --- Patient List (Scrollable) --- */
-        .patient-list-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            padding-bottom: 120px; /* Space for FAB */
-        }
-        .patient-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            border: 2px solid #000; border-radius: 15px;
-            padding: 1rem; margin-bottom: 1rem; cursor: pointer;
-            transition: background-color 0.2s;
-            text-decoration: none;
-            color: inherit;
-        }
-        .patient-item:hover {
-            background-color: #f1f1f1;
-            color: inherit;
-        }
-        .patient-avatar {
-            width: 60px; height: 60px;
-            min-width: 60px;
-            border-radius: 50%; border: 3px solid #000;
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-        }
+        /* Patient List */
+        .patient-list-container { flex-grow: 1; overflow-y: auto; padding: 1rem; padding-bottom: 120px; }
+        .patient-item { display: flex; align-items: center; gap: 1rem; border: 2px solid #000; border-radius: 15px; padding: 1rem; margin-bottom: 1rem; cursor: pointer; transition: background-color 0.2s; text-decoration: none; color: inherit; }
+        .patient-item:hover { background-color: #f1f1f1; }
+        .patient-avatar { width: 60px; height: 60px; min-width: 60px; border-radius: 50%; border: 3px solid #000; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .patient-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .patient-info {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            width: 100%;
-            align-items: center;
-        }
-        .patient-name-block { grid-column: 1 / 2; }
+        .patient-info { display: grid; grid-template-columns: 1fr auto; width: 100%; align-items: center; }
         .patient-name { font-weight: bold; font-size: 1.1rem; }
         .patient-phone { color: #555; }
-        .patient-status { grid-column: 2 / 3; font-weight: bold; justify-self: end; }
-        .status-active { color: #198754; }
-        .status-inactive { color: #dc3545; }
-        .status-not-verified { color: #fd7e14; }
-        .status-archived { color: #6f42c1; }
-        .status-deleted { color: #6c757d; }
+        .patient-status { font-weight: bold; justify-self: end; }
+        .status-active { color: #198754; } .status-inactive { color: #dc3545; }
+        .status-not-verified { color: #fd7e14; } .status-archived { color: #6f42c1; } .status-deleted { color: #6c757d; }
 
-        /* --- FAB & Offcanvas --- */
+        /* FAB & Offcanvas */
         .fab { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90px; height: 90px; border-radius: 50%; background-color: #e0e0e0; border: 3px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 500; text-decoration: none; color: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1040; }
         .fab .plus-icon { font-size: 2rem; line-height: 1; }
         .fab .plus-text { font-size: 0.8em; }
         .offcanvas-header { border-bottom: 1px solid #dee2e6; }
         #resultModal .modal-footer { border-top: 0; }
         #resultModal .close-btn { background: #000; color: #fff; border-radius: 50%; width: 50px; height: 50px; border: 0; }
-
-        @media (min-width: 768px) { .page-container { max-width: 720px; } }
+        #alert-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px; }
     </style>
 </head>
-<body onload="initializePage()">
+<body>
 
-<div id="alert-container" style="position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px;"></div>
+<div id="alert-container"></div>
 
 <div class="page-container">
-    <!-- Header -->
     <header class="header">
         <a href="/dashboard/admin" class="back-button"><i class="fas fa-chevron-left"></i> Back</a>
         <h1 class="header-title">Management</h1>
-        <h2 class="header-subtitle" style="position: absolute; left: 50%; transform: translateX(-50%); top: 4.5rem; font-size: 1.5rem; color: #555;">Patients</h2>
+        <h2 class="header-subtitle">Patients</h2>
         <div class="profile">
             <div class="profile-icon"><img src="<?=$photo?>" alt="avatar"></div>
             <span class="profile-username"><?=$fullname?></span>
         </div>
     </header>
 
-    <!-- Controls -->
     <section class="controls-section">
         <div class="input-group search-bar">
             <input type="text" id="search-input" class="form-control" placeholder="Search patient...">
@@ -139,26 +88,15 @@
         </div>
     </section>
 
-    <!-- Patient List -->
     <main class="patient-list-container">
-        <div id="patient-list">
-            <div class="text-center p-5"><div class="spinner-border"></div></div>
-        </div>
+        <div id="patient-list"><div class="text-center p-5"><div class="spinner-border"></div></div></div>
     </main>
 </div>
 
-<!-- Floating Action Button -->
-<a href="#" class="fab" id="add-patient-btn">
-    <div class="plus-icon">+</div>
-    <div class="plus-text">Patient</div>
-</a>
+<a href="#" class="fab" id="add-patient-btn"><div class="plus-icon">+</div><div class="plus-text">Patient</div></a>
 
-<!-- Offcanvas for Add Patient Form -->
 <div class="offcanvas offcanvas-bottom" tabindex="-1" id="addPatientOffcanvas" style="height: auto;">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title w-100 text-center">Add Patient</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
-    </div>
+    <div class="offcanvas-header"><h5 class="offcanvas-title w-100 text-center">Add Patient</h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button></div>
     <div class="offcanvas-body">
         <form id="add-patient-form" class="mx-auto" style="max-width: 400px;">
             <div class="input-group mb-3"><span class="input-group-text"><i class="fa-solid fa-user"></i></span><input type="text" class="form-control" id="form-firstname" placeholder="First name" required></div>
@@ -170,167 +108,171 @@
     </div>
 </div>
 
-<!-- Modal for API Call Result -->
-<div class="modal fade" id="resultModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius: 15px;">
-            <div class="modal-header"><h5 class="modal-title w-100 text-center">Message</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body text-center fs-5 py-4" id="result-modal-message"></div>
-            <div class="modal-footer justify-content-center"><button type="button" class="close-btn" data-bs-dismiss="modal"><i class="fa-solid fa-xmark fs-4"></i></button></div>
-        </div>
-    </div>
-</div>
+<div class="modal fade" id="resultModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content" style="border-radius: 15px;"><div class="modal-header"><h5 class="modal-title w-100 text-center">Message</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body text-center fs-5 py-4" id="result-modal-message"></div><div class="modal-footer justify-content-center"><button type="button" class="close-btn" data-bs-dismiss="modal"><i class="fa-solid fa-xmark fs-4"></i></button></div></div></div></div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const baseUrl = '<?=$baseUrl?>';
-    const authToken = '<?=$authToken?>';
+    $(document).ready(function() {
+        const PatientManagementApp = {
+            state: {
+                baseUrl: <?= json_encode($baseUrl ?? '') ?>,
+                authToken: <?= json_encode($authToken ?? '') ?>,
+                allPatients: [],
+            },
 
-    let allPatients = [];
-    let addPatientOffcanvas;
-    let resultModal;
+            elements: {
+                alertContainer: $('#alert-container'), patientList: $('#patient-list'),
+                searchInput: $('#search-input'), searchButton: $('#search-button'),
+                filterButtons: $('.filter-btn'), addPatientBtn: $('#add-patient-btn'),
+                addPatientForm: $('#add-patient-form'), resultModalMessage: $('#result-modal-message'),
+            },
 
-    // --- HELPER FUNCTIONS ---
-    const getStatusInfo = status => {
-        const map = {
-            '-1': { text: "Not Verified", class: "status-not-verified" }, '0': { text: "Inactive", class: "status-inactive" },
-            '1': { text: "Active", class: "status-active" }, '2': { text: "Archived", class: "status-archived" },
-            '3': { text: "Deleted", class: "status-deleted" }
-        };
-        return map[status] || { text: 'Unknown', class: '' };
-    };
+            modals: { addPatient: null, result: null },
 
-    const showAlert = (message, type = 'success') => {
-        const alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
-        $('#alert-container').html(alertHtml).find('.alert').delay(4000).fadeOut();
-    };
+            init() {
+                this.modals.addPatient = new bootstrap.Offcanvas(document.getElementById('addPatientOffcanvas'));
+                this.modals.result = new bootstrap.Modal(document.getElementById('resultModal'));
+                this.bindEvents();
+                this.api.fetchPatients();
+            },
 
-    const showResultModal = (message, type = 'success') => {
-        $('#result-modal-message').text(message).removeClass('text-danger text-success').addClass(type === 'success' ? 'text-success' : 'text-danger');
-        resultModal.show();
-    };
+            bindEvents() {
+                this.elements.filterButtons.on('click', this.handlers.onFilterClick);
+                const debouncedSearch = this.helpers.debounce(this.handlers.applyFilters, 300);
+                this.elements.searchInput.on('keyup', debouncedSearch);
+                this.elements.searchButton.on('click', this.handlers.applyFilters);
+                this.elements.addPatientBtn.on('click', e => { e.preventDefault(); this.modals.addPatient.show(); });
+                this.elements.addPatientForm.on('submit', this.handlers.onNewPatientSubmit);
 
-    const renderPatientsList = (patients) => {
-        const listContainer = $('#patient-list');
-        listContainer.empty();
-        if (!patients || patients.length === 0) {
-            listContainer.html('<p class="text-center text-muted">No patients found.</p>');
-            return;
-        }
-        patients.forEach(patient => {
-            const fullName = `${patient.firstname || ''} ${patient.lastname || ''}`.trim();
-            const photoSrc = baseUrl + patient.photo;
-            const statusInfo = getStatusInfo(patient.status);
-            const cardHtml = `
-                    <a href="/patient/profile/${patient.id}" class="patient-item" data-patient-id="${patient.id}" data-status="${patient.status}">
-                        <div class="patient-avatar"><img src="${photoSrc}" alt="Avatar"></div>
-                        <div class="patient-info">
-                            <div class="patient-name-block">
-                                <div class="patient-name">${fullName}</div>
-                                <div class="patient-phone">${patient.phone || 'No phone'}</div>
+                window.addEventListener('pageshow', e => { if (e.persisted) this.api.fetchPatients(); });
+            },
+
+            handlers: {
+                applyFilters() {
+                    const term = PatientManagementApp.elements.searchInput.val().toLowerCase();
+                    const status = PatientManagementApp.elements.filterButtons.filter('.active').data('filter-status').toString();
+
+                    const filtered = PatientManagementApp.state.allPatients.filter(patient => {
+                        const statusMatch = (status === 'all' || patient.status.toString() === status);
+                        const name = `${patient.firstname || ''} ${patient.lastname || ''}`.toLowerCase();
+                        const searchMatch = !term || name.includes(term);
+                        return statusMatch && searchMatch;
+                    });
+
+                    PatientManagementApp.render.patientList(filtered);
+                },
+
+                onFilterClick(e) {
+                    $(e.currentTarget).addClass('active').siblings().removeClass('active');
+                    PatientManagementApp.handlers.applyFilters();
+                },
+
+                onNewPatientSubmit(e) {
+                    e.preventDefault();
+                    const payload = {
+                        firstname: $('#form-firstname').val(),
+                        lastname: $('#form-lastname').val(),
+                        phone: $('#form-phone').val(),
+                    };
+                    const middlename = $('#form-middlename').val();
+                    if (middlename) payload.middlename = middlename;
+
+                    PatientManagementApp.api.createPatient(payload);
+                }
+            },
+
+            api: {
+                _ajax: settings => $.ajax({ ...settings, headers: { 'Authorization': PatientManagementApp.state.authToken }, dataType: 'json' })
+                    .fail(err => PatientManagementApp.helpers.showAlert(err.responseJSON?.message || 'API request failed.', 'danger')),
+
+                fetchPatients() {
+                    PatientManagementApp.elements.patientList.html('<div class="text-center p-5"><div class="spinner-border"></div></div>');
+                    this._ajax({ url: `${PatientManagementApp.state.baseUrl}/patients` })
+                        .done(res => {
+                            PatientManagementApp.state.allPatients = res.status === 'success' ? res.data.patients : [];
+                            PatientManagementApp.handlers.applyFilters();
+                            if(res.status === 'success') PatientManagementApp.helpers.showAlert(`Loaded ${res.data.count} patients.`, 'success');
+                        });
+                },
+
+                createPatient(payload) {
+                    this._ajax({
+                        url: `${PatientManagementApp.state.baseUrl}/patient/new`,
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(payload),
+                    }).done(() => {
+                        PatientManagementApp.helpers.showResultModal('Patient added successfully!', 'success');
+                        PatientManagementApp.modals.addPatient.hide();
+                        PatientManagementApp.elements.addPatientForm.reset();
+                        this.fetchPatients();
+                    }).fail(err => PatientManagementApp.helpers.showResultModal(err.responseJSON?.message || 'Failed to add patient.', 'danger'));
+                }
+            },
+
+            render: {
+                patientList(patients) {
+                    const listContainer = PatientManagementApp.elements.patientList;
+                    if (!patients?.length) {
+                        listContainer.html('<p class="text-center text-muted mt-4">No matching patients found.</p>');
+                        return;
+                    }
+                    const itemsHTML = patients.map(p => PatientManagementApp.helpers.getPatientCardHTML(p)).join('');
+                    listContainer.html(itemsHTML);
+                }
+            },
+
+            helpers: {
+                getPatientCardHTML(patient) {
+                    const h = PatientManagementApp.helpers;
+                    const fullName = `${patient.firstname || ''} ${patient.lastname || ''}`.trim() || 'Unnamed Patient';
+                    const photoSrc = patient.photo ? `${PatientManagementApp.state.baseUrl}${patient.photo}` : 'https://via.placeholder.com/60';
+                    const status = h.getStatusInfo(patient.status);
+                    return `
+                        <a href="/patient/profile/${patient.id}" class="patient-item">
+                            <div class="patient-avatar"><img src="${photoSrc}" alt="Avatar"></div>
+                            <div class="patient-info">
+                                <div>
+                                    <div class="patient-name">${fullName}</div>
+                                    <div class="patient-phone">${patient.phone || 'No phone'}</div>
+                                </div>
+                                <div class="patient-status ${status.class}">${status.text}</div>
                             </div>
-                            <div class="patient-status ${statusInfo.class}">${statusInfo.text}</div>
-                        </div>
-                    </a>`;
-            listContainer.append(cardHtml);
-        });
-    };
+                        </a>`;
+                },
 
-    function fetchPatientsList() {
-        $('#patient-list').html('<div class="text-center p-5"><div class="spinner-border"></div></div>');
-        $.ajax({
-            url: `${baseUrl}/patients`,
-            headers: { 'Authorization': authToken },
-            success: (response) => {
-                if (response.status === 'success' && response.data.patients) {
-                    allPatients = response.data.patients;
-                    renderPatientsList(allPatients);
-                    showAlert(`Loaded ${response.data.count} patients successfully.`, 'success');
-                } else { throw new Error('Failed to parse patients'); }
-            },
-            error: () => {
-                showAlert('Error fetching patient list.', 'danger');
-                $('#patient-list').html('<p class="text-center text-danger">Could not load patients.</p>');
+                getStatusInfo: status => ({
+                    '-1': { text: "Not Verified", class: "status-not-verified" },
+                    '0':  { text: "Inactive", class: "status-inactive" },
+                    '1':  { text: "Active", class: "status-active" },
+                    '2':  { text: "Archived", class: "status-archived" },
+                    '3':  { text: "Deleted", class: "status-deleted" },
+                })[status] || { text: 'Unknown', class: '' },
+
+                showAlert(message, type = 'success') {
+                    const alertHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+                    PatientManagementApp.elements.alertContainer.html(alertHTML).children().delay(4000).fadeOut();
+                },
+
+                showResultModal(message, type = 'success') {
+                    PatientManagementApp.elements.resultModalMessage.text(message)
+                        .removeClass('text-danger text-success')
+                        .addClass(type === 'success' ? 'text-success' : 'text-danger');
+                    PatientManagementApp.modals.result.show();
+                },
+
+                debounce(func, delay) {
+                    let timeout;
+                    return function(...args) {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => func.apply(this, args), delay);
+                    };
+                }
             }
-        });
-    }
-
-    function handleNewPatientSubmit(event) {
-        event.preventDefault();
-
-        const payload = {
-            firstname: $('#form-firstname').val(),
-            lastname: $('#form-lastname').val(),
-            phone: $('#form-phone').val()
         };
 
-        const middlename = $('#form-middlename').val();
-        if (middlename && middlename.trim() !== '') {
-            payload.middlename = middlename;
-        }
-
-        $.ajax({
-            url: `${baseUrl}/patient/new`, // FIXED: Changed from /patient/new
-            type: 'POST',
-            headers: { 'Authorization': authToken },
-            contentType: 'application/json',
-            data: JSON.stringify(payload),
-            success: (response) => {
-                showResultModal('Patient added successfully!');
-                addPatientOffcanvas.hide();
-                $('#add-patient-form').trigger('reset');
-                fetchPatientsList();
-            },
-            error: (xhr) => {
-                const errorMsg = xhr.responseJSON?.message || 'An unknown error occurred.';
-                showResultModal(`Failed to add patient: ${errorMsg}`, 'danger');
-            }
-        });
-    }
-
-    function applyFiltersAndSearch() {
-        const searchTerm = $('#search-input').val().toLowerCase();
-        const activeFilterStatus = $('.filter-btn.active').data('filter-status').toString();
-
-        const filteredPatients = allPatients.filter(patient => {
-            const statusMatch = (activeFilterStatus === 'all' || patient.status.toString() === activeFilterStatus);
-            const fullName = `${patient.firstname || ''} ${patient.lastname || ''}`.toLowerCase();
-            const searchMatch = (searchTerm === '' || fullName.includes(searchTerm));
-            return statusMatch && searchMatch;
-        });
-
-        renderPatientsList(filteredPatients);
-    }
-
-    // --- PAGE INITIALIZATION ---
-    function initializePage() {
-        addPatientOffcanvas = new bootstrap.Offcanvas(document.getElementById('addPatientOffcanvas'));
-        resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
-
-        fetchPatientsList();
-
-        // Event Listeners
-        $('.filter-btn').on('click', function() {
-            $('.filter-btn').removeClass('active');
-            $(this).addClass('active');
-            applyFiltersAndSearch();
-        });
-
-        $('#search-button, #search-input').on('keyup', applyFiltersAndSearch);
-
-        $('#add-patient-btn').on('click', (e) => { e.preventDefault(); addPatientOffcanvas.show(); });
-
-        $('#add-patient-form').on('submit', handleNewPatientSubmit);
-    }
-
-    // *** THE FIX: This event listener handles back navigation ***
-    window.addEventListener('pageshow', function(event) {
-        // The event.persisted property is true if the page is being loaded from the bfcache (back/forward cache).
-        if (event.persisted) {
-            console.log('Page loaded from cache. Re-fetching patient list.');
-            fetchPatientsList(); // Re-run the data fetch function
-        }
+        PatientManagementApp.init();
     });
 </script>
 </body>
