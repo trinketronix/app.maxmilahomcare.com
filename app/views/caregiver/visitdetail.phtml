@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?=$pageTitle ?? 'Visit Details'?></title>
+
+    <!-- Dependencies -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', 'Roboto', sans-serif; }
+        .page-container { max-width: 500px; margin: 0 auto; background-color: #ffffff; min-height: 100vh; border-left: 1px solid #dcdcdc; border-right: 1px solid #dcdcdc; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; position: relative; }
+        .back-button { text-decoration: none; color: #333; font-weight: 500; }
+        .header-title { font-size: 2.2rem; font-weight: bold; }
+        .profile { text-align: center; }
+        .profile-icon { font-size: 1.5rem; border: 2px solid #000; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; margin: 0 auto; overflow: hidden; }
+        .profile-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-username { font-size: 0.8rem; color: #555; margin-top: 4px; }
+
+        .main-content { padding: 1.5rem; }
+        .visit-header { text-align: center; margin-bottom: 1.5rem; }
+        .visit-progress-text { font-size: 1.25rem; font-weight: 500; color: #555; }
+        .visit-date-text { font-size: 1.75rem; font-weight: bold; margin-top: 0.25rem; }
+
+        .participants-grid { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; }
+        .participant { text-align: center; }
+        .participant-avatar { width: 70px; height: 70px; border: 3px solid #000; border-radius: 50%; overflow: hidden; margin: 0 auto 0.5rem; display:flex; align-items:center; justify-content:center;}
+        .participant-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .participant-role { font-size: 0.8rem; text-transform: uppercase; color: #6c757d; }
+        .participant-name { font-weight: 500; font-size: 1.1rem; }
+        .visit-meta { text-align: center; }
+
+        .address-box { border: 2px solid #000; border-radius: 1rem; padding: 1rem; margin-top: 1.5rem; }
+        .edit-mode .address-box { cursor: pointer; border-style: dashed; border-color: #0d6efd; background-color: #f8f9fa; }
+        .address-box-header { display: flex; align-items: center; gap: 1rem; font-weight: bold; font-size: 1.25rem; margin-bottom: 0.5rem; }
+        .address-box-icon { font-size: 2rem; }
+
+        .details-list { list-style: none; padding: 0; margin-top: 1.5rem; }
+        .details-list li { display: flex; flex-direction: column; padding: 0.5rem 0; border-bottom: 1px solid #eee; }
+        .details-list .list-item-row { display: flex; justify-content: space-between; align-items: center; width: 100%;}
+        .details-list .label { font-weight: bold; }
+        .details-list .value { color: #555; text-align: right; }
+        .details-list .note-value { text-align: left; white-space: pre-wrap; width: 100%; margin-top: 0.25rem; }
+
+        .view-mode .editable-field, .view-mode .save-button { display: none; }
+        .edit-mode .read-only-value, .edit-mode .action-buttons { display: none !important; }
+
+        .action-buttons, .save-button { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; }
+        .btn-custom { border: 2px solid #000; border-radius: 8px; font-weight: 500; background-color: #fff; }
+        .btn-custom.main-action { background-color: #000; color: #fff; width: 100%; padding: 0.75rem; }
+
+        .offcanvas-body .selection-list { max-height: 40vh; overflow-y: auto; }
+        .offcanvas-body .selection-item { display: flex; align-items: center; gap: 1rem; border: 2px solid #ccc; border-radius: 15px; padding: 0.75rem; margin-bottom: 0.5rem; cursor: pointer; }
+        .offcanvas-body .selection-item.selected { border-color: #0d6efd; background-color: #eef5ff; }
+    </style>
+</head>
+<body>
+
+<div id="alert-container" style="position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px;"></div>
+
+<div id="page-container" class="page-container view-mode">
+    <header class="header">
+        <a href="/dashboard/caregiver" class="back-button"><i class="fas fa-chevron-left"></i> Exit</a>
+        <h1 class="header-title">Visit</h1>
+        <div class="profile">
+            <div class="profile-icon"><img src="<?=$photo?>" alt="avatar"></div>
+            <span class="profile-username"><?=$fullname?></span>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div id="visit-content-placeholder"><div class="text-center p-5"><div class="spinner-border"></div></div></div>
+        <div id="visit-content" style="display:none;">
+            <div class="visit-header"><div id="visit-progress-text" class="visit-progress-text"></div><div id="visit-date-text" class="visit-date-text"></div></div>
+            <div class="participants-grid">
+                <div class="participant"><div class="participant-avatar"><img id="caregiver-avatar" src=""></div><div class="participant-role">Caregiver</div><div id="caregiver-name" class="participant-name"></div></div>
+                <div class="visit-meta"><div id="visit-duration" class="fw-bold"></div><div id="visit-relative-time" class="text-muted"></div></div>
+                <div class="participant"><div class="participant-avatar"><img id="patient-avatar" src=""></div><div class="participant-role">Patient</div><div id="patient-name" class="participant-name"></div></div>
+            </div>
+            <div id="address-box" class="address-box"><div class="address-box-header"><i id="address-icon" class="fa-solid"></i> Address</div><div id="address-text" class="address-text"></div></div>
+
+            <!-- MODIFIED: Details list structure for View/Edit modes -->
+            <ul class="details-list">
+                <!-- Editable fields -->
+                <li class="view-mode"><div class="list-item-row"><span class="label">Start time:</span> <span class="value" id="start_time-view"></span></div></li>
+                <li class="edit-mode"><div class="list-item-row"><span class="label">Visit Date:</span> <span class="value" id="visit_date-edit"></span></div></li>
+                <li class="edit-mode"><div class="list-item-row"><span class="label">Start time:</span> <input type="time" class="form-control" id="start_time-edit"></div></li>
+
+                <li class="view-mode"><div class="list-item-row"><span class="label">Total Hours:</span> <span class="value" id="duration-view"></span></div></li>
+                <li class="edit-mode"><div class="list-item-row"><span class="label">Total Hours:</span> <input type="number" class="form-control" id="total_hours-edit" min="1" max="12" placeholder="e.g., 4"></div></li>
+
+                <!-- Read-only fields (always visible) -->
+                <li><div class="list-item-row"><span class="label">Scheduled by:</span> <span class="value" id="scheduled_by-view"></span></div></li>
+                <li><div class="list-item-row"><span class="label">Check-in by:</span> <span class="value" id="checkin_by-view"></span></div></li>
+                <li><div class="list-item-row"><span class="label">Check-out by:</span> <span class="value" id="checkout_by-view"></span></div></li>
+                <li><div class="list-item-row"><span class="label">Approved by:</span> <span class="value" id="approved_by-view"></span></div></li>
+                <li><div class="list-item-row"><span class="label">Canceled by:</span> <span class="value" id="canceled_by-view"></span></div></li>
+
+                <!-- Note field -->
+                <li><span class="label">Note:</span> <span class="value note-value read-only-value" id="note-view"></span> <textarea class="form-control editable-field" id="note-edit"></textarea></li>
+            </ul>
+
+            <div class="action-buttons"><button type="button" class="btn btn-custom" id="progress-btn">Progress</button><button type="button" class="btn btn-custom" id="status-btn">Status</button><button type="button" class="btn btn-custom" id="edit-btn">Edit</button></div>
+            <div class="save-button"><button type="button" class="btn btn-custom main-action" id="save-btn">Save Changes</button></div>
+        </div>
+    </main>
+</div>
+
+<!-- Modals & Offcanvas are unchanged -->
+<div class="modal fade" id="progressModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Change Progress</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="d-grid gap-2"><button class="btn btn-outline-info" data-action="checkin">Check-in</button><button class="btn btn-outline-secondary" data-action="checkout">Check-out</button><button class="btn btn-outline-success" data-action="approve">Approved</button><button class="btn btn-outline-danger" data-action="cancel">Cancel</button></div><div id="cancel-note-group" class="mt-3" style="display:none;"><label for="cancel-note" class="form-label">Cancellation Note (Required)</label><textarea class="form-control" id="cancel-note" rows="3"></textarea><button class="btn btn-danger w-100 mt-2" id="confirm-cancel-btn">Confirm Cancellation</button></div></div></div></div></div>
+<div class="modal fade" id="statusModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Change Status</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="d-grid gap-2"><button class="btn btn-outline-primary" data-action="status/visible">Visible</button><button class="btn btn-outline-warning" data-action="status/archived">Archived</button><button class="btn btn-outline-danger" data-action="status/deleted">Deleted</button></div></div></div></div></div>
+<div class="modal fade" id="confirmAddressModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Edit Address</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body text-center">Do you want to edit the Address?<div class="d-flex justify-content-center gap-2 mt-3"><button class="btn btn-primary" id="confirm-address-yes">Yes</button><button class="btn btn-secondary" data-bs-dismiss="modal">No</button></div></div></div></div></div>
+<div class="offcanvas offcanvas-bottom" tabindex="-1" id="addressOffcanvas" style="height: 75%;"><div class="offcanvas-header"><h5 class="offcanvas-title w-100 text-center">Change Address</h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button></div><div class="offcanvas-body"><div class="input-group search-bar mb-2"><input type="text" id="address-search" class="form-control" placeholder="Search address..."></div><div class="selection-list" id="address-selection-list"></div></div></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        const visitId = <?=$visitId?>;
+        const baseUrl = '<?=$baseUrl?>';
+        const authToken = '<?=$authToken?>';
+        let currentVisitData = {};
+
+        const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+        const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+        const confirmAddressModal = new bootstrap.Modal(document.getElementById('confirmAddressModal'));
+        const addressOffcanvas = new bootstrap.Offcanvas(document.getElementById('addressOffcanvas'));
+
+        // --- HELPERS ---
+        const showAlert = (message, type = 'success') => { $('#alert-container').html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).delay(4000).fadeOut(); };
+        const getProgressText = (p) => ({ '-1': "Canceled", '0': "Scheduled", '1': "Check-in", '2': "Check-out", '3': "Approved" }[p] || 'Unknown');
+        const getFormattedDateTime = (dateStr) => { const d = new Date(dateStr); return d.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }); };
+        const getRelativeTime = (dateStr) => { const n=new Date(),v=new Date(dateStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/(1e3*60*60*24));if(d<0)return"Past visit";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`; };
+
+        // --- API CALLS ---
+        function fetchVisitDetails() {
+            $.ajax({ url: `${baseUrl}/visit/${visitId}`, headers: { 'Authorization': authToken },
+                success: (res) => { if (res.status === 'success') { currentVisitData = res.data; renderVisitDetails(currentVisitData); } },
+                error: () => { $('#visit-content-placeholder').html('<p class="text-center text-danger">Could not load visit details.</p>'); }
+            });
+        }
+        function updateVisit(payload) {
+            $.ajax({ url: `${baseUrl}/visit/${visitId}`, type: 'PUT', headers: { 'Authorization': authToken, 'Content-Type': 'application/json' }, data: JSON.stringify(payload),
+                success: (res) => { showAlert(res.message || 'Visit updated successfully!', 'success'); fetchVisitDetails(); },
+                error: (xhr) => showAlert(xhr.responseJSON?.message || 'Failed to update visit.', 'danger')
+            });
+        }
+        function performVisitAction(actionEndpoint, dataPayload = null) {
+            const ajaxConfig = { url: `${baseUrl}/visit/${visitId}/${actionEndpoint}`, type: 'PUT', headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
+                success: (res) => { showAlert(res.message || 'Action completed!', 'success'); fetchVisitDetails(); },
+                error: (xhr) => showAlert(xhr.responseJSON?.message || 'Action failed.', 'danger')
+            };
+            if (dataPayload) { ajaxConfig.contentType = 'application/json'; ajaxConfig.data = JSON.stringify(dataPayload); }
+            $.ajax(ajaxConfig);
+        }
+        function fetchAccountName(userId, elementId) {
+            $.ajax({ url: `${baseUrl}/account/${userId}`, headers: { 'Authorization': authToken },
+                success: (res) => { if (res.status === 'success' && res.data) { $(`#${elementId}`).text(`${res.data.firstname} ${res.data.lastname}`); } },
+                error: () => $(`#${elementId}`).text('Unknown User')
+            });
+        }
+
+        // --- RENDER FUNCTION ---
+        function renderVisitDetails(data) {
+            if (!data || !data.user || !data.patient) { showAlert('Incomplete visit data.', 'danger'); return; }
+            $('#visit-progress-text').text(getProgressText(data.progress));
+            $('#visit-date-text').text(new Date(data.start_time).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }));
+            $('#visit-duration').text(`${Math.floor(data.duration_minutes / 60)} hrs total`);
+            $('#visit-relative-time').text(getRelativeTime(data.start_time));
+            $('#caregiver-avatar').attr('src', data.user.photo ? baseUrl + data.user.photo : 'https://via.placeholder.com/70');
+            $('#caregiver-name').text(`${data.user.firstname} ${data.user.lastname}`);
+            $('#patient-avatar').attr('src', data.patient.photo ? baseUrl + data.patient.photo : 'https://via.placeholder.com/70');
+            $('#patient-name').text(`${data.patient.firstname} ${data.patient.lastname}`);
+            if (data.address) {
+                $('#address-text').html(`${data.address.address}<br>${data.address.city}, ${data.address.state} ${data.address.zipcode}`);
+                $('#address-icon').attr('class', data.address.type === 'Apartment' ? 'fa-solid fa-building' : 'fa-solid fa-house');
+            }
+
+            // Render static details and fetch names for dynamic ones
+            $('#start_time-view').text(getFormattedDateTime(data.start_time));
+            $('#duration-view').text(`${Math.floor(data.duration_minutes / 60)} Hours`);
+            $('#note-view').text(data.note || 'N/A');
+
+            const byFields = ['scheduled_by', 'checkin_by', 'checkout_by', 'approved_by', 'canceled_by'];
+            byFields.forEach(key => {
+                const viewEl = $(`#${key}-view`);
+                if (data[key] !== null) {
+                    viewEl.text('Loading...'); // Placeholder
+                    fetchAccountName(data[key], `${key}-view`);
+                } else {
+                    viewEl.text('TBD');
+                }
+            });
+
+            $('#visit-content-placeholder').hide();
+            $('#visit-content').show();
+        }
+
+        // --- UI MODE MANAGEMENT ---
+        function setMode(mode) {
+            const container = $('#page-container');
+            if (mode === 'edit') {
+                const startDate = new Date(currentVisitData.start_time);
+                $('#visit_date-edit').text(startDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'}));
+                $('#start_time-edit').val(String(startDate.getHours()).padStart(2,'0') + ':' + String(startDate.getMinutes()).padStart(2,'0'));
+                $('#total_hours-edit').val(Math.floor(currentVisitData.duration_minutes / 60));
+                $('#note-edit').val(currentVisitData.note || '');
+                container.removeClass('view-mode').addClass('edit-mode');
+            } else {
+                container.removeClass('edit-mode').addClass('view-mode');
+            }
+        }
+
+        // --- EVENT LISTENERS ---
+        $('#edit-btn').on('click', () => setMode('edit'));
+        $('#back-button').on('click', (e) => {
+            e.preventDefault(); // Always prevent the default link action
+            if ($('#page-container').hasClass('edit-mode')) {
+                setMode('view'); // If in edit mode, just switch back to view mode
+            } else {
+                window.history.back(); // If in view mode, go to the previous page
+            }
+        });
+
+        $('#save-btn').on('click', () => {
+            const totalHours = parseInt($('#total_hours-edit').val());
+            if (isNaN(totalHours) || totalHours <= 0) { showAlert('Total Hours must be > 0.', 'warning'); return; }
+
+            // Reconstruct the start_time from the fixed date and new time
+            const visitDate = new Date(currentVisitData.start_time);
+            const timeParts = $('#start_time-edit').val().split(':');
+            visitDate.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), 0, 0);
+
+            const payload = {
+                start_time: visitDate.toISOString().slice(0, 19).replace('T', ' '),
+                total_hours: totalHours,
+                note: $('#note-edit').val()
+            };
+            updateVisit(payload);
+            setMode('view');
+        });
+
+        // Other listeners (progress, status, address) are unchanged...
+        $('#progress-btn').on('click', () => progressModal.show());
+        $('#status-btn').on('click', () => statusModal.show());
+        $('#progressModal button[data-action]').on('click', function() {
+            const action = $(this).data('action');
+            if (action === 'cancel') { $('#cancel-note-group').show(); } else { performVisitAction(action); progressModal.hide(); }
+        });
+        $('#confirm-cancel-btn').on('click', function() {
+            const note = $('#cancel-note').val();
+            if (!note.trim()) { showAlert('Cancellation note is required.', 'warning'); return; }
+            performVisitAction('cancel', { note });
+            progressModal.hide(); $('#cancel-note').val(''); $('#cancel-note-group').hide();
+        });
+        $('#statusModal button[data-action]').on('click', function() { performVisitAction($(this).data('action')); statusModal.hide(); });
+        $('#address-box').on('click', () => { if ($('#page-container').hasClass('edit-mode')) confirmAddressModal.show(); });
+        $('#confirm-address-yes').on('click', () => {
+            confirmAddressModal.hide();
+            $.ajax({ url: `${baseUrl}/address/person/${currentVisitData.patient_id}/1`, headers: { 'Authorization': authToken },
+                success: (res) => {
+                    const list = $('#address-selection-list'); list.empty();
+                    if (res.data && res.data.length > 0) { res.data.forEach(addr => list.append(`<div class="selection-item" data-id="${addr.id}">${addr.address}, ${addr.city}</div>`)); }
+                    else { list.html('<p class="text-center text-muted">No other addresses found.</p>'); }
+                    addressOffcanvas.show();
+                },
+                error: () => showAlert('Could not fetch addresses.', 'danger')
+            });
+        });
+        $('#address-selection-list').on('click', '.selection-item', function() { updateVisit({ address_id: $(this).data('id') }); addressOffcanvas.hide(); });
+
+        // Initial data fetch
+        fetchVisitDetails();
+    });
+</script>
+</body>
+</html>
