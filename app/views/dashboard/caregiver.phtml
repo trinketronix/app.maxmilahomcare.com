@@ -408,7 +408,7 @@
                     const addressString = `${visit.address.address}, ${visit.address.city}, ${visit.address.state}`;
                     this.elements.actionsModalTitle.text(`Visit to ${visit.patient.firstname}`);
                     this.elements.actionNavigateBtn.attr('href', `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressString)}`);
-                    this.elements.actionDetailBtn.attr('href', `/visit/detail/${visit.id}`);
+                    this.elements.actionDetailBtn.attr('href', `/caregiver/visitdetail/${visit.id}`);
                     this.modals.actions.show();
                 },
 
