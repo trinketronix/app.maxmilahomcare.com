@@ -69,7 +69,7 @@
 
     <section class="user-info-section">
         <div class="user-avatar-container">
-            <div class="user-avatar"><img id="patient-avatar-img" src="<?=$photo?>" alt="Patient"></div>
+            <div class="user-avatar"><img id="patient-avatar-img" src="" alt="Patient" style="display: none;"></div>
             <div class="user-role">Patient</div>
         </div>
         <div class="user-name-container">
@@ -173,7 +173,6 @@
                     e.preventDefault();
                     const app = PatientAddressesApp;
                     const addressId = $('#form-address-id').val();
-                    const isEdit = !!addressId;
                     const payload = {
                         person_id: app.state.patientId, person_type: app.state.personType,
                         address: $('#form-address').val(), city: $('#form-city').val(),
@@ -188,14 +187,19 @@
                 _ajax: settings => $.ajax({ ...settings, headers: { 'Authorization': PatientAddressesApp.state.authToken }, dataType: 'json' })
                     .fail(err => PatientAddressesApp.helpers.showAlert(err.responseJSON?.message || 'API request failed.', 'danger')),
 
+                // *** THIS IS THE CORRECTED FUNCTION ***
                 fetchInitialData() {
                     $.when(
                         this._ajax({ url: `${PatientAddressesApp.state.baseUrl}/patient/${PatientAddressesApp.state.patientId}` }),
                         this._ajax({ url: `${PatientAddressesApp.state.baseUrl}/address/person/${PatientAddressesApp.state.patientId}/${PatientAddressesApp.state.personType}` })
-                    ).done(([patientRes], [addressRes]) => {
-                        PatientAddressesApp.render.patientHeader(patientRes[0].data);
-                        PatientAddressesApp.state.allAddresses = addressRes[0].data;
-                        PatientAddressesApp.render.addressList(addressRes[0].data);
+                    ).done((patientApiResponse, addressApiResponse) => {
+                        // Correctly access the data object, which is the first element of the response array
+                        const patientData = patientApiResponse[0].data;
+                        const addressesData = addressApiResponse[0].data;
+
+                        PatientAddressesApp.render.patientHeader(patientData);
+                        PatientAddressesApp.state.allAddresses = addressesData;
+                        PatientAddressesApp.render.addressList(addressesData);
 
                     }).fail(() => PatientAddressesApp.helpers.showAlert('Could not load initial page data.', 'danger'));
                 },
