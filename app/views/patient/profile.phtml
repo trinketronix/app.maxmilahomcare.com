@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?=$pageTitle?></title>
+    <title><?=$pageTitle ?? 'Patient Profile'?></title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="../../img/fav/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../../img/fav/favicon-32x32.png">
@@ -11,38 +11,24 @@
     <link rel="manifest" href="../../site.webmanifest">
     <link rel="shortcut icon" href="../../img/fav/favicon.ico">
 
-    <!-- Bootstrap 5.1 CSS -->
+    <!-- Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Font Awesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
     <style>
-        body {
-            background-color: #f0f2f5;
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
-        }
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', 'Roboto', sans-serif; }
+        .page-container { max-width: 500px; margin: 0 auto; background-color: #ffffff; min-height: 100vh; border-left: 1px solid #dcdcdc; border-right: 1px solid #dcdcdc; }
 
-        .page-container {
-            max-width: 500px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            min-height: 100vh;
-            border-left: 1px solid #dcdcdc;
-            border-right: 1px solid #dcdcdc;
-        }
-
-        /* --- Header --- */
+        /* Header */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; position: relative; }
         .back-button { text-decoration: none; color: #333; font-weight: 500; }
-        .header-title { font-size: 1.8rem; font-weight: bold; margin: 0; }
         .header-title-group { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; }
-        .profile { text-align: center; }
+        .header-title { font-size: 1.8rem; font-weight: bold; margin: 0; }
         .profile-icon { font-size: 1.5rem; border: 2px solid #000; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; margin: 0 auto; overflow: hidden; }
         .profile-icon img { width: 100%; height: 100%; object-fit: cover; }
         .profile-username { font-size: 0.8rem; color: #555; margin-top: 4px; }
 
-        /* --- Main Content & Details Layout --- */
+        /* Main Content */
         .main-content { padding: 1rem; }
         .current-status-banner { text-align: center; font-weight: 500; margin-bottom: 1.5rem; padding: 0.5rem; border-radius: 8px; }
         .status-active { background-color: #d1e7dd; color: #0f5132; }
@@ -54,96 +40,63 @@
         .avatar-section { grid-column: 1 / 2; text-align: center; }
         .avatar-img { width: 100px; height: 100px; border: 3px solid #000; padding: 0.5rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; border-radius: 50%; overflow: hidden; }
         .avatar-img img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* NEW: Make avatar clickable in edit mode */
-        .edit-mode .avatar-img {
-            cursor: pointer;
-            transition: box-shadow 0.2s;
-        }
-        .edit-mode .avatar-img:hover {
-            box-shadow: 0 0 10px rgba(0, 123, 255, 0.7);
-        }
-
+        .edit-mode .avatar-img { cursor: pointer; transition: box-shadow 0.2s; }
+        .edit-mode .avatar-img:hover { box-shadow: 0 0 10px rgba(0, 123, 255, 0.7); }
         .role-text { font-weight: bold; }
         .name-section { grid-column: 2 / 3; }
 
         .details-section { grid-column: 1 / -1; margin-top: 1rem; }
         .detail-item { margin-bottom: 1.25rem; }
         .detail-item .label { font-weight: bold; display: block; margin-bottom: 0.25rem; }
-        .detail-item .value, .detail-item .form-control { color: #555; border-radius: 8px; border: 2px solid #000; padding: 0.5rem 1rem; width: 100%; background: #f8f9fa; }
-        .detail-item .value { border: 2px solid transparent; background: transparent; padding: 0.5rem 0; }
-
+        .detail-item .value { border: 2px solid transparent; background: transparent; padding: 0.5rem 0; word-break: break-word; }
+        .detail-item .form-control { color: #555; border-radius: 8px; border: 2px solid #000; padding: 0.5rem 1rem; width: 100%; background: #f8f9fa; }
         .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
-        /* --- Edit/View Mode Toggle --- */
+        /* Mode Toggling */
         .view-mode .form-control, .view-mode .save-button { display: none; }
         .edit-mode .value, .edit-mode .action-buttons { display: none !important; }
 
-        /* --- Buttons --- */
+        /* Buttons & Alerts */
         .action-buttons, .save-button { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; }
         .btn-custom { border: 2px solid #000; border-radius: 8px; font-weight: 500; background-color: #fff; }
         .btn-custom.main-action { background-color: #000; color: #fff; width: 100%; padding: 0.75rem; }
-
-        /* --- Status Change Modal --- */
         .status-modal-body { display: flex; justify-content: space-around; text-align: center; padding: 1.5rem 0; }
         .status-option { cursor: pointer; color: #333; }
         .status-option:hover { color: #007bff; }
         .status-option i { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; width: 50px; }
-
         #alert-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px; }
 
-        @media (min-width: 768px) {
-            .page-container { max-width: 720px; }
-        }
+        @media (min-width: 768px) { .page-container { max-width: 720px; } }
     </style>
 </head>
-<body onload="initializePage()">
+<body>
 
 <div id="alert-container"></div>
 
 <div id="page-container" class="page-container view-mode">
-
-    <!-- Header -->
     <header class="header">
         <a href="#" class="back-button" id="back-button"><i class="fas fa-chevron-left"></i> Back</a>
-        <div class="header-title-group">
-            <h1 class="header-title"><?=$pageTitle?></h1>
-        </div>
+        <div class="header-title-group"><h1 class="header-title"><?=$pageTitle ?? 'Patient Profile'?></h1></div>
         <div class="profile">
             <div class="profile-icon"><img src="<?=$photo?>" alt="avatar"></div>
             <span class="profile-username"><?=$fullname?></span>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="main-content">
         <div id="current-status" class="current-status-banner">Loading status...</div>
 
-        <!-- NEW: Added hidden file input for photo upload -->
-        <form id="details-form">
-            <input type="file" id="photo-upload-input" style="display:none;" accept="image/png, image/jpeg, image/gif, image/webp">
-
+        <form id="details-form" onsubmit="return false;">
+            <input type="file" id="photo-upload-input" style="display:none;" accept="image/*">
             <div class="details-grid">
                 <div class="avatar-section">
-                    <!-- NEW: Clickable avatar area -->
-                    <div class="avatar-img" id="avatar-container">
-                        <img id="photo-view" src="" alt="avatar">
-                    </div>
-                    <div class="role-text" id="role-text">Patient</div>
+                    <div class="avatar-img" id="avatar-container"><img id="photo-view" src="https://via.placeholder.com/100" alt="Patient Avatar"></div>
+                    <div class="role-text">Patient</div>
                 </div>
                 <div class="name-section">
-                    <div class="detail-item">
-                        <span class="value" id="firstname-view"></span>
-                        <input type="text" class="form-control" id="firstname-edit" placeholder="First Name">
-                    </div>
-                    <div class="detail-item">
-                        <span class="value" id="middlename-view"></span>
-                        <input type="text" class="form-control" id="middlename-edit" placeholder="Middle Name">
-                    </div>
-                    <div class="detail-item">
-                        <span class="value" id="lastname-view"></span>
-                        <input type="text" class="form-control" id="lastname-edit" placeholder="Last Name">
-                    </div>
+                    <div class="detail-item"><span class="value" id="firstname-view"></span><input type="text" class="form-control" id="firstname-edit" placeholder="First Name"></div>
+                    <div class="detail-item"><span class="value" id="middlename-view"></span><input type="text" class="form-control" id="middlename-edit" placeholder="Middle Name"></div>
+                    <div class="detail-item"><span class="value" id="lastname-view"></span><input type="text" class="form-control" id="lastname-edit" placeholder="Last Name"></div>
                 </div>
                 <div class="details-section">
                     <div class="detail-item"><span class="label">Phone</span><span class="value" id="phone-view"></span><input type="tel" class="form-control" id="phone-edit"></div>
@@ -155,9 +108,9 @@
             </div>
 
             <div class="action-buttons">
-                <button type="button" class="btn btn-custom" onclick="window.location.href='/patient/addresses/<?=$targetPatientId?>'">Addresses</button>
-                <button type="button" class="btn btn-custom" onclick="window.location.href='/patient/caregivers/<?=$targetPatientId?>'">Caregivers</button>
-                <button type="button" class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#statusModal">Status</button>
+                <button type="button" class="btn btn-custom" id="addresses-btn">Addresses</button>
+                <button type="button" class="btn btn-custom" id="caregivers-btn">Caregivers</button>
+                <button type="button" class="btn btn-custom" id="status-btn" data-bs-toggle="modal" data-bs-target="#statusModal">Status</button>
                 <button type="button" class="btn btn-custom" id="edit-btn">Edit</button>
             </div>
             <div class="save-button">
@@ -167,16 +120,15 @@
     </main>
 </div>
 
-<!-- Status Change Modal (No changes) -->
 <div class="modal fade" id="statusModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header"><h5 class="modal-title">Change Status</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
             <div class="modal-body status-modal-body">
-                <div class="status-option" onclick="changePatientStatus('activate')"><i class="fa-solid fa-user-plus"></i>Activate</div>
-                <div class="status-option" onclick="changePatientStatus('inactivate')"><i class="fa-solid fa-user-slash"></i>Inactivate</div>
-                <div class="status-option" onclick="changePatientStatus('archivate')"><i class="fa-solid fa-user-minus"></i>Archive</div>
-                <div class="status-option" onclick="changePatientStatus('delete')"><i class="fa-solid fa-folder-closed"></i>Delete</div>
+                <div class="status-option" data-status-action="activate"><i class="fa-solid fa-user-plus"></i>Activate</div>
+                <div class="status-option" data-status-action="inactivate"><i class="fa-solid fa-user-slash"></i>Inactivate</div>
+                <div class="status-option" data-status-action="archivate"><i class="fa-solid fa-user-minus"></i>Archive</div>
+                <div class="status-option" data-status-action="delete"><i class="fa-solid fa-folder-closed"></i>Delete</div>
             </div>
         </div>
     </div>
@@ -185,207 +137,195 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    let patientData = {};
-    const loggedInUserId = <?=$userId?>; /* IMPORTANT: Assumes your controller provides the logged-in user's ID as $id */
-    const patientId = <?=$targetPatientId?>;
-    const baseUrl = '<?=$baseUrl?>';
-    const authToken = '<?=$authToken?>';
+    $(document).ready(function() {
+        /**
+         * Encapsulates all functionality for the Patient Profile page.
+         */
+        const PatientProfileApp = {
+            state: {
+                patientData: {},
+                loggedInUserId: <?= json_encode($userId ?? null) ?>,
+                patientId: <?= json_encode($targetPatientId ?? null) ?>,
+                baseUrl: <?= json_encode($baseUrl ?? '') ?>,
+                authToken: <?= json_encode($authToken ?? '') ?>,
+            },
 
-    // --- HELPER FUNCTIONS ---
-    const getRoleText = role => ({ 0: 'Administrator', 1: 'Manager', 2: 'Caregiver' }[role] || 'Patient');
-    const getStatusInfo = status => {
-        const s = parseInt(status);
-        const map = {
-            '-1': { text: 'The patient is Not Verified', class: 'status-not-verified' },
-            '0': { text: 'The patient is currently Inactive', class: 'status-inactive' },
-            '1': { text: 'The patient is currently Active', class: 'status-active' },
-            '2': { text: 'The patient is Archived', class: 'status-archived' },
-        };
-        return map[s] || { text: 'Unknown Status', class: '' };
-    };
-    const showAlert = (message, type = 'success') => {
-        $('#alert-container').html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`);
-    };
+            elements: {
+                pageContainer: $('#page-container'), alertContainer: $('#alert-container'),
+                currentStatus: $('#current-status'), photoView: $('#photo-view'), avatarContainer: $('#avatar-container'),
+                photoUploadInput: $('#photo-upload-input'), statusModal: $('#statusModal'),
+                editBtn: $('#edit-btn'), saveBtn: $('#save-btn'), backBtn: $('#back-button'),
+                addressesBtn: $('#addresses-btn'), caregiversBtn: $('#caregivers-btn'),
+                formFields: ['firstname', 'middlename', 'lastname', 'phone', 'patient', 'admission']
+            },
 
-    // --- DATA POPULATION ---
-    function populateView(data) {
-        const statusInfo = getStatusInfo(data.status);
-        $('#current-status').text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
-        $('#role-text').text(getRoleText(data.role));
+            init() {
+                if (!this.state.patientId) {
+                    this.helpers.showAlert('Patient ID is missing.', 'danger');
+                    return;
+                }
+                this.bindEvents();
+                this.api.fetchPatientData();
+            },
 
-        for (const key in data) {
-            if(key === 'photo') {
-                $(`#${key}-view`).attr('src', data[key] ? baseUrl + data[key] : 'https://via.placeholder.com/100').show();
-            } else {
-                if ($(`#${key}-view`).length) {
-                    $(`#${key}-view`).text(data[key] || 'N/A');
+            bindEvents() {
+                this.elements.editBtn.on('click', () => this.setMode('edit'));
+                this.elements.saveBtn.on('click', () => this.api.savePatientData());
+                this.elements.backBtn.on('click', this.handlers.onBackClick);
+                this.elements.avatarContainer.on('click', this.handlers.onAvatarClick);
+                this.elements.photoUploadInput.on('change', this.handlers.onFileSelected);
+                this.elements.statusModal.on('click', '.status-option', this.handlers.onStatusChange);
+
+                this.elements.addressesBtn.on('click', () => window.location.href = `/patient/addresses/${this.state.patientId}`);
+                this.elements.caregiversBtn.on('click', () => window.location.href = `/patient/caregivers/${this.state.patientId}`);
+            },
+
+            handlers: {
+                onBackClick(e) {
+                    e.preventDefault();
+                    if (PatientProfileApp.elements.pageContainer.hasClass('edit-mode')) {
+                        PatientProfileApp.setMode('view');
+                    } else {
+                        window.history.back();
+                    }
+                },
+                onAvatarClick() {
+                    if (PatientProfileApp.elements.pageContainer.hasClass('edit-mode')) {
+                        PatientProfileApp.elements.photoUploadInput.click();
+                    }
+                },
+                onFileSelected(event) {
+                    const file = event.target.files[0];
+                    if (file) PatientProfileApp.api.uploadOrUpdatePhoto(file);
+                },
+                onStatusChange(e) {
+                    const action = $(e.currentTarget).data('status-action');
+                    PatientProfileApp.api.changePatientStatus(action);
+                }
+            },
+
+            api: {
+                _ajax(settings) {
+                    return $.ajax({
+                        ...settings,
+                        headers: { 'Authorization': PatientProfileApp.state.authToken },
+                        dataType: 'json',
+                    }).fail(err => PatientProfileApp.helpers.showAlert(err.responseJSON?.message || 'An API error occurred.', 'danger'));
+                },
+                fetchPatientData() {
+                    this._ajax({ url: `${PatientProfileApp.state.baseUrl}/patient/${PatientProfileApp.state.patientId}` })
+                        .done(res => {
+                            if (res.status === 'success' && res.data) {
+                                PatientProfileApp.state.patientData = res.data;
+                                PatientProfileApp.render.view(res.data);
+                            }
+                        });
+                },
+                savePatientData() {
+                    const updatedFields = {};
+                    PatientProfileApp.elements.formFields.forEach(key => {
+                        const newValue = $(`#${key}-edit`).val();
+                        if (newValue !== (PatientProfileApp.state.patientData[key] || '')) {
+                            updatedFields[key] = newValue;
+                        }
+                    });
+
+                    if ($.isEmptyObject(updatedFields)) {
+                        PatientProfileApp.helpers.showAlert('No changes were made.', 'info');
+                        PatientProfileApp.setMode('view');
+                        return;
+                    }
+
+                    this._ajax({
+                        url: `${PatientProfileApp.state.baseUrl}/patient/${PatientProfileApp.state.patientId}`,
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify(updatedFields),
+                    }).done(() => {
+                        PatientProfileApp.helpers.showAlert('Patient details updated successfully!', 'success');
+                        this.fetchPatientData();
+                        PatientProfileApp.setMode('view');
+                    });
+                },
+                changePatientStatus(action) {
+                    const endpoints = { activate:'activate', inactivate:'inactivate', archivate:'archivate', delete:'delete' };
+                    if (!endpoints[action]) return;
+
+                    this._ajax({ url: `${PatientProfileApp.state.baseUrl}/patient/${PatientProfileApp.state.patientId}/${endpoints[action]}`, type: 'PUT' })
+                        .done(res => {
+                            PatientProfileApp.helpers.showAlert(res.message || 'Status changed successfully.', 'success');
+                            bootstrap.Modal.getInstance(PatientProfileApp.elements.statusModal[0])?.hide();
+                            this.fetchPatientData();
+                        });
+                },
+                uploadOrUpdatePhoto(file) {
+                    const { patientData, loggedInUserId, patientId, baseUrl } = PatientProfileApp.state;
+                    const isDefaultPhoto = patientData.photo?.endsWith('default.jpg');
+                    const isEditingSelf = loggedInUserId === patientId; // This condition might be irrelevant for patients
+
+                    const httpMethod = isDefaultPhoto ? 'POST' : 'PUT';
+                    const endpoint = isDefaultPhoto ? 'upload/photo' : 'update/photo';
+                    let finalUrl = `${baseUrl}/patient/${patientId}/${endpoint}`;
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    PatientProfileApp.helpers.showAlert('Uploading photo...', 'info');
+
+                    this._ajax({
+                        url: finalUrl, type: httpMethod, data: formData,
+                        processData: false, contentType: false,
+                    }).done(res => {
+                        PatientProfileApp.helpers.showAlert(res.message || 'Photo updated!', 'success');
+                        this.fetchPatientData();
+                    });
+                }
+            },
+
+            render: {
+                view(data) {
+                    const h = PatientProfileApp.helpers;
+                    const statusInfo = h.getStatusInfo(data.status);
+
+                    PatientProfileApp.elements.currentStatus.text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
+                    PatientProfileApp.elements.photoView.attr('src', data.photo ? PatientProfileApp.state.baseUrl + data.photo : 'https://via.placeholder.com/100');
+
+                    PatientProfileApp.elements.formFields.forEach(key => {
+                        $(`#${key}-view`).text(data[key] || 'N/A');
+                    });
+                },
+                edit(data) {
+                    PatientProfileApp.elements.formFields.forEach(key => {
+                        $(`#${key}-edit`).val(data[key] || '');
+                    });
+                }
+            },
+
+            helpers: {
+                getStatusInfo: status => ({
+                    '-1': { text: 'Not Verified', class: 'status-not-verified' },
+                    '0':  { text: 'Inactive', class: 'status-inactive' },
+                    '1':  { text: 'Active', class: 'status-active' },
+                    '2':  { text: 'Archived', class: 'status-archived' },
+                })[status] || { text: 'Unknown Status', class: '' },
+
+                showAlert(message, type = 'success') {
+                    const alertHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+                    PatientProfileApp.elements.alertContainer.html(alertHTML).children().delay(4000).fadeOut();
+                }
+            },
+
+            setMode(mode) {
+                if (mode === 'edit') {
+                    this.render.edit(this.state.patientData);
+                    this.elements.pageContainer.removeClass('view-mode').addClass('edit-mode');
+                } else {
+                    this.elements.pageContainer.removeClass('edit-mode').addClass('view-mode');
                 }
             }
-        }
-    }
-
-    function populateEdit(data) {
-        for (const key in data) {
-            if ($(`#${key}-edit`).length) {
-                $(`#${key}-edit`).val(data[key]);
-            }
-        }
-    }
-
-    // --- API CALLS ---
-    function fetchPatient(patientId) {
-        $.ajax({
-            url: `${baseUrl}/patient/${patientId}`,
-            type: 'GET',
-            headers: { 'Authorization': authToken },
-            success: (response) => {
-                if (response.status === 'success' && response.data) {
-                    patientData = response.data;
-                    populateView(patientData);
-                }
-            },
-            error: (err) => showAlert('Failed to load patients details.', 'danger'),
-        });
-    }
-
-    function savePatient(patientId) {
-        const updatedFields = {};
-        const formData = {
-            firstname: $('#firstname-edit').val(),
-            middlename: $('#middlename-edit').val(),
-            lastname: $('#lastname-edit').val(),
-            phone: $('#phone-edit').val(),
-            patient: $('#patient-edit').val(),
-            admission: $('#admission-edit').val()
         };
 
-        for (const key in formData) {
-            if (formData[key] !== (patientData[key] || '')) {
-                updatedFields[key] = formData[key];
-            }
-        }
-
-        if ($.isEmptyObject(updatedFields)) {
-            showAlert('No changes were made.', 'info');
-            setMode('view');
-            return;
-        }
-
-        $.ajax({
-            url: `${baseUrl}/patient/${patientId}`, // Fixed typo here (removed extra brace)
-            type: 'PUT',
-            headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
-            data: JSON.stringify(updatedFields),
-            success: (response) => {
-                showAlert('Patient details updated successfully!', 'success');
-                fetchPatient(patientId);
-                setMode('view');
-            },
-            error: (err) => showAlert('Failed to update user. ' + (err.responseJSON?.message || ''), 'danger'),
-        });
-    }
-
-    function changePatientStatus(action) {
-        const userId = patientData.id;
-        const endpoints = {
-            activate: 'activate', inactivate: 'inactivate',
-            archivate: 'archivate', delete: 'delete'
-        };
-
-        $.ajax({
-            url: `${baseUrl}/patient/${patientId}/${endpoints[action]}`,
-            type: 'PUT',
-            headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
-            success: (response) => {
-                showAlert(`User status changed successfully. ${response.message || ''}`, 'success');
-                $('#statusModal').modal('hide');
-                fetchPatient(patientId); // Refresh data
-            },
-            error: (err) => showAlert(`Failed to change status. ${err.responseJSON?.message || ''}`, 'danger'),
-        });
-    }
-
-    // --- NEW PHOTO UPLOAD/UPDATE FUNCTIONALITY ---
-    function uploadOrUpdatePhoto(file) {
-        if (!file) return;
-
-        // 1. Determine method (POST for new, PUT for update)
-        const isDefaultPhoto = patientData.photo.endsWith('default.jpg');
-        const httpMethod = isDefaultPhoto ? 'POST' : 'PUT';
-
-        // 2. Determine URL (if admin is editing someone else vs. editing self)
-        const isEditingSelf = loggedInUserId === patientId;
-        let endpoint = isDefaultPhoto ? 'upload/photo' : 'update/photo';
-        let finalUrl = isEditingSelf
-            ? `${baseUrl}/patient/${endpoint}`
-            : `${baseUrl}/patient/${patientId}/${endpoint}`;
-
-        // 3. Prepare FormData
-        const formData = new FormData();
-        formData.append('file', file, file.name);
-
-        showAlert('Uploading photo...', 'info');
-
-        // 4. Make the AJAX call
-        $.ajax({
-            url: finalUrl,
-            type: httpMethod,
-            headers: { 'Authorization': authToken },
-            data: formData,
-            processData: false, // Important for file uploads
-            contentType: false, // Important for file uploads
-            success: (response) => {
-                showAlert(response.message || 'Photo updated successfully!', 'success');
-                fetchPatient(patientId); // Refresh the page data to show new photo
-            },
-            error: (err) => {
-                const errorMsg = err.responseJSON?.message || 'Failed to upload photo.';
-                showAlert(errorMsg, 'danger');
-            }
-        });
-    }
-
-    // --- UI MODE MANAGEMENT ---
-    function setMode(mode) {
-        const container = $('#page-container');
-        if (mode === 'edit') {
-            populateEdit(patientData);
-            container.removeClass('view-mode').addClass('edit-mode');
-        } else {
-            container.removeClass('edit-mode').addClass('view-mode');
-        }
-    }
-
-    // --- INITIALIZATION & EVENT HANDLERS ---
-    function initializePage() {
-        fetchPatient(patientId);
-
-        $('#edit-btn').on('click', () => setMode('edit'));
-        $('#save-btn').on('click', () => savePatient(patientData.id));
-        $('#back-button').on('click', function(e) {
-            e.preventDefault();
-            if ($('#page-container').hasClass('edit-mode')) {
-                setMode('view');
-            } else {
-                window.history.back();
-            }
-        });
-
-        // --- NEW EVENT LISTENERS FOR PHOTO UPLOAD ---
-
-        // 1. When the user clicks the avatar *in edit mode*
-        $('#avatar-container').on('click', function() {
-            if ($('#page-container').hasClass('edit-mode')) {
-                $('#photo-upload-input').click(); // Trigger the hidden file input
-            }
-        });
-
-        // 2. When the user selects a file from the file browser
-        $('#photo-upload-input').on('change', function(event) {
-            const file = event.target.files[0];
-            uploadOrUpdatePhoto(file);
-        });
-    }
+        PatientProfileApp.init();
+    });
 </script>
 </body>
 </html>
