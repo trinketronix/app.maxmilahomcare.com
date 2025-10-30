@@ -55,15 +55,16 @@
         .offcanvas-body .selection-list { max-height: 40vh; overflow-y: auto; }
         .offcanvas-body .selection-item { display: flex; align-items: center; gap: 1rem; border: 2px solid #ccc; border-radius: 15px; padding: 0.75rem; margin-bottom: 0.5rem; cursor: pointer; }
         .offcanvas-body .selection-item.selected { border-color: #0d6efd; background-color: #eef5ff; }
+        #alert-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px; }
     </style>
 </head>
 <body>
 
-<div id="alert-container" style="position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px;"></div>
+<div id="alert-container"></div>
 
 <div id="page-container" class="page-container view-mode">
     <header class="header">
-        <a href="/visit/management" class="back-button"><i class="fas fa-chevron-left"></i> Exit</a>
+        <a href="#" class="back-button" id="back-button"><i class="fas fa-chevron-left"></i> Exit</a>
         <h1 class="header-title">Visit</h1>
         <div class="profile">
             <div class="profile-icon"><img src="<?=$photo?>" alt="avatar"></div>
@@ -73,6 +74,7 @@
 
     <main class="main-content">
         <div id="visit-content-placeholder"><div class="text-center p-5"><div class="spinner-border"></div></div></div>
+
         <div id="visit-content" style="display:none;">
             <div class="visit-header"><div id="visit-progress-text" class="visit-progress-text"></div><div id="visit-date-text" class="visit-date-text"></div></div>
             <div class="participants-grid">
@@ -82,35 +84,32 @@
             </div>
             <div id="address-box" class="address-box"><div class="address-box-header"><i id="address-icon" class="fa-solid"></i> Address</div><div id="address-text" class="address-text"></div></div>
 
-            <!-- MODIFIED: Details list structure for View/Edit modes -->
             <ul class="details-list">
-                <!-- Editable fields -->
                 <li class="view-mode"><div class="list-item-row"><span class="label">Start time:</span> <span class="value" id="start_time-view"></span></div></li>
                 <li class="edit-mode"><div class="list-item-row"><span class="label">Visit Date:</span> <span class="value" id="visit_date-edit"></span></div></li>
-                <li class="edit-mode"><div class="list-item-row"><span class="label">Start time:</span> <input type="time" class="form-control" id="start_time-edit"></div></li>
-
+                <li class="edit-mode"><div class="list-item-row"><span class="label">Start time:</span> <input type="time" class="form-control editable-field" id="start_time-edit"></div></li>
                 <li class="view-mode"><div class="list-item-row"><span class="label">Total Hours:</span> <span class="value" id="duration-view"></span></div></li>
-                <li class="edit-mode"><div class="list-item-row"><span class="label">Total Hours:</span> <input type="number" class="form-control" id="total_hours-edit" min="1" max="12" placeholder="e.g., 4"></div></li>
-
-                <!-- Read-only fields (always visible) -->
+                <li class="edit-mode"><div class="list-item-row"><span class="label">Total Hours:</span> <input type="number" class="form-control editable-field" id="total_hours-edit" min="1" max="12" placeholder="e.g., 4"></div></li>
                 <li><div class="list-item-row"><span class="label">Scheduled by:</span> <span class="value" id="scheduled_by-view"></span></div></li>
                 <li><div class="list-item-row"><span class="label">Check-in by:</span> <span class="value" id="checkin_by-view"></span></div></li>
                 <li><div class="list-item-row"><span class="label">Check-out by:</span> <span class="value" id="checkout_by-view"></span></div></li>
                 <li><div class="list-item-row"><span class="label">Approved by:</span> <span class="value" id="approved_by-view"></span></div></li>
                 <li><div class="list-item-row"><span class="label">Canceled by:</span> <span class="value" id="canceled_by-view"></span></div></li>
-
-                <!-- Note field -->
                 <li><span class="label">Note:</span> <span class="value note-value read-only-value" id="note-view"></span> <textarea class="form-control editable-field" id="note-edit"></textarea></li>
             </ul>
 
-            <div class="action-buttons"><button type="button" class="btn btn-custom" id="progress-btn">Progress</button><button type="button" class="btn btn-custom" id="status-btn">Status</button><button type="button" class="btn btn-custom" id="edit-btn">Edit</button></div>
+            <div class="action-buttons">
+                <button type="button" class="btn btn-custom" id="progress-btn">Progress</button>
+                <button type="button" class="btn btn-custom" id="status-btn">Status</button>
+                <button type="button" class="btn btn-custom" id="edit-btn">Edit</button>
+            </div>
             <div class="save-button"><button type="button" class="btn btn-custom main-action" id="save-btn">Save Changes</button></div>
         </div>
     </main>
 </div>
 
-<!-- Modals & Offcanvas are unchanged -->
-<div class="modal fade" id="progressModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Change Progress</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="d-grid gap-2"><button class="btn btn-outline-info" data-action="checkin">Check-in</button><button class="btn btn-outline-secondary" data-action="checkout">Check-out</button><button class="btn btn-outline-success" data-action="approve">Approved</button><button class="btn btn-outline-danger" data-action="cancel">Cancel</button></div><div id="cancel-note-group" class="mt-3" style="display:none;"><label for="cancel-note" class="form-label">Cancellation Note (Required)</label><textarea class="form-control" id="cancel-note" rows="3"></textarea><button class="btn btn-danger w-100 mt-2" id="confirm-cancel-btn">Confirm Cancellation</button></div></div></div></div></div>
+<!-- Modals & Offcanvas -->
+<div class="modal fade" id="progressModal" tabindex="-1"> <div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Change Progress</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="d-grid gap-2"><button class="btn btn-outline-info" data-action="checkin">Check-in</button><button class="btn btn-outline-secondary" data-action="checkout">Check-out</button><button class="btn btn-outline-success" data-action="approve">Approved</button><button class="btn btn-outline-danger" data-action="cancel">Cancel</button></div><div id="cancel-note-group" class="mt-3" style="display:none;"><label for="cancel-note" class="form-label">Cancellation Note (Required)</label><textarea class="form-control" id="cancel-note" rows="3"></textarea><button class="btn btn-danger w-100 mt-2" id="confirm-cancel-btn">Confirm Cancellation</button></div></div></div></div></div>
 <div class="modal fade" id="statusModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Change Status</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="d-grid gap-2"><button class="btn btn-outline-primary" data-action="status/visible">Visible</button><button class="btn btn-outline-warning" data-action="status/archived">Archived</button><button class="btn btn-outline-danger" data-action="status/deleted">Deleted</button></div></div></div></div></div>
 <div class="modal fade" id="confirmAddressModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Edit Address</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body text-center">Do you want to edit the Address?<div class="d-flex justify-content-center gap-2 mt-3"><button class="btn btn-primary" id="confirm-address-yes">Yes</button><button class="btn btn-secondary" data-bs-dismiss="modal">No</button></div></div></div></div></div>
 <div class="offcanvas offcanvas-bottom" tabindex="-1" id="addressOffcanvas" style="height: 75%;"><div class="offcanvas-header"><h5 class="offcanvas-title w-100 text-center">Change Address</h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button></div><div class="offcanvas-body"><div class="input-group search-bar mb-2"><input type="text" id="address-search" class="form-control" placeholder="Search address..."></div><div class="selection-list" id="address-selection-list"></div></div></div>
@@ -120,161 +119,261 @@
 
 <script>
     $(document).ready(function() {
-        const visitId = <?=$visitId?>;
-        const baseUrl = '<?=$baseUrl?>';
-        const authToken = '<?=$authToken?>';
-        let currentVisitData = {};
+        /**
+         * Encapsulates all functionality for the Visit Detail page.
+         */
+        const VisitDetailApp = {
+            state: {
+                visitId: <?= json_encode($visitId ?? null) ?>,
+                baseUrl: <?= json_encode($baseUrl ?? '') ?>,
+                authToken: <?= json_encode($authToken ?? '') ?>,
+                currentVisitData: {},
+            },
 
-        const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
-        const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
-        const confirmAddressModal = new bootstrap.Modal(document.getElementById('confirmAddressModal'));
-        const addressOffcanvas = new bootstrap.Offcanvas(document.getElementById('addressOffcanvas'));
+            elements: {
+                pageContainer: $('#page-container'),
+                alertContainer: $('#alert-container'),
+                visitContent: $('#visit-content'),
+                placeholder: $('#visit-content-placeholder'),
+                backBtn: $('#back-button'),
+                editBtn: $('#edit-btn'),
+                saveBtn: $('#save-btn'),
+                progressBtn: $('#progress-btn'),
+                statusBtn: $('#status-btn'),
+                confirmCancelBtn: $('#confirm-cancel-btn'),
+                cancelNote: $('#cancel-note'),
+                cancelNoteGroup: $('#cancel-note-group'),
+                addressBox: $('#address-box'),
+                addressSelectionList: $('#address-selection-list'),
+                confirmAddressYesBtn: $('#confirm-address-yes'),
+            },
 
-        // --- HELPERS ---
-        const showAlert = (message, type = 'success') => { $('#alert-container').html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).delay(4000).fadeOut(); };
-        const getProgressText = (p) => ({ '-1': "Canceled", '0': "Scheduled", '1': "Check-in", '2': "Check-out", '3': "Approved" }[p] || 'Unknown');
-        const getFormattedDateTime = (dateStr) => { const d = new Date(dateStr); return d.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }); };
-        const getRelativeTime = (dateStr) => { const n=new Date(),v=new Date(dateStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/(1e3*60*60*24));if(d<0)return"Past visit";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`; };
+            // Bootstrap component instances
+            modals: {
+                progress: null,
+                status: null,
+                confirmAddress: null,
+                addressOffcanvas: null,
+            },
 
-        // --- API CALLS ---
-        function fetchVisitDetails() {
-            $.ajax({ url: `${baseUrl}/visit/${visitId}`, headers: { 'Authorization': authToken },
-                success: (res) => { if (res.status === 'success') { currentVisitData = res.data; renderVisitDetails(currentVisitData); } },
-                error: () => { $('#visit-content-placeholder').html('<p class="text-center text-danger">Could not load visit details.</p>'); }
-            });
-        }
-        function updateVisit(payload) {
-            $.ajax({ url: `${baseUrl}/visit/${visitId}`, type: 'PUT', headers: { 'Authorization': authToken, 'Content-Type': 'application/json' }, data: JSON.stringify(payload),
-                success: (res) => { showAlert(res.message || 'Visit updated successfully!', 'success'); fetchVisitDetails(); },
-                error: (xhr) => showAlert(xhr.responseJSON?.message || 'Failed to update visit.', 'danger')
-            });
-        }
-        function performVisitAction(actionEndpoint, dataPayload = null) {
-            const ajaxConfig = { url: `${baseUrl}/visit/${visitId}/${actionEndpoint}`, type: 'PUT', headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
-                success: (res) => { showAlert(res.message || 'Action completed!', 'success'); fetchVisitDetails(); },
-                error: (xhr) => showAlert(xhr.responseJSON?.message || 'Action failed.', 'danger')
-            };
-            if (dataPayload) { ajaxConfig.contentType = 'application/json'; ajaxConfig.data = JSON.stringify(dataPayload); }
-            $.ajax(ajaxConfig);
-        }
-        function fetchAccountName(userId, elementId) {
-            $.ajax({ url: `${baseUrl}/account/${userId}`, headers: { 'Authorization': authToken },
-                success: (res) => { if (res.status === 'success' && res.data) { $(`#${elementId}`).text(`${res.data.firstname} ${res.data.lastname}`); } },
-                error: () => $(`#${elementId}`).text('Unknown User')
-            });
-        }
-
-        // --- RENDER FUNCTION ---
-        function renderVisitDetails(data) {
-            if (!data || !data.user || !data.patient) { showAlert('Incomplete visit data.', 'danger'); return; }
-            $('#visit-progress-text').text(getProgressText(data.progress));
-            $('#visit-date-text').text(new Date(data.start_time).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }));
-            $('#visit-duration').text(`${Math.floor(data.duration_minutes / 60)} hrs total`);
-            $('#visit-relative-time').text(getRelativeTime(data.start_time));
-            $('#caregiver-avatar').attr('src', data.user.photo ? baseUrl + data.user.photo : 'https://via.placeholder.com/70');
-            $('#caregiver-name').text(`${data.user.firstname} ${data.user.lastname}`);
-            $('#patient-avatar').attr('src', data.patient.photo ? baseUrl + data.patient.photo : 'https://via.placeholder.com/70');
-            $('#patient-name').text(`${data.patient.firstname} ${data.patient.lastname}`);
-            if (data.address) {
-                $('#address-text').html(`${data.address.address}<br>${data.address.city}, ${data.address.state} ${data.address.zipcode}`);
-                $('#address-icon').attr('class', data.address.type === 'Apartment' ? 'fa-solid fa-building' : 'fa-solid fa-house');
-            }
-
-            // Render static details and fetch names for dynamic ones
-            $('#start_time-view').text(getFormattedDateTime(data.start_time));
-            $('#duration-view').text(`${Math.floor(data.duration_minutes / 60)} Hours`);
-            $('#note-view').text(data.note || 'N/A');
-
-            const byFields = ['scheduled_by', 'checkin_by', 'checkout_by', 'approved_by', 'canceled_by'];
-            byFields.forEach(key => {
-                const viewEl = $(`#${key}-view`);
-                if (data[key] !== null) {
-                    viewEl.text('Loading...'); // Placeholder
-                    fetchAccountName(data[key], `${key}-view`);
-                } else {
-                    viewEl.text('TBD');
+            init() {
+                if (!this.state.visitId) {
+                    this.helpers.showAlert('Visit ID is missing.', 'danger');
+                    this.elements.placeholder.text('Error: No Visit ID specified.');
+                    return;
                 }
-            });
+                this.modals.progress = new bootstrap.Modal(document.getElementById('progressModal'));
+                this.modals.status = new bootstrap.Modal(document.getElementById('statusModal'));
+                this.modals.confirmAddress = new bootstrap.Modal(document.getElementById('confirmAddressModal'));
+                this.modals.addressOffcanvas = new bootstrap.Offcanvas(document.getElementById('addressOffcanvas'));
 
-            $('#visit-content-placeholder').hide();
-            $('#visit-content').show();
-        }
+                this.bindEvents();
+                this.api.fetchVisitDetails();
+            },
 
-        // --- UI MODE MANAGEMENT ---
-        function setMode(mode) {
-            const container = $('#page-container');
-            if (mode === 'edit') {
-                const startDate = new Date(currentVisitData.start_time);
-                $('#visit_date-edit').text(startDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'}));
-                $('#start_time-edit').val(String(startDate.getHours()).padStart(2,'0') + ':' + String(startDate.getMinutes()).padStart(2,'0'));
-                $('#total_hours-edit').val(Math.floor(currentVisitData.duration_minutes / 60));
-                $('#note-edit').val(currentVisitData.note || '');
-                container.removeClass('view-mode').addClass('edit-mode');
-            } else {
-                container.removeClass('edit-mode').addClass('view-mode');
-            }
-        }
+            bindEvents() {
+                this.elements.editBtn.on('click', () => this.setMode('edit'));
+                this.elements.saveBtn.on('click', this.handlers.onSave);
+                this.elements.backBtn.on('click', this.handlers.onBack);
+                this.elements.progressBtn.on('click', () => this.modals.progress.show());
+                this.elements.statusBtn.on('click', () => this.modals.status.show());
+                this.elements.confirmCancelBtn.on('click', this.handlers.onConfirmCancel);
+                this.elements.addressBox.on('click', this.handlers.onAddressBoxClick);
+                this.elements.confirmAddressYesBtn.on('click', this.handlers.onConfirmAddressChange);
+                this.elements.addressSelectionList.on('click', '.selection-item', this.handlers.onAddressSelect);
 
-        // --- EVENT LISTENERS ---
-        $('#edit-btn').on('click', () => setMode('edit'));
-        $('#back-button').on('click', (e) => {
-            e.preventDefault(); // Always prevent the default link action
-            if ($('#page-container').hasClass('edit-mode')) {
-                setMode('view'); // If in edit mode, just switch back to view mode
-            } else {
-                window.history.back(); // If in view mode, go to the previous page
-            }
-        });
+                $('#progressModal').on('click', 'button[data-action]', this.handlers.onProgressAction);
+                $('#statusModal').on('click', 'button[data-action]', this.handlers.onStatusAction);
+            },
 
-        $('#save-btn').on('click', () => {
-            const totalHours = parseInt($('#total_hours-edit').val());
-            if (isNaN(totalHours) || totalHours <= 0) { showAlert('Total Hours must be > 0.', 'warning'); return; }
-
-            // Reconstruct the start_time from the fixed date and new time
-            const visitDate = new Date(currentVisitData.start_time);
-            const timeParts = $('#start_time-edit').val().split(':');
-            visitDate.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), 0, 0);
-
-            const payload = {
-                start_time: visitDate.toISOString().slice(0, 19).replace('T', ' '),
-                total_hours: totalHours,
-                note: $('#note-edit').val()
-            };
-            updateVisit(payload);
-            setMode('view');
-        });
-
-        // Other listeners (progress, status, address) are unchanged...
-        $('#progress-btn').on('click', () => progressModal.show());
-        $('#status-btn').on('click', () => statusModal.show());
-        $('#progressModal button[data-action]').on('click', function() {
-            const action = $(this).data('action');
-            if (action === 'cancel') { $('#cancel-note-group').show(); } else { performVisitAction(action); progressModal.hide(); }
-        });
-        $('#confirm-cancel-btn').on('click', function() {
-            const note = $('#cancel-note').val();
-            if (!note.trim()) { showAlert('Cancellation note is required.', 'warning'); return; }
-            performVisitAction('cancel', { note });
-            progressModal.hide(); $('#cancel-note').val(''); $('#cancel-note-group').hide();
-        });
-        $('#statusModal button[data-action]').on('click', function() { performVisitAction($(this).data('action')); statusModal.hide(); });
-        $('#address-box').on('click', () => { if ($('#page-container').hasClass('edit-mode')) confirmAddressModal.show(); });
-        $('#confirm-address-yes').on('click', () => {
-            confirmAddressModal.hide();
-            $.ajax({ url: `${baseUrl}/address/person/${currentVisitData.patient_id}/1`, headers: { 'Authorization': authToken },
-                success: (res) => {
-                    const list = $('#address-selection-list'); list.empty();
-                    if (res.data && res.data.length > 0) { res.data.forEach(addr => list.append(`<div class="selection-item" data-id="${addr.id}">${addr.address}, ${addr.city}</div>`)); }
-                    else { list.html('<p class="text-center text-muted">No other addresses found.</p>'); }
-                    addressOffcanvas.show();
+            handlers: {
+                onBack(e) {
+                    e.preventDefault();
+                    if (VisitDetailApp.elements.pageContainer.hasClass('edit-mode')) {
+                        VisitDetailApp.setMode('view');
+                    } else {
+                        window.history.back();
+                    }
                 },
-                error: () => showAlert('Could not fetch addresses.', 'danger')
-            });
-        });
-        $('#address-selection-list').on('click', '.selection-item', function() { updateVisit({ address_id: $(this).data('id') }); addressOffcanvas.hide(); });
+                onSave() {
+                    const totalHours = parseInt($('#total_hours-edit').val());
+                    if (isNaN(totalHours) || totalHours <= 0) {
+                        VisitDetailApp.helpers.showAlert('Total Hours must be a number greater than 0.', 'warning');
+                        return;
+                    }
 
-        // Initial data fetch
-        fetchVisitDetails();
+                    const visitDate = new Date(VisitDetailApp.state.currentVisitData.start_time);
+                    const timeParts = $('#start_time-edit').val().split(':');
+                    visitDate.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), 0, 0);
+
+                    const payload = {
+                        start_time: visitDate.toISOString().slice(0, 19).replace('T', ' '),
+                        total_hours: totalHours,
+                        note: $('#note-edit').val()
+                    };
+
+                    VisitDetailApp.api.updateVisit(payload)
+                        .done(() => VisitDetailApp.setMode('view'));
+                },
+                onProgressAction(e) {
+                    const action = $(e.currentTarget).data('action');
+                    if (action === 'cancel') {
+                        VisitDetailApp.elements.cancelNoteGroup.show();
+                    } else {
+                        VisitDetailApp.api.performAction(action).done(() => VisitDetailApp.modals.progress.hide());
+                    }
+                },
+                onStatusAction(e) {
+                    const action = $(e.currentTarget).data('action');
+                    VisitDetailApp.api.performAction(action).done(() => VisitDetailApp.modals.status.hide());
+                },
+                onConfirmCancel() {
+                    const note = VisitDetailApp.elements.cancelNote.val();
+                    if (!note.trim()) {
+                        VisitDetailApp.helpers.showAlert('A cancellation note is required.', 'warning');
+                        return;
+                    }
+                    VisitDetailApp.api.performAction('cancel', { note }).done(() => {
+                        VisitDetailApp.modals.progress.hide();
+                        VisitDetailApp.elements.cancelNote.val('');
+                        VisitDetailApp.elements.cancelNoteGroup.hide();
+                    });
+                },
+                onAddressBoxClick() {
+                    if (VisitDetailApp.elements.pageContainer.hasClass('edit-mode')) {
+                        VisitDetailApp.modals.confirmAddress.show();
+                    }
+                },
+                onConfirmAddressChange() {
+                    VisitDetailApp.modals.confirmAddress.hide();
+                    VisitDetailApp.api.fetchPatientAddresses();
+                },
+                onAddressSelect(e) {
+                    const addressId = $(e.currentTarget).data('id');
+                    VisitDetailApp.api.updateVisit({ address_id: addressId })
+                        .done(() => VisitDetailApp.modals.addressOffcanvas.hide());
+                }
+            },
+
+            api: {
+                _ajax(settings) {
+                    return $.ajax({
+                        ...settings,
+                        headers: { 'Authorization': VisitDetailApp.state.authToken, 'Content-Type': 'application/json' },
+                    }).fail(err => {
+                        const errorMsg = err.responseJSON?.message || 'An API error occurred.';
+                        VisitDetailApp.helpers.showAlert(errorMsg, 'danger');
+                    });
+                },
+                fetchVisitDetails() {
+                    this._ajax({ url: `${VisitDetailApp.state.baseUrl}/visit/${VisitDetailApp.state.visitId}` })
+                        .done(res => {
+                            if (res.status === 'success') {
+                                VisitDetailApp.state.currentVisitData = res.data;
+                                VisitDetailApp.render.visitDetails(res.data);
+                            }
+                        });
+                },
+                updateVisit(payload) {
+                    return this._ajax({
+                        url: `${VisitDetailApp.state.baseUrl}/visit/${VisitDetailApp.state.visitId}`,
+                        type: 'PUT',
+                        data: JSON.stringify(payload)
+                    }).done(res => {
+                        VisitDetailApp.helpers.showAlert(res.message || 'Visit updated successfully!', 'success');
+                        this.fetchVisitDetails();
+                    });
+                },
+                performAction(actionEndpoint, payload = null) {
+                    return this._ajax({
+                        url: `${VisitDetailApp.state.baseUrl}/visit/${VisitDetailApp.state.visitId}/${actionEndpoint}`,
+                        type: 'PUT',
+                        data: payload ? JSON.stringify(payload) : null
+                    }).done(res => {
+                        VisitDetailApp.helpers.showAlert(res.message || 'Action completed successfully!', 'success');
+                        this.fetchVisitDetails();
+                    });
+                },
+                fetchPatientAddresses() {
+                    this._ajax({ url: `${VisitDetailApp.state.baseUrl}/address/person/${VisitDetailApp.state.currentVisitData.patient_id}/1` })
+                        .done(res => {
+                            VisitDetailApp.render.addressSelectionList(res.data);
+                            VisitDetailApp.modals.addressOffcanvas.show();
+                        });
+                },
+                fetchAccountName(userId, elementId) {
+                    this._ajax({ url: `${VisitDetailApp.state.baseUrl}/account/${userId}` })
+                        .done(res => {
+                            if (res.status === 'success' && res.data) {
+                                $(`#${elementId}`).text(`${res.data.firstname} ${res.data.lastname}`);
+                            }
+                        }).fail(() => $(`#${elementId}`).text('Unknown User'));
+                }
+            },
+
+            render: {
+                visitDetails(data) {
+                    if (!data?.user || !data?.patient) { return; }
+                    const h = VisitDetailApp.helpers;
+
+                    $('#visit-progress-text').text(h.getProgressText(data.progress));
+                    $('#visit-date-text').text(new Date(data.start_time).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }));
+                    $('#visit-duration').text(`${Math.floor(data.duration_minutes / 60)} hrs total`);
+                    $('#visit-relative-time').text(h.getRelativeTime(data.start_time));
+                    $('#caregiver-avatar').attr('src', data.user.photo ? VisitDetailApp.state.baseUrl + data.user.photo : 'https://via.placeholder.com/70');
+                    $('#caregiver-name').text(`${data.user.firstname} ${data.user.lastname}`);
+                    $('#patient-avatar').attr('src', data.patient.photo ? VisitDetailApp.state.baseUrl + data.patient.photo : 'https://via.placeholder.com/70');
+                    $('#patient-name').text(`${data.patient.firstname} ${data.patient.lastname}`);
+
+                    if (data.address) {
+                        $('#address-text').html(`${data.address.address}<br>${data.address.city}, ${data.address.state} ${data.address.zipcode}`);
+                        $('#address-icon').attr('class', data.address.type === 'Apartment' ? 'fa-solid fa-building' : 'fa-solid fa-house');
+                    }
+
+                    $('#start_time-view').text(h.getFormattedDateTime(data.start_time));
+                    $('#duration-view').text(`${Math.floor(data.duration_minutes / 60)} Hours`);
+                    $('#note-view').text(data.note || 'N/A');
+
+                    ['scheduled_by', 'checkin_by', 'checkout_by', 'approved_by', 'canceled_by'].forEach(key => {
+                        const el = $(`#${key}-view`);
+                        data[key] ? VisitDetailApp.api.fetchAccountName(data[key], `${key}-view`, el.text('Loading...')) : el.text('TBD');
+                    });
+
+                    VisitDetailApp.elements.placeholder.hide();
+                    VisitDetailApp.elements.visitContent.show();
+                },
+                addressSelectionList(addresses) {
+                    const list = VisitDetailApp.elements.addressSelectionList.empty();
+                    if (addresses?.length) {
+                        addresses.forEach(addr => list.append(`<div class="selection-item" data-id="${addr.id}">${addr.address}, ${addr.city}</div>`));
+                    } else {
+                        list.html('<p class="text-center text-muted">No other addresses found.</p>');
+                    }
+                }
+            },
+
+            helpers: {
+                showAlert: (message, type = 'success') => VisitDetailApp.elements.alertContainer.html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).fadeIn().delay(4000).fadeOut(),
+                getProgressText: p => ({ '-1': "Canceled", '0': "Scheduled", '1': "Check-in", '2': "Check-out", '3': "Approved" }[p] || 'Unknown'),
+                getFormattedDateTime: dStr => new Date(dStr).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }),
+                getRelativeTime(dStr) { const n=new Date(),v=new Date(dStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/864e5);if(d<0)return"Past";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`;}
+            },
+
+            setMode(mode) {
+                if (mode === 'edit') {
+                    const startDate = new Date(this.state.currentVisitData.start_time);
+                    $('#visit_date-edit').text(startDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'}));
+                    $('#start_time-edit').val(String(startDate.getHours()).padStart(2,'0') + ':' + String(startDate.getMinutes()).padStart(2,'0'));
+                    $('#total_hours-edit').val(Math.floor(this.state.currentVisitData.duration_minutes / 60));
+                    $('#note-edit').val(this.state.currentVisitData.note || '');
+                    this.elements.pageContainer.removeClass('view-mode').addClass('edit-mode');
+                } else {
+                    this.elements.pageContainer.removeClass('edit-mode').addClass('view-mode');
+                }
+            }
+        };
+
+        VisitDetailApp.init();
     });
 </script>
 </body>
