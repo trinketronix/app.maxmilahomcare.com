@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?=$pageTitle ?? 'Caregiver Profile'?></title>
+    <title><?=$pageTitle ?? 'Profile'?></title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="../../img/fav/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../../img/fav/favicon-32x32.png">
@@ -135,7 +135,6 @@
                 baseUrl: <?= json_encode($baseUrl ?? '') ?>,
                 authToken: <?= json_encode($authToken ?? '') ?>,
             },
-
             elements: {
                 pageContainer: $('#page-container'), alertContainer: $('#alert-container'),
                 currentStatus: $('#current-status'), roleText: $('#role-text'), photoView: $('#photo-view'),
@@ -155,44 +154,42 @@
                 this.api.fetchUserData();
             },
 
+            // *** THIS FUNCTION IS NOW CORRECTED ***
             bindEvents() {
-                const h = this.handlers; // Alias for brevity
-                h.editBtn.on('click', h.onEditClick); h.saveBtn.on('click', h.onSaveClick); h.backBtn.on('click', h.onBackClick);
-                h.avatarContainer.on('click', h.onAvatarClick); h.photoUploadInput.on('change', h.onFileSelected);
-                h.statusOptions.on('click', h.onStatusChange);
-                h.addressesBtn.on('click', () => window.location.href = `/caregiver/addresses/${this.state.targetUserId}`);
-                h.patientsBtn.on('click', () => window.location.href = `/caregiver/patients/${this.state.targetUserId}`);
+                // Use 'this.elements' to correctly reference cached DOM elements.
+                // Use '.bind(this)' to ensure the correct 'this' context inside the handlers.
+                this.elements.editBtn.on('click', this.handlers.onEditClick.bind(this));
+                this.elements.saveBtn.on('click', this.handlers.onSaveClick.bind(this));
+                this.elements.backBtn.on('click', this.handlers.onBackClick.bind(this));
+                this.elements.avatarContainer.on('click', this.handlers.onAvatarClick.bind(this));
+                this.elements.photoUploadInput.on('change', this.handlers.onFileSelected.bind(this));
+                this.elements.statusOptions.on('click', this.handlers.onStatusChange.bind(this));
+                this.elements.addressesBtn.on('click', () => window.location.href = `/caregiver/addresses/${this.state.targetUserId}`);
+                this.elements.patientsBtn.on('click', () => window.location.href = `/caregiver/patients/${this.state.targetUserId}`);
             },
 
             handlers: {
-                onEditClick() { CaregiverProfileApp.setMode('edit'); },
-                onSaveClick() { CaregiverProfileApp.api.saveUserData(); },
-                onBackClick(e) { e.preventDefault(); if (CaregiverProfileApp.elements.pageContainer.hasClass('edit-mode')) CaregiverProfileApp.setMode('view'); else window.history.back(); },
-                onAvatarClick() { if (CaregiverProfileApp.elements.pageContainer.hasClass('edit-mode')) CaregiverProfileApp.elements.photoUploadInput.click(); },
-                onFileSelected(e) { const file = e.target.files[0]; if (file) CaregiverProfileApp.api.uploadOrUpdatePhoto(file); },
-                onStatusChange(e) { const action = $(e.currentTarget).data('status-action'); CaregiverProfileApp.api.changeUserStatus(action); }
+                onEditClick() { this.setMode('edit'); },
+                onSaveClick() { this.api.saveUserData(); },
+                onBackClick(e) { e.preventDefault(); if (this.elements.pageContainer.hasClass('edit-mode')) this.setMode('view'); else window.history.back(); },
+                onAvatarClick() { if (this.elements.pageContainer.hasClass('edit-mode')) this.elements.photoUploadInput.click(); },
+                onFileSelected(e) { const file = e.target.files[0]; if (file) this.api.uploadOrUpdatePhoto(file); },
+                onStatusChange(e) { const action = $(e.currentTarget).data('status-action'); this.api.changeUserStatus(action); }
             },
 
             api: {
-                /**
-                 * *** THE FIX IS HERE ***
-                 * This universal AJAX helper now intelligently handles both JSON and FormData requests.
-                 */
                 _ajax(settings) {
                     const baseSettings = {
                         headers: { 'Authorization': CaregiverProfileApp.state.authToken },
-                        // Check if data is FormData. If so, let browser set Content-Type.
                         processData: !(settings.data instanceof FormData),
                         contentType: (settings.data instanceof FormData) ? false : 'application/json',
-                        // Convert object data to JSON string if it's not FormData
                         data: (settings.data && !(settings.data instanceof FormData)) ? JSON.stringify(settings.data) : settings.data
                     };
-
                     return $.ajax({ ...baseSettings, ...settings })
                         .fail(err => CaregiverProfileApp.helpers.showAlert(err.responseJSON?.message || 'An error occurred.', 'danger'));
                 },
 
-                fetchUserData() { this._ajax({ url: `${CaregiverProfileApp.state.baseUrl}/account/${CaregiverProfileApp.state.targetUserId}`, type: 'GET' }).done(res => { if (res.status === 'success') { CaregiverProfileApp.state.targetUserData = res.data; CaregiverProfileApp.render.view(res.data); } }); },
+                fetchUserData() { this._ajax({ url: `${CaregiverProfileApp.state.baseUrl}/account/${CaregiverProfileApp.state.targetUserId}`, type: 'GET', dataType: 'json' }).done(res => { if (res.status === 'success') { CaregiverProfileApp.state.targetUserData = res.data; CaregiverProfileApp.render.view(res.data); } }); },
 
                 saveUserData() {
                     const updatedFields = {};
@@ -209,14 +206,10 @@
 
                 uploadOrUpdatePhoto(file) {
                     const { targetUserData, loggedInUserId, targetUserId, baseUrl } = CaregiverProfileApp.state;
-
                     const isDefault = targetUserData.photo?.includes('default.jpg');
-                    const isEditingSelf = loggedInUserId === targetUserId;
                     const httpMethod = isDefault ? 'POST' : 'PUT';
                     const endpoint = isDefault ? 'upload/photo' : 'update/photo';
-
-                    // Endpoint logic for self vs. others remains the same
-                    const finalUrl = isEditingSelf ? `${baseUrl}/user/${endpoint}` : `${baseUrl}/user/${targetUserId}/${endpoint}`;
+                    const finalUrl = (loggedInUserId === targetUserId) ? `${baseUrl}/user/${endpoint}` : `${baseUrl}/user/${targetUserId}/${endpoint}`;
 
                     const formData = new FormData();
                     formData.append('file', file);
@@ -256,9 +249,12 @@
             },
 
             helpers: {
-                getRoleText: r => ({'0':'Admin','1':'Manager','2':'Caregiver'}[r]||'Unknown'),
-                getStatusInfo: s => ({'-1':{t:'Not Verified',c:'status-not-verified'},'0':{t:'Inactive',c:'status-inactive'},'1':{t:'Active',c:'status-active'},'2':{t:'Archived',c:'status-archived'}}[s]||{t:'Unknown',c:''}),
-                showAlert(message, type = 'success') { const h=`<div class="alert alert-${type} alert-dismissible fade show">${message}<button class="btn-close" data-bs-dismiss="alert"></button></div>`; CaregiverProfileApp.elements.alertContainer.html(h).children().delay(4000).fadeOut(); }
+                getRoleText: r => ({'0':'Administrator','1':'Manager','2':'Caregiver'}[r] ||'Unknown'),
+                getStatusInfo(status) {
+                    const map = {'-1':{text:'Not Verified',class:'status-not-verified'},'0':{text:'Inactive',class:'status-inactive'},'1':{text:'Active',class:'status-active'},'2':{text:'Archived',class:'status-archived'}};
+                    return map[status] || {text:'Unknown Status',class:''};
+                },
+                showAlert(message, type = 'success') { const h = `<div class="alert alert-${type} alert-dismissible fade show">${message}<button class="btn-close" data-bs-dismiss="alert"></button></div>`; CaregiverProfileApp.elements.alertContainer.html(h).children().delay(4000).fadeOut(); }
             },
 
             setMode(mode) {
