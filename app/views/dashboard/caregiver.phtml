@@ -380,7 +380,7 @@
                 this.elements.confirmCreateVisitBtn.on('click', this.handlers.onConfirmCreateVisit.bind(this));
 
                 // Profile link navigation
-                $('#profile-link').on('click', () => window.location.href = `/caregiver/profile/${this.state.caregiverId}`);
+                $('#profile-link').on('click', () => window.location.href = `/caregiver/profile`);
             },
 
             // --- HANDLERS: Respond to user interactions ---
@@ -619,7 +619,7 @@
                         if (type === 'patient') {
                             id = item.id;
                             name = `${item.firstname || ''} ${item.lastname || ''}`.trim();
-                            photo = `${CaregiverApp.state.baseUrl}${item.photo}`;
+                            photo = `${baseUrl}${item.photo}`;
                             iconClass = 'fa-user';
                         } else { // address
                             id = item.id;
