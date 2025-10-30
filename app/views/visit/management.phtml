@@ -110,7 +110,7 @@
 
 <script>
     $(document).ready(function() {
-        const VisitsManagementApp = {
+        const VisitManagementApp = {
             state: {
                 baseUrl: <?= json_encode($baseUrl ?? '') ?>,
                 authToken: <?= json_encode($authToken ?? '') ?>,
@@ -240,49 +240,49 @@
             },
 
             api: {
-                _ajax: settings => $.ajax({ ...settings, headers: {'Authorization': VisitsManagementApp.state.authToken} }).fail(err => VisitsManagementApp.helpers.showAlert(err.responseJSON?.message || 'API request failed.', 'danger')),
-                fetchAllVisits() { VisitsManagementApp.elements.visitList.html('<div class="text-center p-5"><div class="spinner-border"></div></div>'); this._ajax({url:`${VisitsManagementApp.state.baseUrl}/visits`}).done(res => { VisitsManagementApp.state.allVisits = res.data.visits || []; VisitsManagementApp.handlers.applyFilters.call(VisitsManagementApp); }); },
-                fetchCaregivers: () => VisitsManagementApp.api._ajax({ url: `${VisitsManagementApp.state.baseUrl}/accounts` }),
-                fetchAssignedPatients: () => VisitsManagementApp.api._ajax({ url: `${VisitsManagementApp.state.baseUrl}/assigned/patients/${VisitsManagementApp.state.newVisit.caregiverId}` }),
-                fetchPatientAddresses: () => VisitsManagementApp.api._ajax({ url: `${VisitsManagementApp.state.baseUrl}/address/person/${VisitsManagementApp.state.newVisit.patientId}/1` }),
+                _ajax: settings => $.ajax({ ...settings, headers: {'Authorization': VisitManagementApp.state.authToken} }).fail(err => VisitManagementApp.helpers.showAlert(err.responseJSON?.message || 'API request failed.', 'danger')),
+                fetchAllVisits() { VisitManagementApp.elements.visitList.html('<div class="text-center p-5"><div class="spinner-border"></div></div>'); this._ajax({url:`${VisitManagementApp.state.baseUrl}/visits`}).done(res => { VisitManagementApp.state.allVisits = res.data.visits || []; VisitManagementApp.handlers.applyFilters.call(VisitManagementApp); }); },
+                fetchCaregivers: () => VisitManagementApp.api._ajax({ url: `${VisitManagementApp.state.baseUrl}/accounts` }),
+                fetchAssignedPatients: () => VisitManagementApp.api._ajax({ url: `${VisitManagementApp.state.baseUrl}/assigned/patients/${VisitManagementApp.state.newVisit.caregiverId}` }),
+                fetchPatientAddresses: () => VisitManagementApp.api._ajax({ url: `${VisitManagementApp.state.baseUrl}/address/person/${VisitManagementApp.state.newVisit.patientId}/1` }),
                 createVisit() {
-                    const { caregiverId, patientId, addressId, visitDate, startTime, totalHours } = VisitsManagementApp.state.newVisit;
+                    const { caregiverId, patientId, addressId, visitDate, startTime, totalHours } = VisitManagementApp.state.newVisit;
                     const payload = { user_id: caregiverId, patient_id: patientId, address_id: addressId, visit_date: new Date(visitDate).toISOString().slice(0, 10), total_hours: totalHours };
                     if(startTime){ const dt=new Date(visitDate); dt.setHours(startTime.h,startTime.m,0,0); payload.start_time = dt.toISOString().slice(0,19).replace('T',' '); }
-                    this._ajax({ url:`${VisitsManagementApp.state.baseUrl}/visit`, type:'POST', contentType:'application/json', data: JSON.stringify(payload)})
-                        .done(() => { VisitsManagementApp.helpers.showAlert('Visit created successfully!','success'); VisitsManagementApp.modals.confirmation.hide(); VisitsManagementApp.modals.offcanvas.hide(); VisitsManagementApp.api.fetchAllVisits(); });
+                    this._ajax({ url:`${VisitManagementApp.state.baseUrl}/visit`, type:'POST', contentType:'application/json', data: JSON.stringify(payload)})
+                        .done(() => { VisitManagementApp.helpers.showAlert('Visit created successfully!','success'); VisitManagementApp.modals.confirmation.hide(); VisitManagementApp.modals.offcanvas.hide(); VisitManagementApp.api.fetchAllVisits(); });
                 }
             },
 
             render: {
                 visitList(visits) {
-                    const container = VisitsManagementApp.elements.visitList.empty();
+                    const container = VisitManagementApp.elements.visitList.empty();
                     if (!visits?.length) { container.html('<p class="text-center text-muted mt-4">No visits found.</p>'); return; }
-                    visits.forEach(v => container.append(VisitsManagementApp.helpers.getVisitCardHTML(v)));
+                    visits.forEach(v => container.append(VisitManagementApp.helpers.getVisitCardHTML(v)));
                 },
                 selectionList(type, items) {
-                    const container = VisitsManagementApp.elements[`${type}List`].empty();
+                    const container = VisitManagementApp.elements[`${type}List`].empty();
                     if(!items?.length){ container.html(`<p class="text-center text-muted mt-3">No ${type}s found.</p>`); return; }
-                    items.forEach(item => container.append(VisitsManagementApp.helpers.getSelectionItemHTML(type, item)));
+                    items.forEach(item => container.append(VisitManagementApp.helpers.getSelectionItemHTML(type, item)));
                 },
                 timePicker() {
                     // Use 'VisitsManagementApp' instead of 'this'
-                    VisitsManagementApp.elements.timePicker.html(`<label class="form-label me-2">Start:</label><select id="start-time-picker-hour" class="form-select me-2"><option value="">--</option>${Array.from({length:24},(v,k)=>`<option value="${k}">${String(k).padStart(2,'0')}</option>`).join('')}</select>:<select id="start-time-picker-minute" class="form-select"><option value="">--</option>${Array.from({length:4},(v,k)=>`<option value="${k*15}">${String(k*15).padStart(2,'0')}</option>`).join('')}</select>`).addClass('time-picker-wrapper');
+                    VisitManagementApp.elements.timePicker.html(`<label class="form-label me-2">Start:</label><select id="start-time-picker-hour" class="form-select me-2"><option value="">--</option>${Array.from({length:24},(v,k)=>`<option value="${k}">${String(k).padStart(2,'0')}</option>`).join('')}</select>:<select id="start-time-picker-minute" class="form-select"><option value="">--</option>${Array.from({length:4},(v,k)=>`<option value="${k*15}">${String(k*15).padStart(2,'0')}</option>`).join('')}</select>`).addClass('time-picker-wrapper');
                 },
                 confirmationText() {
                     // Use 'VisitsManagementApp' instead of 'this'
-                    const { patientFullname, caregiverFullname, visitDate, startTime, totalHours } = VisitsManagementApp.state.newVisit;
+                    const { patientFullname, caregiverFullname, visitDate, startTime, totalHours } = VisitManagementApp.state.newVisit;
                     const d = new Date(visitDate).toLocaleDateString('en-US',{month:'long',day:'numeric'});
                     let t = `for ${totalHours} hours.`;
                     if (startTime) { const s=`${startTime.h%12||12}:${String(startTime.m).padStart(2,'0')} ${startTime.h>=12?'PM':'AM'}`; t=`starting ~${s} ${t}` }
-                    VisitsManagementApp.elements.visitConfirmationText.html(`Create a visit for <strong>${patientFullname}</strong> on <strong>${d}</strong>, with <strong>${caregiverFullname}</strong>, ${t}`);
+                    VisitManagementApp.elements.visitConfirmationText.html(`Create a visit for <strong>${patientFullname}</strong> on <strong>${d}</strong>, with <strong>${caregiverFullname}</strong>, ${t}`);
                 }
             },
 
             helpers: {
                 getVisitCardHTML(v) {
-                    const h = VisitsManagementApp.helpers;
-                    const baseUrl = VisitsManagementApp.state.baseUrl;
+                    const h = VisitManagementApp.helpers;
+                    const baseUrl = VisitManagementApp.state.baseUrl;
                     const cgName=`${v.user.firstname} ${v.user.lastname}`, ptName=`${v.patient.firstname} ${v.patient.lastname}`;
                     const prog = h.getProgressText(v.progress);
                     return `<a href="/visit/detail/${v.id}" class="visit-card">
@@ -291,13 +291,13 @@
                         <div class="visit-person"><div class="visit-person-avatar"><img src="${baseUrl}${v.patient.photo}" alt="PT"></div><div class="visit-person-name">${ptName}</div></div></a>`;
                 },
                 getSelectionItemHTML(type, item) {
-                    const baseUrl = VisitsManagementApp.state.baseUrl;
+                    const baseUrl = VisitManagementApp.state.baseUrl;
                     let id, name, photo, icon = 'fa-user';
                     if (type === 'address') { id=item.id; name=`${item.address}, ${item.city}`; photo=null; icon = item.type==='Apartment'?'fa-building':'fa-house';}
                     else { id=item.id; name=`${item.firstname} ${item.lastname}`; photo=baseUrl + item.photo;}
                     return `<div class="selection-item" data-id="${id}" data-name="${name}"><div class="item-avatar">${photo ? `<img src="${photo}" class="rounded-circle w-100 h-100" style="object-fit:cover;">` : `<i class="fa-solid ${icon} fs-3"></i>`}</div><div>${name}</div></div>`;
                 },
-                showAlert: (m,t='success')=>VisitsManagementApp.elements.alertContainer.html(`<div class="alert alert-${t} a-d fade show" role="alert">${m}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).children().delay(4000).fadeOut(),
+                showAlert: (m,t='success')=>VisitManagementApp.elements.alertContainer.html(`<div class="alert alert-${t} a-d fade show" role="alert">${m}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).children().delay(4000).fadeOut(),
                 getProgressText: p => ({'-1':"Canceled",'0':"Scheduled",'1':"Check-in",'2':"Check-out",'3':"Approved"}[p]||'Unknown'),
                 getFormattedDate: d=>new Date(d).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}),
                 getRelativeTime: dStr=>{const n=new Date(),v=new Date(dStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/864e5);if(d<0)return"Past";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`},
@@ -326,7 +326,7 @@
             }
         };
 
-        VisitsManagementApp.init();
+        VisitManagementApp.init();
     });
 </script>
 </body>
