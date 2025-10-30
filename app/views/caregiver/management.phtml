@@ -112,7 +112,7 @@
         /**
          * Encapsulates all functionality for the Caregiver Management page.
          */
-        const ManagementApp = {
+        const CaregiverManagementApp = {
             state: {
                 adminId: <?= json_encode($userId ?? null) ?>,
                 baseUrl: <?= json_encode($baseUrl ?? '') ?>,
@@ -159,23 +159,23 @@
 
             handlers: {
                 applyFilters() {
-                    const searchTerm = ManagementApp.elements.searchInput.val().toLowerCase();
-                    const activeStatus = ManagementApp.elements.filterButtons.filter('.active').data('filter-status').toString();
+                    const searchTerm = CaregiverManagementApp.elements.searchInput.val().toLowerCase();
+                    const activeStatus = CaregiverManagementApp.elements.filterButtons.filter('.active').data('filter-status').toString();
 
-                    const filteredUsers = ManagementApp.state.allUsers.filter(user => {
+                    const filteredUsers = CaregiverManagementApp.state.allUsers.filter(user => {
                         const statusMatch = (activeStatus === 'all' || user.status.toString() === activeStatus);
                         const fullName = `${user.firstname || ''} ${user.lastname || ''}`.toLowerCase();
                         const searchMatch = !searchTerm || fullName.includes(searchTerm);
                         return statusMatch && searchMatch;
                     });
 
-                    ManagementApp.render.userList(filteredUsers);
+                    CaregiverManagementApp.render.userList(filteredUsers);
                 },
 
                 onFilterClick(e) {
-                    ManagementApp.elements.filterButtons.removeClass('active');
+                    CaregiverManagementApp.elements.filterButtons.removeClass('active');
                     $(e.currentTarget).addClass('active');
-                    ManagementApp.handlers.applyFilters();
+                    CaregiverManagementApp.handlers.applyFilters();
                 },
 
                 onRegisterSubmit(e) {
@@ -185,10 +185,10 @@
                     const confirmPassword = $('#form-confirm-password').val();
 
                     if (password !== confirmPassword) {
-                        ManagementApp.helpers.showAlert('Passwords do not match.', 'danger');
+                        CaregiverManagementApp.helpers.showAlert('Passwords do not match.', 'danger');
                         return;
                     }
-                    ManagementApp.api.registerUser(username, password);
+                    CaregiverManagementApp.api.registerUser(username, password);
                 }
             },
 
@@ -196,58 +196,58 @@
                 _ajax(settings) {
                     return $.ajax({
                         ...settings,
-                        headers: { 'Authorization': ManagementApp.state.authToken },
+                        headers: { 'Authorization': CaregiverManagementApp.state.authToken },
                         dataType: 'json'
                     }).fail(err => {
                         const errorMsg = err.responseJSON?.message || 'An API error occurred.';
-                        ManagementApp.helpers.showAlert(errorMsg, 'danger');
+                        CaregiverManagementApp.helpers.showAlert(errorMsg, 'danger');
                     });
                 },
 
                 fetchUserList() {
-                    ManagementApp.elements.userList.html('<div class="text-center p-5"><div class="spinner-border"></div></div>');
-                    this._ajax({ url: `${ManagementApp.state.baseUrl}/accounts` })
+                    CaregiverManagementApp.elements.userList.html('<div class="text-center p-5"><div class="spinner-border"></div></div>');
+                    this._ajax({ url: `${CaregiverManagementApp.state.baseUrl}/accounts` })
                         .done(res => {
                             if (res.status === 'success' && res.data?.users) {
-                                ManagementApp.state.allUsers = res.data.users;
-                                ManagementApp.handlers.applyFilters(); // Apply default filters on load
+                                CaregiverManagementApp.state.allUsers = res.data.users;
+                                CaregiverManagementApp.handlers.applyFilters(); // Apply default filters on load
                             } else {
-                                ManagementApp.elements.userList.html('<p class="text-center text-muted">No users found.</p>');
+                                CaregiverManagementApp.elements.userList.html('<p class="text-center text-muted">No users found.</p>');
                             }
                         });
                 },
 
                 registerUser(username, password) {
                     this._ajax({
-                        url: `${ManagementApp.state.baseUrl}/auth/register`,
+                        url: `${CaregiverManagementApp.state.baseUrl}/auth/register`,
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify({ username, password })
                     }).done(response => {
-                        ManagementApp.helpers.showResultModal('Caregiver added successfully!', 'success');
-                        ManagementApp.modals.addCaregiver.hide();
-                        ManagementApp.elements.addCaregiverForm[0].reset();
+                        CaregiverManagementApp.helpers.showResultModal('Caregiver added successfully!', 'success');
+                        CaregiverManagementApp.modals.addCaregiver.hide();
+                        CaregiverManagementApp.elements.addCaregiverForm[0].reset();
                         this.fetchUserList();
                     }).fail(err => {
                         const errorMsg = err.responseJSON?.message || 'Unknown error.';
-                        ManagementApp.helpers.showResultModal(`Failed to add caregiver: ${errorMsg}`, 'danger');
+                        CaregiverManagementApp.helpers.showResultModal(`Failed to add caregiver: ${errorMsg}`, 'danger');
                     });
                 }
             },
 
             render: {
                 userList(users) {
-                    const { userList } = ManagementApp.elements;
+                    const { userList } = CaregiverManagementApp.elements;
                     if (!users || users.length === 0) {
                         userList.html('<p class="text-center text-muted mt-4">No matching users found.</p>');
                         return;
                     }
 
                     const userItemsHTML = users.map(user => {
-                        const h = ManagementApp.helpers;
+                        const h = CaregiverManagementApp.helpers;
                         const fullName = `${user.firstname || ''} ${user.lastname || ''}`.trim() || 'Unnamed User';
                         const status = h.getStatusInfo(user.status);
-                        const photoSrc = user.photo ? `${ManagementApp.state.baseUrl}${user.photo}` : 'https://via.placeholder.com/60';
+                        const photoSrc = user.photo ? `${CaregiverManagementApp.state.baseUrl}${user.photo}` : 'https://via.placeholder.com/60';
 
                         return `
                             <a href="/caregiver/profile/${user.id}" class="user-item">
@@ -265,14 +265,14 @@
             helpers: {
                 showAlert(message, type = 'success') {
                     const alertHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
-                    ManagementApp.elements.alertContainer.html(alertHTML).children().delay(4000).fadeOut();
+                    CaregiverManagementApp.elements.alertContainer.html(alertHTML).children().delay(4000).fadeOut();
                 },
 
                 showResultModal(message, type = 'success') {
-                    ManagementApp.elements.resultModalMessage.text(message)
+                    CaregiverManagementApp.elements.resultModalMessage.text(message)
                         .removeClass('text-danger text-success')
                         .addClass(type === 'success' ? 'text-success' : 'text-danger');
-                    ManagementApp.modals.result.show();
+                    CaregiverManagementApp.modals.result.show();
                 },
 
                 getStatusInfo: status => ({
@@ -293,7 +293,7 @@
             }
         };
 
-        ManagementApp.init();
+        CaregiverManagementApp.init();
     });
 </script>
 </body>
