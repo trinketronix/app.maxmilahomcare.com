@@ -280,7 +280,7 @@
          * Encapsulates the entire functionality for the Caregiver Visits page
          * to improve readability, maintainability, and organization.
          */
-        const CaregiverApp = {
+        const DashboardCaregiverApp = {
             // Configuration and state variables
             state: {
                 baseUrl: <?= json_encode($baseUrl ?? '') ?>,
@@ -536,36 +536,36 @@
             api: {
                 _ajax(url, method, data) {
                     const settings = {
-                        url: `${CaregiverApp.state.baseUrl}${url}`,
+                        url: `${DashboardCaregiverApp.state.baseUrl}${url}`,
                         method: method || 'GET',
-                        headers: { 'Authorization': CaregiverApp.state.authToken, 'Content-Type': 'application/json' },
+                        headers: { 'Authorization': DashboardCaregiverApp.state.authToken, 'Content-Type': 'application/json' },
                         dataType: 'json'
                     };
                     if (data) settings.data = JSON.stringify(data);
 
                     return $.ajax(settings)
-                        .fail((xhr) => CaregiverApp.helpers.showAlert(xhr.responseJSON?.message || `An error occurred.`, 'danger'));
+                        .fail((xhr) => DashboardCaregiverApp.helpers.showAlert(xhr.responseJSON?.message || `An error occurred.`, 'danger'));
                 },
 
                 fetchVisits() {
-                    CaregiverApp.elements.visitList.html('<div class="text-center p-5"><div class="spinner-border"></div></div>');
-                    this._ajax(`/user/visits/${CaregiverApp.state.caregiverId}`)
+                    DashboardCaregiverApp.elements.visitList.html('<div class="text-center p-5"><div class="spinner-border"></div></div>');
+                    this._ajax(`/user/visits/${DashboardCaregiverApp.state.caregiverId}`)
                         .done(res => {
-                            CaregiverApp.state.allVisits = (res.status === 'success' && res.data) ? res.data.visits : [];
-                            CaregiverApp.handlers.applyFilters.call(CaregiverApp);
+                            DashboardCaregiverApp.state.allVisits = (res.status === 'success' && res.data) ? res.data.visits : [];
+                            DashboardCaregiverApp.handlers.applyFilters.call(DashboardCaregiverApp);
                         }).fail(() => {
-                        CaregiverApp.state.allVisits = [];
-                        CaregiverApp.handlers.applyFilters.call(CaregiverApp);
+                        DashboardCaregiverApp.state.allVisits = [];
+                        DashboardCaregiverApp.handlers.applyFilters.call(DashboardCaregiverApp);
                     });
                 },
 
-                fetchPatients() { return this._ajax(`/assigned/patients/${CaregiverApp.state.caregiverId}`); },
+                fetchPatients() { return this._ajax(`/assigned/patients/${DashboardCaregiverApp.state.caregiverId}`); },
                 fetchAddresses(patientId) { return this._ajax(`/address/person/${patientId}/1`); },
 
                 performAction(action, visitId) {
                     return this._ajax(`/visit/${visitId}/${action}`, 'PUT')
                         .done(res => {
-                            CaregiverApp.helpers.showAlert(res.message || `Visit ${action} successful.`, 'success');
+                            DashboardCaregiverApp.helpers.showAlert(res.message || `Visit ${action} successful.`, 'success');
                             this.fetchVisits();
                         });
                 },
@@ -573,7 +573,7 @@
                 scheduleVisit(payload) {
                     return this._ajax(`/visit/schedule`, 'POST', payload)
                         .done(() => {
-                            CaregiverApp.helpers.showAlert('Visit created!', 'success');
+                            DashboardCaregiverApp.helpers.showAlert('Visit created!', 'success');
                             this.fetchVisits();
                         });
                 }
@@ -582,15 +582,15 @@
             // --- RENDER: Functions to update the DOM ---
             render: {
                 visits(visits) {
-                    const container = CaregiverApp.elements.visitList;
+                    const container = DashboardCaregiverApp.elements.visitList;
                     if (!visits || visits.length === 0) {
                         container.html('<p class="text-center text-muted mt-4">No visits found.</p>');
                         return;
                     }
                     const visitCardsHTML = visits.map(v => {
-                        const h = CaregiverApp.helpers;
+                        const h = DashboardCaregiverApp.helpers;
                         const patientName = `${v.patient.firstname} ${v.patient.lastname}`;
-                        const patientPhoto = `${CaregiverApp.state.baseUrl}${v.patient.photo}`;
+                        const patientPhoto = `${DashboardCaregiverApp.state.baseUrl}${v.patient.photo}`;
                         const progressText = h.getProgressText(v.progress);
                         const duration = v.duration_minutes ? Math.floor(v.duration_minutes / 60) : (v.total_hours || 0);
                         const isCanceled = progressText === 'Canceled' ? 'visit-progress-canceled' : '';
@@ -619,7 +619,7 @@
                         return;
                     }
 
-                    const baseUrl = CaregiverApp.state.baseUrl;
+                    const baseUrl = DashboardCaregiverApp.state.baseUrl;
                     const itemsHTML = items.map(item => {
                         let id, name, photo, iconClass;
                         if (type === 'patient') {
@@ -662,7 +662,7 @@
             // --- HELPERS: Utility functions ---
             helpers: {
                 showAlert(message, type = 'success') {
-                    CaregiverApp.elements.alertContainer
+                    DashboardCaregiverApp.elements.alertContainer
                         .html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`)
                         .show().delay(4000).fadeOut(400);
                 },
@@ -719,7 +719,7 @@
             },
         };
 
-        CaregiverApp.init();
+        DashboardCaregiverApp.init();
     });
 </script>
 </body>

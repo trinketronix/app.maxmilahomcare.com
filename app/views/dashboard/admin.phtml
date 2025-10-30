@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administrator Dashboard</title>
+    <title><?=$pageTitle ?? 'Administrator Dashboard'?></title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="../img/fav/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../img/fav/favicon-32x32.png">
@@ -11,189 +11,49 @@
     <link rel="manifest" href="../site.webmanifest">
     <link rel="shortcut icon" href="../img/fav/favicon.ico">
 
-    <!-- Bootstrap 5.1 CSS -->
+    <!-- Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Font Awesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
     <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
-        }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', 'Roboto', sans-serif; }
+        .page-container { max-width: 500px; margin: 0 auto; }
 
-        .page-container {
-            max-width: 500px;
-            margin: 0 auto;
-        }
+        /* Header */
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; }
+        .header-title { font-weight: bold; font-size: 1.8rem; }
+        .header-action-left, .header-action-right { width: 120px; }
+        .header-action-left { text-align: left; }
+        .header-action-right { text-align: center; }
+        .sign-out-link { text-decoration: none; color: #333; font-weight: 500; font-size: 1rem; transition: color 0.2s; }
+        .sign-out-link:hover { color: #000; text-decoration: underline; }
+        .sign-out-link i { margin-right: 0.4rem; }
+        .user-profile-avatar { width: 60px; height: 60px; border: 2px solid #000; border-radius: 50%; object-fit: cover; }
+        .user-profile-name { font-size: 0.9rem; font-weight: 500; display: block; margin-top: 0.25rem; }
 
-        /* --- HEADER STYLING --- */
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-        }
+        /* Navigation */
+        .nav-buttons-container { margin-top: 2rem; }
+        .nav-button { display: flex; align-items: center; padding: 1rem 1.5rem; font-size: 1.5rem; font-weight: 500; border: 2px solid #000; border-radius: 1rem; text-decoration: none; color: #212529; background-color: #fff; transition: all 0.2s ease-in-out; }
+        .nav-button:hover { border-color: #0d6efd; background-color: #f0f8ff; transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); color: #212529; }
+        .nav-button i { font-size: 2rem; margin-right: 1.5rem; width: 35px; text-align: center; }
 
-        .header-title {
-            font-weight: bold;
-            font-size: 1.8rem;
-        }
-
-        .header-action-left,
-        .header-action-right {
-            width: 120px;
-        }
-
-        .header-action-left {
-            text-align: left;
-        }
-
-        .header-action-right {
-            text-align: center; /* Changed from 'right' to 'center' */
-        }
-
-        .sign-out-link {
-            text-decoration: none;
-            color: #333; /* A nice dark grey, not default blue */
-            font-weight: 500;
-            font-size: 1rem;
-            transition: color 0.2s;
-        }
-
-        .sign-out-link:hover {
-            color: #000; /* Darken on hover */
-            text-decoration: underline; /* Add an underline on hover */
-        }
-
-        .sign-out-link i {
-            margin-right: 0.4rem; /* Adds space between the icon and "Sign Out" */
-        }
-
-        .user-profile-avatar {
-            width: 60px;
-            height: 60px;
-            border: 2px solid #000;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .user-profile-name {
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: block;
-            margin-top: 0.25rem;
-            /* text-align: center; is no longer needed here as it's inherited */
-        }
-
-        /* --- Navigation Buttons (No changes needed here) --- */
-        .nav-buttons-container {
-            margin-top: 2rem;
-        }
-        .nav-button {
-            display: flex;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            font-size: 1.5rem;
-            font-weight: 500;
-            border: 2px solid #000;
-            border-radius: 1rem;
-            text-decoration: none;
-            color: #212529;
-            background-color: #fff;
-            transition: all 0.2s ease-in-out;
-        }
-        .nav-button:hover {
-            border-color: #0d6efd;
-            background-color: #f0f8ff;
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            color: #212529;
-        }
-        .nav-button i {
-            font-size: 2rem;
-            margin-right: 1.5rem;
-            width: 35px;
-            text-align: center;
-        }
-
-        /* --- Custom Logout Modal Styling (No changes needed here) --- */
-        #logoutModal .modal-content {
-            border-radius: 1rem;
-            border: 2px solid #000;
-        }
-        #logoutModal .modal-header {
-            border-bottom: 2px solid #000;
-            padding: 1rem 1.5rem;
-            position: relative;
-        }
-        #logoutModal .modal-header .warning-icon {
-            color: #ffc107;
-            font-size: 1.8rem;
-        }
-        #logoutModal .modal-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-align: center;
-            width: 100%;
-        }
-        #logoutModal .btn-close {
-            background-color: #dc3545;
-            border-radius: 50%;
-            opacity: 1;
-            padding: 0.75rem;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
-            position: absolute;
-            right: 1.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        #logoutModal .modal-body {
-            padding: 2rem;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: 500;
-        }
-        #logoutModal .modal-footer {
-            border-top: none;
-            display: flex;
-            justify-content: space-around;
-            padding: 0 2rem 2rem 2rem;
-        }
-        .confirmation-option {
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.1rem;
-            text-decoration: none;
-            color: #000;
-            transition: transform 0.2s;
-        }
-        .confirmation-option:hover {
-            transform: scale(1.05);
-            color: #000;
-        }
-        .confirmation-option .icon-bg {
-            font-size: 2rem;
-            width: 60px;
-            height: 60px;
-            border-radius: 20%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            margin: 0 auto 0.5rem auto;
-        }
-        .bg-yes { background-color: #ffc107; }
-        .bg-no { background-color: #dc3545; }
+        /* Logout Modal */
+        .modal-content { border-radius: 1rem; border: 2px solid #000; }
+        .modal-header { border-bottom: 2px solid #000; padding: 1rem 1.5rem; position: relative; }
+        .modal-header .warning-icon { color: #ffc107; font-size: 1.8rem; }
+        .modal-title { font-size: 1.8rem; font-weight: bold; text-align: center; width: 100%; }
+        .modal-body { padding: 2rem; text-align: center; font-size: 1.2rem; font-weight: 500; }
+        .modal-footer { border-top: none; display: flex; justify-content: space-around; padding: 0 2rem 2rem 2rem; }
+        .confirmation-option { text-align: center; font-weight: bold; font-size: 1.1rem; text-decoration: none; color: #000; transition: transform 0.2s; }
+        .confirmation-option:hover { transform: scale(1.05); color: #000; }
+        .confirmation-option .icon-bg { font-size: 2rem; width: 60px; height: 60px; border-radius: 20%; display: flex; align-items: center; justify-content: center; color: #fff; margin: 0 auto 0.5rem; }
+        .bg-yes { background-color: #ffc107; } .bg-no { background-color: #dc3545; }
     </style>
 </head>
 <body>
 
 <div class="container page-container">
-
-    <!-- Header HTML (No changes needed) -->
     <header class="dashboard-header">
-        <!-- NEW HTML -->
         <div class="header-action-left">
             <a href="#" class="sign-out-link" data-bs-toggle="modal" data-bs-target="#logoutModal">
                 <i class="fa-solid fa-right-from-bracket"></i> Sign Out
@@ -208,34 +68,34 @@
         </div>
     </header>
 
-    <!-- Navigation Buttons (No changes needed) -->
-    <main class="nav-buttons-container d-grid gap-3">
+    <!-- Adding role="navigation" to main for semantic clarity -->
+    <main class="nav-buttons-container d-grid gap-3" role="navigation">
         <a href="/caregiver/management" class="nav-button">
-            <i class="fa-solid fa-users"></i>
+            <i class="fa-solid fa-users" aria-hidden="true"></i>
             <span>Caregivers</span>
         </a>
         <a href="/patient/management" class="nav-button">
-            <i class="fa-solid fa-hospital-user"></i>
+            <i class="fa-solid fa-hospital-user" aria-hidden="true"></i>
             <span>Patients</span>
         </a>
         <a href="/visit/management" class="nav-button">
-            <i class="fa-solid fa-clipboard-list"></i>
+            <i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>
             <span>Visits</span>
         </a>
         <a href="/settings" class="nav-button">
-            <i class="fa-solid fa-gear"></i>
+            <i class="fa-solid fa-gear" aria-hidden="true"></i>
             <span>Settings</span>
         </a>
     </main>
 </div>
 
-<!-- Logout Confirmation Modal (No changes needed) -->
-<div class="modal fade" id="logoutModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+<!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <i class="fa-solid fa-triangle-exclamation warning-icon"></i>
-                <h5 class="modal-title">Sign Out</h5>
+                <i class="fa-solid fa-triangle-exclamation warning-icon" aria-hidden="true"></i>
+                <h5 class="modal-title" id="logoutModalLabel">Sign Out</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -244,20 +104,18 @@
             </div>
             <div class="modal-footer">
                 <a href="/signout" class="confirmation-option">
-                    <div class="icon-bg bg-yes"><i class="fa-solid fa-check"></i></div>
-                    <span>Yes</span>
+                    <div class="icon-bg bg-yes"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+                    <span>Yes, Sign Out</span>
                 </a>
                 <a href="#" class="confirmation-option" data-bs-dismiss="modal">
-                    <div class="icon-bg bg-no"><i class="fa-solid fa-xmark"></i></div>
-                    <span>No</span>
+                    <div class="icon-bg bg-no"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+                    <span>No, Stay Logged In</span>
                 </a>
             </div>
         </div>
     </div>
 </div>
 
-<!-- JS Libraries (No changes needed) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
