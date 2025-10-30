@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?=$pageTitle ?? 'User Profile'?></title>
+    <title><?=$pageTitle ?? 'Profile'?></title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="../../img/fav/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../../img/fav/favicon-32x32.png">
@@ -151,7 +151,7 @@
         /**
          * Encapsulates all functionality for the User Profile page.
          */
-        const UserProfileApp = {
+        const CaregiverProfileApp = {
             // Configuration and dynamic data
             state: {
                 targetUserData: {},
@@ -238,33 +238,33 @@
             api: {
                 _ajax(settings) {
                     const defaults = {
-                        headers: { 'Authorization': UserProfileApp.state.authToken },
+                        headers: { 'Authorization': CaregiverProfileApp.state.authToken },
                         dataType: 'json'
                     };
                     return $.ajax($.extend(defaults, settings))
                         .fail(err => {
                             const errorMsg = err.responseJSON?.message || 'An unknown error occurred.';
-                            UserProfileApp.helpers.showAlert(errorMsg, 'danger');
+                            CaregiverProfileApp.helpers.showAlert(errorMsg, 'danger');
                         });
                 },
 
                 fetchUserData() {
                     this._ajax({
-                        url: `${UserProfileApp.state.baseUrl}/account/${UserProfileApp.state.targetUserId}`,
+                        url: `${CaregiverProfileApp.state.baseUrl}/account/${CaregiverProfileApp.state.targetUserId}`,
                         type: 'GET'
                     }).done(response => {
                         if (response.status === 'success' && response.data) {
-                            UserProfileApp.state.targetUserData = response.data;
-                            UserProfileApp.render.populateView(response.data);
+                            CaregiverProfileApp.state.targetUserData = response.data;
+                            CaregiverProfileApp.render.populateView(response.data);
                         }
                     });
                 },
 
                 saveUserData() {
                     const updatedFields = {};
-                    const { targetUserData } = UserProfileApp.state;
+                    const { targetUserData } = CaregiverProfileApp.state;
 
-                    UserProfileApp.elements.formFields.forEach(key => {
+                    CaregiverProfileApp.elements.formFields.forEach(key => {
                         const newValue = $(`#${key}-edit`).val();
                         if (newValue !== (targetUserData[key] || '')) {
                             updatedFields[key] = newValue;
@@ -272,25 +272,25 @@
                     });
 
                     if ($.isEmptyObject(updatedFields)) {
-                        UserProfileApp.helpers.showAlert('No changes were made.', 'info');
-                        UserProfileApp.setMode('view');
+                        CaregiverProfileApp.helpers.showAlert('No changes were made.', 'info');
+                        CaregiverProfileApp.setMode('view');
                         return;
                     }
 
                     this._ajax({
-                        url: `${UserProfileApp.state.baseUrl}/user/${targetUserData.id}`,
+                        url: `${CaregiverProfileApp.state.baseUrl}/user/${targetUserData.id}`,
                         type: 'PUT',
                         contentType: 'application/json',
                         data: JSON.stringify(updatedFields)
                     }).done(response => {
-                        UserProfileApp.helpers.showAlert('User details updated successfully!', 'success');
+                        CaregiverProfileApp.helpers.showAlert('User details updated successfully!', 'success');
                         this.fetchUserData();
-                        UserProfileApp.setMode('view');
+                        CaregiverProfileApp.setMode('view');
                     });
                 },
 
                 uploadOrUpdatePhoto(file) {
-                    const { targetUserData, loggedInUserId, targetUserId, baseUrl } = UserProfileApp.state;
+                    const { targetUserData, loggedInUserId, targetUserId, baseUrl } = CaregiverProfileApp.state;
 
                     const isDefaultPhoto = targetUserData.photo?.endsWith('default.jpg');
                     const isEditingSelf = loggedInUserId === targetUserId;
@@ -305,7 +305,7 @@
                     const formData = new FormData();
                     formData.append('file', file);
 
-                    UserProfileApp.helpers.showAlert('Uploading photo...', 'info');
+                    CaregiverProfileApp.helpers.showAlert('Uploading photo...', 'info');
 
                     this._ajax({
                         url: finalUrl,
@@ -314,7 +314,7 @@
                         processData: false,
                         contentType: false
                     }).done(response => {
-                        UserProfileApp.helpers.showAlert(response.message || 'Photo updated!', 'success');
+                        CaregiverProfileApp.helpers.showAlert(response.message || 'Photo updated!', 'success');
                         this.fetchUserData();
                     });
                 },
@@ -324,13 +324,13 @@
                     if (!endpoints[action]) return;
 
                     this._ajax({
-                        url: `${UserProfileApp.state.baseUrl}/auth/${endpoints[action]}/account`,
+                        url: `${CaregiverProfileApp.state.baseUrl}/auth/${endpoints[action]}/account`,
                         type: 'PUT',
                         contentType: 'application/json',
-                        data: JSON.stringify({ id: String(UserProfileApp.state.targetUserId) })
+                        data: JSON.stringify({ id: String(CaregiverProfileApp.state.targetUserId) })
                     }).done(response => {
-                        UserProfileApp.helpers.showAlert(response.message || 'User status changed successfully.', 'success');
-                        bootstrap.Modal.getInstance(UserProfileApp.elements.statusModal[0])?.hide();
+                        CaregiverProfileApp.helpers.showAlert(response.message || 'User status changed successfully.', 'success');
+                        bootstrap.Modal.getInstance(CaregiverProfileApp.elements.statusModal[0])?.hide();
                         this.fetchUserData();
                     });
                 }
@@ -339,20 +339,20 @@
             // --- DOM MANIPULATION & RENDERING ---
             render: {
                 populateView(data) {
-                    const h = UserProfileApp.helpers;
+                    const h = CaregiverProfileApp.helpers;
                     const statusInfo = h.getStatusInfo(data.status);
 
-                    UserProfileApp.elements.currentStatus.text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
-                    UserProfileApp.elements.roleText.text(h.getRoleText(data.role));
-                    UserProfileApp.elements.photoView.attr('src', data.photo ? `${UserProfileApp.state.baseUrl}${data.photo}` : 'https://via.placeholder.com/100');
+                    CaregiverProfileApp.elements.currentStatus.text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
+                    CaregiverProfileApp.elements.roleText.text(h.getRoleText(data.role));
+                    CaregiverProfileApp.elements.photoView.attr('src', data.photo ? `${CaregiverProfileApp.state.baseUrl}${data.photo}` : 'https://via.placeholder.com/100');
 
-                    UserProfileApp.elements.formFields.forEach(key => {
+                    CaregiverProfileApp.elements.formFields.forEach(key => {
                         $(`#${key}-view`).text(data[key] || 'N/A');
                     });
                 },
 
                 populateEdit(data) {
-                    UserProfileApp.elements.formFields.forEach(key => {
+                    CaregiverProfileApp.elements.formFields.forEach(key => {
                         $(`#${key}-edit`).val(data[key] || '');
                     });
                 }
@@ -373,7 +373,7 @@
                 },
                 showAlert(message, type = 'success') {
                     const alertHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
-                    UserProfileApp.elements.alertContainer.html(alertHTML);
+                    CaregiverProfileApp.elements.alertContainer.html(alertHTML);
                 }
             },
 
@@ -388,7 +388,7 @@
             }
         };
 
-        UserProfileApp.init();
+        CaregiverProfileApp.init();
     });
 </script>
 </body>
