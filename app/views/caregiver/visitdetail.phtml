@@ -128,7 +128,7 @@
         /**
          * Encapsulates all functionality for the Visit Detail page.
          */
-        const VisitDetailApp = {
+        const CaregiverVisitDetailApp = {
             state: {
                 visitId: <?= json_encode($visitId ?? null) ?>,
                 baseUrl: <?= json_encode($baseUrl ?? '') ?>,
@@ -195,8 +195,8 @@
             handlers: {
                 onBack(e) {
                     e.preventDefault();
-                    if (VisitDetailApp.elements.pageContainer.hasClass('edit-mode')) {
-                        VisitDetailApp.setMode('view');
+                    if (CaregiverVisitDetailApp.elements.pageContainer.hasClass('edit-mode')) {
+                        CaregiverVisitDetailApp.setMode('view');
                     } else {
                         window.history.back();
                     }
@@ -204,11 +204,11 @@
                 onSave() {
                     const totalHours = parseInt($('#total_hours-edit').val());
                     if (isNaN(totalHours) || totalHours <= 0) {
-                        VisitDetailApp.helpers.showAlert('Total Hours must be a number greater than 0.', 'warning');
+                        CaregiverVisitDetailApp.helpers.showAlert('Total Hours must be a number greater than 0.', 'warning');
                         return;
                     }
 
-                    const visitDate = new Date(VisitDetailApp.state.currentVisitData.start_time);
+                    const visitDate = new Date(CaregiverVisitDetailApp.state.currentVisitData.start_time);
                     const timeParts = $('#start_time-edit').val().split(':');
                     visitDate.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), 0, 0);
 
@@ -218,46 +218,46 @@
                         note: $('#note-edit').val()
                     };
 
-                    VisitDetailApp.api.updateVisit(payload)
-                        .done(() => VisitDetailApp.setMode('view'));
+                    CaregiverVisitDetailApp.api.updateVisit(payload)
+                        .done(() => CaregiverVisitDetailApp.setMode('view'));
                 },
                 onProgressAction(e) {
                     const action = $(e.currentTarget).data('action');
                     if (action === 'cancel') {
-                        VisitDetailApp.elements.cancelNoteGroup.show();
+                        CaregiverVisitDetailApp.elements.cancelNoteGroup.show();
                     } else {
-                        VisitDetailApp.api.performAction(action).done(() => VisitDetailApp.modals.progress.hide());
+                        CaregiverVisitDetailApp.api.performAction(action).done(() => CaregiverVisitDetailApp.modals.progress.hide());
                     }
                 },
                 onStatusAction(e) {
                     const action = $(e.currentTarget).data('action');
-                    VisitDetailApp.api.performAction(action).done(() => VisitDetailApp.modals.status.hide());
+                    CaregiverVisitDetailApp.api.performAction(action).done(() => CaregiverVisitDetailApp.modals.status.hide());
                 },
                 onConfirmCancel() {
-                    const note = VisitDetailApp.elements.cancelNote.val();
+                    const note = CaregiverVisitDetailApp.elements.cancelNote.val();
                     if (!note.trim()) {
-                        VisitDetailApp.helpers.showAlert('A cancellation note is required.', 'warning');
+                        CaregiverVisitDetailApp.helpers.showAlert('A cancellation note is required.', 'warning');
                         return;
                     }
-                    VisitDetailApp.api.performAction('cancel', { note }).done(() => {
-                        VisitDetailApp.modals.progress.hide();
-                        VisitDetailApp.elements.cancelNote.val('');
-                        VisitDetailApp.elements.cancelNoteGroup.hide();
+                    CaregiverVisitDetailApp.api.performAction('cancel', { note }).done(() => {
+                        CaregiverVisitDetailApp.modals.progress.hide();
+                        CaregiverVisitDetailApp.elements.cancelNote.val('');
+                        CaregiverVisitDetailApp.elements.cancelNoteGroup.hide();
                     });
                 },
                 onAddressBoxClick() {
-                    if (VisitDetailApp.elements.pageContainer.hasClass('edit-mode')) {
-                        VisitDetailApp.modals.confirmAddress.show();
+                    if (CaregiverVisitDetailApp.elements.pageContainer.hasClass('edit-mode')) {
+                        CaregiverVisitDetailApp.modals.confirmAddress.show();
                     }
                 },
                 onConfirmAddressChange() {
-                    VisitDetailApp.modals.confirmAddress.hide();
-                    VisitDetailApp.api.fetchPatientAddresses();
+                    CaregiverVisitDetailApp.modals.confirmAddress.hide();
+                    CaregiverVisitDetailApp.api.fetchPatientAddresses();
                 },
                 onAddressSelect(e) {
                     const addressId = $(e.currentTarget).data('id');
-                    VisitDetailApp.api.updateVisit({ address_id: addressId })
-                        .done(() => VisitDetailApp.modals.addressOffcanvas.hide());
+                    CaregiverVisitDetailApp.api.updateVisit({ address_id: addressId })
+                        .done(() => CaregiverVisitDetailApp.modals.addressOffcanvas.hide());
                 }
             },
 
@@ -265,50 +265,50 @@
                 _ajax(settings) {
                     return $.ajax({
                         ...settings,
-                        headers: { 'Authorization': VisitDetailApp.state.authToken, 'Content-Type': 'application/json' },
+                        headers: { 'Authorization': CaregiverVisitDetailApp.state.authToken, 'Content-Type': 'application/json' },
                     }).fail(err => {
                         const errorMsg = err.responseJSON?.message || 'An API error occurred.';
-                        VisitDetailApp.helpers.showAlert(errorMsg, 'danger');
+                        CaregiverVisitDetailApp.helpers.showAlert(errorMsg, 'danger');
                     });
                 },
                 fetchVisitDetails() {
-                    this._ajax({ url: `${VisitDetailApp.state.baseUrl}/visit/${VisitDetailApp.state.visitId}` })
+                    this._ajax({ url: `${CaregiverVisitDetailApp.state.baseUrl}/visit/${CaregiverVisitDetailApp.state.visitId}` })
                         .done(res => {
                             if (res.status === 'success') {
-                                VisitDetailApp.state.currentVisitData = res.data;
-                                VisitDetailApp.render.visitDetails(res.data);
+                                CaregiverVisitDetailApp.state.currentVisitData = res.data;
+                                CaregiverVisitDetailApp.render.visitDetails(res.data);
                             }
                         });
                 },
                 updateVisit(payload) {
                     return this._ajax({
-                        url: `${VisitDetailApp.state.baseUrl}/visit/${VisitDetailApp.state.visitId}`,
+                        url: `${CaregiverVisitDetailApp.state.baseUrl}/visit/${CaregiverVisitDetailApp.state.visitId}`,
                         type: 'PUT',
                         data: JSON.stringify(payload)
                     }).done(res => {
-                        VisitDetailApp.helpers.showAlert(res.message || 'Visit updated successfully!', 'success');
+                        CaregiverVisitDetailApp.helpers.showAlert(res.message || 'Visit updated successfully!', 'success');
                         this.fetchVisitDetails();
                     });
                 },
                 performAction(actionEndpoint, payload = null) {
                     return this._ajax({
-                        url: `${VisitDetailApp.state.baseUrl}/visit/${VisitDetailApp.state.visitId}/${actionEndpoint}`,
+                        url: `${CaregiverVisitDetailApp.state.baseUrl}/visit/${CaregiverVisitDetailApp.state.visitId}/${actionEndpoint}`,
                         type: 'PUT',
                         data: payload ? JSON.stringify(payload) : null
                     }).done(res => {
-                        VisitDetailApp.helpers.showAlert(res.message || 'Action completed successfully!', 'success');
+                        CaregiverVisitDetailApp.helpers.showAlert(res.message || 'Action completed successfully!', 'success');
                         this.fetchVisitDetails();
                     });
                 },
                 fetchPatientAddresses() {
-                    this._ajax({ url: `${VisitDetailApp.state.baseUrl}/address/person/${VisitDetailApp.state.currentVisitData.patient_id}/1` })
+                    this._ajax({ url: `${CaregiverVisitDetailApp.state.baseUrl}/address/person/${CaregiverVisitDetailApp.state.currentVisitData.patient_id}/1` })
                         .done(res => {
-                            VisitDetailApp.render.addressSelectionList(res.data);
-                            VisitDetailApp.modals.addressOffcanvas.show();
+                            CaregiverVisitDetailApp.render.addressSelectionList(res.data);
+                            CaregiverVisitDetailApp.modals.addressOffcanvas.show();
                         });
                 },
                 fetchAccountName(userId, elementId) {
-                    this._ajax({ url: `${VisitDetailApp.state.baseUrl}/account/${userId}` })
+                    this._ajax({ url: `${CaregiverVisitDetailApp.state.baseUrl}/account/${userId}` })
                         .done(res => {
                             if (res.status === 'success' && res.data) {
                                 $(`#${elementId}`).text(`${res.data.firstname} ${res.data.lastname}`);
@@ -320,15 +320,15 @@
             render: {
                 visitDetails(data) {
                     if (!data?.user || !data?.patient) { return; }
-                    const h = VisitDetailApp.helpers;
+                    const h = CaregiverVisitDetailApp.helpers;
 
                     $('#visit-progress-text').text(h.getProgressText(data.progress));
                     $('#visit-date-text').text(new Date(data.start_time).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }));
                     $('#visit-duration').text(`${Math.floor(data.duration_minutes / 60)} hrs total`);
                     $('#visit-relative-time').text(h.getRelativeTime(data.start_time));
-                    $('#caregiver-avatar').attr('src', data.user.photo ? VisitDetailApp.state.baseUrl + data.user.photo : 'https://via.placeholder.com/70');
+                    $('#caregiver-avatar').attr('src', data.user.photo ? CaregiverVisitDetailApp.state.baseUrl + data.user.photo : 'https://via.placeholder.com/70');
                     $('#caregiver-name').text(`${data.user.firstname} ${data.user.lastname}`);
-                    $('#patient-avatar').attr('src', data.patient.photo ? VisitDetailApp.state.baseUrl + data.patient.photo : 'https://via.placeholder.com/70');
+                    $('#patient-avatar').attr('src', data.patient.photo ? CaregiverVisitDetailApp.state.baseUrl + data.patient.photo : 'https://via.placeholder.com/70');
                     $('#patient-name').text(`${data.patient.firstname} ${data.patient.lastname}`);
 
                     if (data.address) {
@@ -342,14 +342,14 @@
 
                     ['scheduled_by', 'checkin_by', 'checkout_by', 'approved_by', 'canceled_by'].forEach(key => {
                         const el = $(`#${key}-view`);
-                        data[key] ? VisitDetailApp.api.fetchAccountName(data[key], `${key}-view`, el.text('Loading...')) : el.text('TBD');
+                        data[key] ? CaregiverVisitDetailApp.api.fetchAccountName(data[key], `${key}-view`, el.text('Loading...')) : el.text('TBD');
                     });
 
-                    VisitDetailApp.elements.placeholder.hide();
-                    VisitDetailApp.elements.visitContent.show();
+                    CaregiverVisitDetailApp.elements.placeholder.hide();
+                    CaregiverVisitDetailApp.elements.visitContent.show();
                 },
                 addressSelectionList(addresses) {
-                    const list = VisitDetailApp.elements.addressSelectionList.empty();
+                    const list = CaregiverVisitDetailApp.elements.addressSelectionList.empty();
                     if (addresses?.length) {
                         addresses.forEach(addr => list.append(`<div class="selection-item" data-id="${addr.id}">${addr.address}, ${addr.city}</div>`));
                     } else {
@@ -359,7 +359,7 @@
             },
 
             helpers: {
-                showAlert: (message, type = 'success') => VisitDetailApp.elements.alertContainer.html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).fadeIn().delay(4000).fadeOut(),
+                showAlert: (message, type = 'success') => CaregiverVisitDetailApp.elements.alertContainer.html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).fadeIn().delay(4000).fadeOut(),
                 getProgressText: p => ({ '-1': "Canceled", '0': "Scheduled", '1': "Check-in", '2': "Check-out", '3': "Approved" }[p] || 'Unknown'),
                 getFormattedDateTime: dStr => new Date(dStr).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }),
                 getRelativeTime(dStr) { const n=new Date(),v=new Date(dStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/864e5);if(d<0)return"Past";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`;}
@@ -379,7 +379,7 @@
             }
         };
 
-        VisitDetailApp.init();
+        CaregiverVisitDetailApp.init();
     });
 </script>
 </body>
