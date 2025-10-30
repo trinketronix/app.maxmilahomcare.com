@@ -41,6 +41,7 @@ class AuthMiddleware extends Injectable {
         'caregiver:profile'    => [0, 1, 2],    // All authenticated users
         'caregiver:addresses'  => [0, 1, 2],    // All authenticated users
         'caregiver:patients'   => [0, 1, 2],    // All authenticated users
+        'caregiver:visitdetail'   => [0, 1, 2], // All authenticated users
 
         // === CAREGIVER ROUTES TO ADD ===
         'patient:management' => [0, 1],       // Only Admin and Manager

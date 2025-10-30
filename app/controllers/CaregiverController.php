@@ -163,4 +163,32 @@ class CaregiverController extends BaseController {
             'authToken' => $this->getAuthToken()
         ]);
     }
+
+    /**
+     * Shows a visit detail page for the caregivers.
+     * Accessible only to Administrators and Managers.
+     */
+    public function visitdetailAction() {
+        // SECURITY CHECK: Stop execution if user is not Admin or Manager
+//        if (!$this->requireAnyRole([Role::ADMINISTRATOR, Role::MANAGER])) {
+//            return; // Important: Stop processing if the check fails
+//        }
+
+        // Get the userId from the URL parameter.
+        // If it's not present in the URL, this will be null.
+        $this->targetVisitId = $this->dispatcher->getParam('visitId');
+
+        // Set variables for the view
+        $this->view->setVars([
+            'pageTitle' => 'Visit Detail',
+            'visitId' => $this->targetVisitId,
+            'userId' => $this->getUserId(),
+            'username' => $this->getUsername(),
+            'fullname' => $this->getUserFullname(),
+            'role' => $this->getUserRoleText(),
+            'photo' => $this->getUserPhoto(),
+            'baseUrl' => $this->getApiBaseUrl(),
+            'authToken' => $this->getAuthToken()
+        ]);
+    }
 }

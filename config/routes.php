@@ -89,6 +89,12 @@ $router->add('/caregiver/patients/{userId:[0-9]+}?', [
     'action'     => 'patients'
 ]);
 
+$router->add('/caregiver/visitdetail/{visitId:[0-9]+}?', [
+    'namespace'  => 'App\Controllers',
+    'controller' => 'caregiver',
+    'action'     => 'visitdetail'
+]);
+
 // ========================================================================
 // PATIENT ROUTES
 // ========================================================================
