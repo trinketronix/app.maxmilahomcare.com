@@ -177,7 +177,7 @@
                     return $.ajax({ ...baseSettings, ...settings }).fail(err => CaregiverProfileApp.helpers.showAlert(err.responseJSON?.message || 'An error occurred.', 'danger'));
                 },
 
-                fetchUserData() { this._ajax({ url: `${this.state.baseUrl}/account/${this.state.targetUserId}`, type: 'GET' }).done(res => { if (res.status === 'success') { this.state.targetUserData = res.data; this.render.view(res.data); } }.bind(this)); },
+                fetchUserData() { this._ajax({ url: `${this.state.baseUrl}/account/${this.state.targetUserId}`, type: 'GET' }).done(res => { if (res.status === 'success') { this.state.targetUserData = res.data; this.render.view(res.data); } }.bind(this)) },
 
                 saveUserData() {
                     const updatedFields = {};
