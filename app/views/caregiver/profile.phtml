@@ -18,6 +18,8 @@
     <style>
         body { background-color: #f0f2f5; font-family: 'Segoe UI', 'Roboto', sans-serif; }
         .page-container { max-width: 500px; margin: 0 auto; background-color: #ffffff; min-height: 100vh; border-left: 1px solid #dcdcdc; border-right: 1px solid #dcdcdc; }
+
+        /* Header */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; position: relative; }
         .back-button { text-decoration: none; color: #333; font-weight: 500; }
         .header-title-group { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; }
@@ -25,12 +27,15 @@
         .profile-icon { font-size: 1.5rem; border: 2px solid #000; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; margin: 0 auto; overflow: hidden; }
         .profile-icon img { width: 100%; height: 100%; object-fit: cover; }
         .profile-username { font-size: 0.8rem; color: #555; margin-top: 4px; }
+
+        /* Main Content */
         .main-content { padding: 1rem; }
         .current-status-banner { text-align: center; font-weight: 500; margin-bottom: 1.5rem; padding: 0.5rem; border-radius: 8px; }
         .status-active { background-color: #d1e7dd; color: #0f5132; }
         .status-inactive { background-color: #f8d7da; color: #842029; }
         .status-not-verified { background-color: #fff3cd; color: #664d03; }
         .status-archived { background-color: #e2d9f3; color: #49247a; }
+
         .details-grid { display: grid; grid-template-columns: auto 1fr; gap: 1rem 2rem; align-items: center; }
         .avatar-section { grid-column: 1 / 2; text-align: center; }
         .avatar-img { width: 100px; height: 100px; border: 3px solid #000; padding: 0.5rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; border-radius: 50%; overflow: hidden; }
@@ -39,12 +44,15 @@
         .edit-mode .avatar-img:hover { box-shadow: 0 0 10px rgba(0, 123, 255, 0.7); }
         .role-text { font-weight: bold; }
         .name-section { grid-column: 2 / 3; }
+
         .details-section { grid-column: 1 / -1; margin-top: 1rem; }
         .detail-item { margin-bottom: 1.25rem; }
         .detail-item .label { font-weight: bold; display: block; margin-bottom: 0.25rem; }
         .detail-item .value { border: 2px solid transparent; background: transparent; padding: 0.5rem 0; word-break: break-word; }
         .detail-item .form-control { color: #555; border-radius: 8px; border: 2px solid #000; padding: 0.5rem 1rem; width: 100%; background: #f8f9fa; }
         .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        /* Mode Toggling & UI */
         .view-mode .form-control, .view-mode .save-button { display: none; }
         .edit-mode .value, .edit-mode .action-buttons { display: none !important; }
         .action-buttons, .save-button { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; }
@@ -146,7 +154,10 @@
                 this.api.fetchUserData();
             },
 
+            // *** THIS FUNCTION IS NOW CORRECTED ***
             bindEvents() {
+                // Use 'this.elements' to correctly reference cached DOM elements.
+                // Use '.bind(this)' to ensure the correct 'this' context inside the handlers.
                 this.elements.editBtn.on('click', this.handlers.onEditClick.bind(this));
                 this.elements.saveBtn.on('click', this.handlers.onSaveClick.bind(this));
                 this.elements.backBtn.on('click', this.handlers.onBackClick.bind(this));
@@ -174,73 +185,71 @@
                         contentType: (settings.data instanceof FormData) ? false : 'application/json',
                         data: (settings.data && !(settings.data instanceof FormData)) ? JSON.stringify(settings.data) : settings.data
                     };
-                    return $.ajax({ ...baseSettings, ...settings }).fail(err => CaregiverProfileApp.helpers.showAlert(err.responseJSON?.message || 'An error occurred.', 'danger'));
+                    return $.ajax({ ...baseSettings, ...settings })
+                        .fail(err => CaregiverProfileApp.helpers.showAlert(err.responseJSON?.message || 'An error occurred.', 'danger'));
                 },
 
-                fetchUserData() { this._ajax({ url: `${this.state.baseUrl}/account/${this.state.targetUserId}`, type: 'GET' }).done(res => { if (res.status === 'success') { this.state.targetUserData = res.data; this.render.view(res.data); } }.bind(this)); },
+                fetchUserData() { this._ajax({ url: `${CaregiverProfileApp.state.baseUrl}/account/${CaregiverProfileApp.state.targetUserId}`, type: 'GET', dataType: 'json' }).done(res => { if (res.status === 'success') { CaregiverProfileApp.state.targetUserData = res.data; CaregiverProfileApp.render.view(res.data); } }); },
 
                 saveUserData() {
                     const updatedFields = {};
-                    this.elements.formFields.forEach(key => {
+                    const { targetUserData } = CaregiverProfileApp.state;
+                    CaregiverProfileApp.elements.formFields.forEach(key => {
                         const newVal = $(`#${key}-edit`).val();
-                        if (newVal !== (this.state.targetUserData[key] || '')) updatedFields[key] = newVal;
+                        if (newVal !== (targetUserData[key] || '')) updatedFields[key] = newVal;
                     });
-                    if ($.isEmptyObject(updatedFields)) { this.helpers.showAlert('No changes made.', 'info'); this.setMode('view'); return; }
+                    if ($.isEmptyObject(updatedFields)) { CaregiverProfileApp.helpers.showAlert('No changes made.', 'info'); CaregiverProfileApp.setMode('view'); return; }
 
-                    this._ajax({ url: `${this.state.baseUrl}/user/${this.state.targetUserData.id}`, type: 'PUT', data: updatedFields })
-                        .done(() => { this.helpers.showAlert('Details updated!', 'success'); this.api.fetchUserData(); this.setMode('view'); });
+                    this._ajax({ url: `${CaregiverProfileApp.state.baseUrl}/user/${targetUserData.id}`, type: 'PUT', data: updatedFields })
+                        .done(() => { CaregiverProfileApp.helpers.showAlert('Details updated!', 'success'); this.fetchUserData(); CaregiverProfileApp.setMode('view'); });
                 },
 
                 uploadOrUpdatePhoto(file) {
-                    const { targetUserData, loggedInUserId, targetUserId, baseUrl } = this.state;
-
+                    const { targetUserData, loggedInUserId, targetUserId, baseUrl } = CaregiverProfileApp.state;
                     const isDefault = targetUserData.photo?.includes('default.jpg');
-                    const endpoint = isDefault ? 'upload/photo' : 'update/photo';
-
-                    // Always use POST for multipart file uploads
                     const httpMethod = 'POST';
-
+                    const endpoint = isDefault ? 'upload/photo' : 'update/photo';
                     const finalUrl = (loggedInUserId === targetUserId) ? `${baseUrl}/user/${endpoint}` : `${baseUrl}/user/${targetUserId}/${endpoint}`;
 
                     const formData = new FormData();
                     formData.append('file', file);
 
-                    this.helpers.showAlert('Uploading photo...', 'info');
+                    CaregiverProfileApp.helpers.showAlert('Uploading photo...', 'info');
 
                     this._ajax({ url: finalUrl, type: httpMethod, data: formData })
-                        .done(res => { this.helpers.showAlert(res.message || 'Photo updated!', 'success'); this.api.fetchUserData(); });
+                        .done(res => { CaregiverProfileApp.helpers.showAlert(res.message || 'Photo updated!', 'success'); this.fetchUserData(); });
                 },
 
                 changeUserStatus(action) {
                     this._ajax({
-                        url: `${this.state.baseUrl}/auth/${action}/account`, type: 'PUT',
-                        data: { id: String(this.state.targetUserId) }
+                        url: `${CaregiverProfileApp.state.baseUrl}/auth/${action}/account`, type: 'PUT',
+                        data: { id: String(CaregiverProfileApp.state.targetUserId) }
                     }).done(res => {
-                        this.helpers.showAlert(res.message || 'Status updated!', 'success');
-                        bootstrap.Modal.getInstance(this.elements.statusModal[0])?.hide();
-                        this.api.fetchUserData();
+                        CaregiverProfileApp.helpers.showAlert(res.message || 'Status updated!', 'success');
+                        bootstrap.Modal.getInstance(CaregiverProfileApp.elements.statusModal[0])?.hide();
+                        this.fetchUserData();
                     });
                 }
             },
 
             render: {
                 view(data) {
-                    const h = CaregiverProfileApp.helpers;
-                    const statusInfo = h.getStatusInfo(data.status);
+                    const app = CaregiverProfileApp;
+                    const statusInfo = app.helpers.getStatusInfo(data.status);
 
-                    this.elements.currentStatus.text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
-                    this.elements.roleText.text(h.getRoleText(data.role));
+                    app.elements.currentStatus.text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
+                    app.elements.roleText.text(app.helpers.getRoleText(data.role));
 
-                    const photoUrl = data.photo ? `${this.state.baseUrl}${data.photo}` : 'https://via.placeholder.com/100';
-                    this.elements.photoView.attr('src', photoUrl).fadeIn();
+                    const photoUrl = data.photo ? `${app.state.baseUrl}${data.photo}` : 'https://via.placeholder.com/100';
+                    app.elements.photoView.attr('src', photoUrl).fadeIn();
 
-                    this.elements.formFields.forEach(key => $(`#${key}-view`).text(data[key] || 'N/A'));
+                    app.elements.formFields.forEach(key => $(`#${key}-view`).text(data[key] || 'N/A'));
                 },
-                edit(data) { this.elements.formFields.forEach(key => $(`#${key}-edit`).val(data[key] || '')); }
+                edit(data) { CaregiverProfileApp.elements.formFields.forEach(key => $(`#${key}-edit`).val(data[key] || '')); }
             },
 
             helpers: {
-                getRoleText: r => ({'0':'Administrator','1':'Manager','2':'Caregiver'}[r]||'Unknown'),
+                getRoleText: r => ({'0':'Administrator','1':'Manager','2':'Caregiver'}[r] ||'Unknown'),
                 getStatusInfo(status) {
                     const map = {'-1':{text:'Not Verified',class:'status-not-verified'},'0':{text:'Inactive',class:'status-inactive'},'1':{text:'Active',class:'status-active'},'2':{text:'Archived',class:'status-archived'}};
                     return map[status] || {text:'Unknown Status',class:''};
@@ -253,18 +262,6 @@
                 else { this.elements.pageContainer.removeClass('edit-mode').addClass('view-mode'); }
             }
         };
-
-        // Bind 'this' for all functions to ensure correct context.
-        for (const key in CaregiverProfileApp) {
-            if (typeof CaregiverProfileApp[key] === 'object' && CaregiverProfileApp[key] !== null) {
-                for (const func in CaregiverProfileApp[key]) {
-                    if (typeof CaregiverProfileApp[key][func] === 'function') {
-                        CaregiverProfileApp[key][func] = CaregiverProfileApp[key][func].bind(CaregiverProfileApp);
-                    }
-                }
-            }
-        }
-
         CaregiverProfileApp.init();
     });
 </script>
