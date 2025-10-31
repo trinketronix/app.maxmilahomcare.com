@@ -177,7 +177,7 @@
                     return $.ajax({ ...baseSettings, ...settings }).fail(err => CaregiverProfileApp.helpers.showAlert(err.responseJSON?.message || 'An error occurred.', 'danger'));
                 },
 
-                fetchUserData() { this._ajax({ url: `${this.state.baseUrl}/account/${this.state.targetUserId}`, type: 'GET' }).done(res => { if (res.status === 'success') { this.state.targetUserData = res.data; this.render.view(res.data); } }.bind(this)) },
+                fetchUserData() { this._ajax({ url: `${this.state.baseUrl}/account/${this.state.targetUserId}`, type: 'GET' }).done(res => { if (res.status === 'success') { this.state.targetUserData = res.data; this.render.view(res.data); } }.bind(this)); },
 
                 saveUserData() {
                     const updatedFields = {};
@@ -194,11 +194,10 @@
                 uploadOrUpdatePhoto(file) {
                     const { targetUserData, loggedInUserId, targetUserId, baseUrl } = this.state;
 
-                    // Logic remains the same: use endpoint to differentiate, not method
                     const isDefault = targetUserData.photo?.includes('default.jpg');
                     const endpoint = isDefault ? 'upload/photo' : 'update/photo';
 
-                    // *** THE FIX: Always use POST for multipart/form-data requests ***
+                    // Always use POST for multipart file uploads
                     const httpMethod = 'POST';
 
                     const finalUrl = (loggedInUserId === targetUserId) ? `${baseUrl}/user/${endpoint}` : `${baseUrl}/user/${targetUserId}/${endpoint}`;
@@ -227,18 +226,25 @@
             render: {
                 view(data) {
                     const h = CaregiverProfileApp.helpers;
-                    this.elements.currentStatus.text(h.getStatusInfo(data.status).text).removeClass().addClass('current-status-banner ' + h.getStatusInfo(data.status).class);
+                    const statusInfo = h.getStatusInfo(data.status);
+
+                    this.elements.currentStatus.text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
                     this.elements.roleText.text(h.getRoleText(data.role));
+
                     const photoUrl = data.photo ? `${this.state.baseUrl}${data.photo}` : 'https://via.placeholder.com/100';
                     this.elements.photoView.attr('src', photoUrl).fadeIn();
+
                     this.elements.formFields.forEach(key => $(`#${key}-view`).text(data[key] || 'N/A'));
                 },
                 edit(data) { this.elements.formFields.forEach(key => $(`#${key}-edit`).val(data[key] || '')); }
             },
 
             helpers: {
-                getRoleText: r => ({'0':'Admin','1':'Manager','2':'Caregiver'}[r]||'Unknown'),
-                getStatusInfo: s => ({'-1':{text:'Not Verified',class:'status-not-verified'},'0':{text:'Inactive',class:'status-inactive'},'1':{text:'Active',class:'status-active'},'2':{text:'Archived',class:'status-archived'}}[s]||{text:'Unknown',class:''}),
+                getRoleText: r => ({'0':'Administrator','1':'Manager','2':'Caregiver'}[r]||'Unknown'),
+                getStatusInfo(status) {
+                    const map = {'-1':{text:'Not Verified',class:'status-not-verified'},'0':{text:'Inactive',class:'status-inactive'},'1':{text:'Active',class:'status-active'},'2':{text:'Archived',class:'status-archived'}};
+                    return map[status] || {text:'Unknown Status',class:''};
+                },
                 showAlert(message, type = 'success') { const h = `<div class="alert alert-${type} alert-dismissible fade show">${message}<button class="btn-close" data-bs-dismiss="alert"></button></div>`; CaregiverProfileApp.elements.alertContainer.html(h).children().delay(4000).fadeOut(); }
             },
 
@@ -248,7 +254,7 @@
             }
         };
 
-        // Bind 'this' for all functions within objects to ensure correct context
+        // Bind 'this' for all functions to ensure correct context.
         for (const key in CaregiverProfileApp) {
             if (typeof CaregiverProfileApp[key] === 'object' && CaregiverProfileApp[key] !== null) {
                 for (const func in CaregiverProfileApp[key]) {
