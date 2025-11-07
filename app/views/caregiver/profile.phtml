@@ -132,10 +132,7 @@
                 editBtn: $('#edit-btn'), saveBtn: $('#save-btn'), backBtn: $('#back-button'),
                 addressesBtn: $('#addresses-btn'), patientsBtn: $('#patients-btn'), statusModal: $('#statusModal'),
                 statusOptions: $('.status-option'),
-                formFields: [
-                    'firstname', 'middlename', 'lastname', 'birthdate', 'phone', 'phone2',
-                    'email', 'email2', 'ssn', 'code', 'languages', 'description'
-                ]
+                formFields: [ 'firstname', 'middlename', 'lastname', 'birthdate', 'phone', 'phone2', 'email', 'email2', 'ssn', 'code', 'languages', 'description' ]
             },
 
             init() {
@@ -145,41 +142,42 @@
             },
 
             bindEvents() {
-                this.elements.editBtn.on('click', this.handlers.onEditClick.bind(this));
-                this.elements.saveBtn.on('click', this.handlers.onSaveClick.bind(this));
-                this.elements.backBtn.on('click', this.handlers.onBackClick.bind(this));
-                this.elements.avatarContainer.on('click', this.handlers.onAvatarClick.bind(this));
-                this.elements.photoUploadInput.on('change', this.handlers.onFileSelected.bind(this));
-                this.elements.statusOptions.on('click', this.handlers.onStatusChange.bind(this));
+                this.elements.editBtn.on('click', this.handlers.onEditClick);
+                this.elements.saveBtn.on('click', this.handlers.onSaveClick);
+                this.elements.backBtn.on('click', this.handlers.onBackClick);
+                this.elements.avatarContainer.on('click', this.handlers.onAvatarClick);
+                this.elements.photoUploadInput.on('change', this.handlers.onFileSelected);
+                this.elements.statusOptions.on('click', this.handlers.onStatusChange);
                 this.elements.addressesBtn.on('click', () => window.location.href = `/caregiver/addresses/${this.state.targetUserId}`);
                 this.elements.patientsBtn.on('click', () => window.location.href = `/caregiver/patients/${this.state.targetUserId}`);
             },
 
             handlers: {
-                onEditClick() { this.setMode('edit'); },
-                onSaveClick() { this.api.saveUserData(); },
-                onBackClick(e) { e.preventDefault(); if (this.elements.pageContainer.hasClass('edit-mode')) this.setMode('view'); else window.history.back(); },
-                onAvatarClick() { if (this.elements.pageContainer.hasClass('edit-mode')) this.elements.photoUploadInput.click(); },
-                onFileSelected(e) { const file = e.target.files[0]; if (file) this.api.uploadOrUpdatePhoto(file); },
-                onStatusChange(e) { const action = $(e.currentTarget).data('status-action'); this.api.changeUserStatus(action); }
+                onEditClick() { CaregiverProfileApp.setMode('edit'); },
+                onSaveClick() { CaregiverProfileApp.api.saveUserData(); },
+                onBackClick(e) { e.preventDefault(); if (CaregiverProfileApp.elements.pageContainer.hasClass('edit-mode')) CaregiverProfileApp.setMode('view'); else window.history.back(); },
+                onAvatarClick() { if (CaregiverProfileApp.elements.pageContainer.hasClass('edit-mode')) CaregiverProfileApp.elements.photoUploadInput.click(); },
+                onFileSelected(e) { const file = e.target.files[0]; if (file) CaregiverProfileApp.api.uploadOrUpdatePhoto(file); },
+                onStatusChange(e) { const action = $(e.currentTarget).data('status-action'); CaregiverProfileApp.api.changeUserStatus(action); }
             },
 
             api: {
                 _ajax(settings) {
                     const isFormData = settings.data instanceof FormData;
-                    const baseSettings = {
+                    return $.ajax({
+                        url: settings.url,
+                        type: settings.type,
                         headers: { 'Authorization': CaregiverProfileApp.state.authToken },
                         processData: !isFormData,
                         contentType: isFormData ? false : 'application/json',
                         dataType: 'json',
-                        data: (settings.data && !isFormData) ? JSON.stringify(settings.data) : settings.data
-                    };
-                    return $.ajax({ ...baseSettings, ...settings }).fail(err => CaregiverProfileApp.helpers.showAlert(err.responseJSON?.message || 'An error occurred.', 'danger'));
+                        data: (settings.data && !isFormData) ? JSON.stringify(settings.data) : settings.data,
+                    }).fail(err => CaregiverProfileApp.helpers.showAlert(err.responseJSON?.message || 'An error occurred.', 'danger'));
                 },
 
                 fetchUserData() {
                     this._ajax({ url: `${CaregiverProfileApp.state.baseUrl}/account/${CaregiverProfileApp.state.targetUserId}`, type: 'GET' })
-                        .done(res => { if (res.status === 'success') {
+                        .done(res => { if (res.status === 'success' && res.data) {
                             CaregiverProfileApp.state.targetUserData = res.data;
                             CaregiverProfileApp.render.view(res.data);
                         }});
@@ -189,16 +187,22 @@
                     const updatedFields = {};
                     CaregiverProfileApp.elements.formFields.forEach(key => {
                         const newVal = $(`#${key}-edit`).val();
-                        if (newVal !== (CaregiverProfileApp.state.targetUserData[key] || '')) updatedFields[key] = newVal;
+                        if (newVal !== (CaregiverProfileApp.state.targetUserData[key] || '')) {
+                            updatedFields[key] = newVal;
+                        }
                     });
+
                     if ($.isEmptyObject(updatedFields)) {
                         CaregiverProfileApp.helpers.showAlert('No changes were made.', 'info');
                         CaregiverProfileApp.setMode('view'); return;
                     }
-                    this._ajax({ url: `${CaregiverProfileApp.state.baseUrl}/user/${CaregiverProfileApp.state.targetUserData.id}`, type: 'PUT', data: updatedFields })
+
+                    const url = `${CaregiverProfileApp.state.baseUrl}/user/${CaregiverProfileApp.state.targetUserData.id}`;
+
+                    this._ajax({ url: url, type: 'PUT', data: updatedFields })
                         .done(() => {
                             CaregiverProfileApp.helpers.showAlert('Details updated!', 'success');
-                            CaregiverProfileApp.api.fetchUserData();
+                            CaregiverProfileApp.api.fetchUserData(); // Correctly call fetchUserData
                             CaregiverProfileApp.setMode('view');
                         });
                 },
@@ -222,25 +226,28 @@
                 },
 
                 changeUserStatus(action) {
-                    this._ajax({ url: `${CaregiverProfileApp.state.baseUrl}/auth/${action}/account`, type: 'PUT', data: { id: String(CaregiverProfileApp.state.targetUserId) }})
-                        .done(res => {
-                            CaregiverProfileApp.helpers.showAlert(res.message || 'Status updated!', 'success');
-                            bootstrap.Modal.getInstance(CaregiverProfileApp.elements.statusModal[0])?.hide();
-                            CaregiverProfileApp.api.fetchUserData();
-                        });
+                    this._ajax({
+                        url: `${CaregiverProfileApp.state.baseUrl}/auth/${action}/account`, type: 'PUT',
+                        data: { id: String(CaregiverProfileApp.state.targetUserId) }
+                    }).done(res => {
+                        CaregiverProfileApp.helpers.showAlert(res.message || 'Status updated!', 'success');
+                        bootstrap.Modal.getInstance(CaregiverProfileApp.elements.statusModal[0])?.hide();
+                        CaregiverProfileApp.api.fetchUserData();
+                    });
                 }
             },
 
             render: {
                 view(data) {
                     const app = CaregiverProfileApp;
-                    const h = app.helpers;
-                    const statusInfo = h.getStatusInfo(data.status);
+                    const statusInfo = app.helpers.getStatusInfo(data.status);
 
                     app.elements.currentStatus.text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
-                    app.elements.roleText.text(h.getRoleText(data.role));
+                    app.elements.roleText.text(app.helpers.getRoleText(data.role));
+
                     const photoUrl = data.photo ? `${app.state.baseUrl}${data.photo}` : 'https://via.placeholder.com/100';
                     app.elements.photoView.attr('src', photoUrl).fadeIn();
+
                     app.elements.formFields.forEach(key => $(`#${key}-view`).text(data[key] || 'N/A'));
                 },
                 edit(data) { CaregiverProfileApp.elements.formFields.forEach(key => $(`#${key}-edit`).val(data[key] || '')); }
@@ -248,13 +255,12 @@
 
             helpers: {
                 getRoleText: r => ({'0':'Administrator','1':'Manager','2':'Caregiver'}[r] ||'Unknown'),
-                // CORRECTED readable function
                 getStatusInfo(status) {
                     const map = {
-                        '-1': { text: 'Not Verified', class: 'status-not-verified' },
-                        '0':  { text: 'Inactive', class: 'status-inactive' },
-                        '1':  { text: 'Active', class: 'status-active' },
-                        '2':  { text: 'Archived', class: 'status-archived' },
+                        '-1':{ text: 'Not Verified', class: 'status-not-verified' },
+                        '0':{ text: 'Inactive', class: 'status-inactive' },
+                        '1':{ text: 'Active', class: 'status-active' },
+                        '2':{ text: 'Archived', class: 'status-archived' },
                     };
                     return map[status] || { text:'Unknown Status', class:'' };
                 },
