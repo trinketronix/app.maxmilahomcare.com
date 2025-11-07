@@ -8,8 +8,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../../img/fav/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../../img/fav/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../../img/fav/favicon-16x16.png">
-    <link rel="manifest" href="../../site.webmanifest">
-    <link rel="shortcut icon" href="../../img/fav/favicon.ico">
 
     <!-- Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -168,110 +166,87 @@
 
             api: {
                 _ajax(settings) {
+                    const isFormData = settings.data instanceof FormData;
                     const baseSettings = {
                         headers: { 'Authorization': CaregiverProfileApp.state.authToken },
-                        processData: !(settings.data instanceof FormData),
-                        contentType: (settings.data instanceof FormData) ? false : 'application/json',
-                        data: (settings.data && !(settings.data instanceof FormData)) ? JSON.stringify(settings.data) : settings.data
+                        processData: !isFormData,
+                        contentType: isFormData ? false : 'application/json',
+                        // *** THE FIX: ADD dataType HERE SO ALL CALLS EXPECT JSON BACK ***
+                        dataType: 'json',
+                        data: (settings.data && !isFormData) ? JSON.stringify(settings.data) : settings.data
                     };
                     return $.ajax({ ...baseSettings, ...settings })
                         .fail(err => CaregiverProfileApp.helpers.showAlert(err.responseJSON?.message || 'An error occurred.', 'danger'));
                 },
 
                 fetchUserData() {
-                    // Always reference 'CaregiverProfileApp' to ensure correct scope
-                    this._ajax({ url: `${CaregiverProfileApp.state.baseUrl}/account/${CaregiverProfileApp.state.targetUserId}`, type: 'GET', dataType: 'json' })
-                        .done(res => {
-                            if (res.status === 'success' && res.data) {
-                                CaregiverProfileApp.state.targetUserData = res.data;
-                                CaregiverProfileApp.render.view(res.data);
-                            }
-                        });
+                    this._ajax({ url: `${CaregiverProfileApp.state.baseUrl}/account/${CaregiverProfileApp.state.targetUserId}`, type: 'GET' })
+                        .done(res => { if (res.status === 'success') { this.state.targetUserData = res.data; this.render.view(res.data); } }.bind(this));
                 },
 
                 saveUserData() {
                     const updatedFields = {};
-                    CaregiverProfileApp.elements.formFields.forEach(key => {
+                    this.elements.formFields.forEach(key => {
                         const newVal = $(`#${key}-edit`).val();
-                        // Use explicit app object reference
-                        if (newVal !== (CaregiverProfileApp.state.targetUserData[key] || '')) {
-                            updatedFields[key] = newVal;
-                        }
+                        if (newVal !== (this.state.targetUserData[key] || '')) updatedFields[key] = newVal;
                     });
+                    if ($.isEmptyObject(updatedFields)) { this.helpers.showAlert('No changes made.', 'info'); this.setMode('view'); return; }
 
-                    if ($.isEmptyObject(updatedFields)) {
-                        CaregiverProfileApp.helpers.showAlert('No changes were made.', 'info');
-                        CaregiverProfileApp.setMode('view');
-                        return;
-                    }
-
-                    const url = `${CaregiverProfileApp.state.baseUrl}/user/${CaregiverProfileApp.state.targetUserData.id}`;
-
-                    this._ajax({ url: url, type: 'PUT', data: updatedFields })
+                    this._ajax({ url: `${this.state.baseUrl}/user/${this.state.targetUserData.id}`, type: 'PUT', data: updatedFields })
                         .done(() => {
-                            CaregiverProfileApp.helpers.showAlert('Details updated!', 'success');
-                            CaregiverProfileApp.api.fetchUserData(); // Correctly reference the api object
-                            CaregiverProfileApp.setMode('view');
+                            this.helpers.showAlert('Details updated!', 'success');
+                            this.api.fetchUserData();
+                            this.setMode('view');
                         });
                 },
 
                 uploadOrUpdatePhoto(file) {
-                    const { targetUserData, loggedInUserId, targetUserId, baseUrl } = CaregiverProfileApp.state;
+                    const { targetUserData, loggedInUserId, targetUserId, baseUrl } = this.state;
                     const isDefault = targetUserData.photo?.includes('default.jpg');
-                    const httpMethod = 'POST'; // ALWAYS use POST for multipart uploads
+                    const httpMethod = 'POST'; // ALWAYS use POST for file uploads
                     const endpoint = isDefault ? 'upload/photo' : 'update/photo';
                     const finalUrl = (loggedInUserId === targetUserId) ? `${baseUrl}/user/${endpoint}` : `${baseUrl}/user/${targetUserId}/${endpoint}`;
 
                     const formData = new FormData();
                     formData.append('file', file);
-
-                    CaregiverProfileApp.helpers.showAlert('Uploading photo...', 'info');
+                    this.helpers.showAlert('Uploading photo...', 'info');
 
                     this._ajax({ url: finalUrl, type: httpMethod, data: formData })
-                        .done(res => {
-                            CaregiverProfileApp.helpers.showAlert(res.message || 'Photo updated!', 'success');
-                            CaregiverProfileApp.api.fetchUserData();
-                        });
+                        .done(res => { this.helpers.showAlert(res.message || 'Photo updated!', 'success'); this.api.fetchUserData(); });
                 },
 
                 changeUserStatus(action) {
                     this._ajax({
-                        url: `${CaregiverProfileApp.state.baseUrl}/auth/${action}/account`, type: 'PUT',
-                        data: { id: String(CaregiverProfileApp.state.targetUserId) }
+                        url: `${this.state.baseUrl}/auth/${action}/account`, type: 'PUT',
+                        data: { id: String(this.state.targetUserId) }
                     }).done(res => {
-                        CaregiverProfileApp.helpers.showAlert(res.message || 'Status updated!', 'success');
-                        bootstrap.Modal.getInstance(CaregiverProfileApp.elements.statusModal[0])?.hide();
-                        CaregiverProfileApp.api.fetchUserData();
+                        this.helpers.showAlert(res.message || 'Status updated!', 'success');
+                        bootstrap.Modal.getInstance(this.elements.statusModal[0])?.hide();
+                        this.api.fetchUserData();
                     });
                 }
             },
 
             render: {
                 view(data) {
-                    const app = CaregiverProfileApp; // Alias for clarity
-                    const statusInfo = app.helpers.getStatusInfo(data.status);
-
-                    app.elements.currentStatus.text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
-                    app.elements.roleText.text(app.helpers.getRoleText(data.role));
-
-                    const photoUrl = data.photo ? `${app.state.baseUrl}${data.photo}` : 'https://via.placeholder.com/100';
-                    app.elements.photoView.attr('src', photoUrl).fadeIn();
-
-                    app.elements.formFields.forEach(key => $(`#${key}-view`).text(data[key] || 'N/A'));
+                    const h = this.helpers;
+                    const statusInfo = h.getStatusInfo(data.status);
+                    this.elements.currentStatus.text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
+                    this.elements.roleText.text(h.getRoleText(data.role));
+                    const photoUrl = data.photo ? `${this.state.baseUrl}${data.photo}` : 'https://via.placeholder.com/100';
+                    this.elements.photoView.attr('src', photoUrl).fadeIn();
+                    this.elements.formFields.forEach(key => $(`#${key}-view`).text(data[key] || 'N/A'));
                 },
-                edit(data) { CaregiverProfileApp.elements.formFields.forEach(key => $(`#${key}-edit`).val(data[key] || '')); }
+                edit(data) { this.elements.formFields.forEach(key => $(`#${key}-edit`).val(data[key] || '')); }
             },
 
             helpers: {
-                getRoleText: r => ({'0':'Administrator','1':'Manager','2':'Caregiver'}[r] || 'Unknown'),
+                getRoleText: r => ({'0':'Administrator','1':'Manager','2':'Caregiver'}[r] ||'Unknown'),
                 getStatusInfo(status) {
                     const map = {'-1':{text:'Not Verified',class:'status-not-verified'},'0':{text:'Inactive',class:'status-inactive'},'1':{text:'Active',class:'status-active'},'2':{text:'Archived',class:'status-archived'}};
                     return map[status] || {text:'Unknown Status',class:''};
                 },
-                showAlert(message, type = 'success') {
-                    const h = `<div class="alert alert-${type} alert-dismissible fade show">${message}<button class="btn-close" data-bs-dismiss="alert"></button></div>`;
-                    CaregiverProfileApp.elements.alertContainer.html(h).children().delay(4000).fadeOut();
-                }
+                showAlert(message, type = 'success') { const h = `<div class="alert alert-${type} alert-dismissible fade show">${message}<button class="btn-close" data-bs-dismiss="alert"></button></div>`; this.elements.alertContainer.html(h).children().delay(4000).fadeOut(); }
             },
 
             setMode(mode) {
@@ -284,8 +259,18 @@
             }
         };
 
+        // Bind 'this' context for nested object functions.
+        for (const key of ['api', 'render', 'handlers', 'helpers']) {
+            for (const func in CaregiverProfileApp[key]) {
+                if (typeof CaregiverProfileApp[key][func] === 'function') {
+                    CaregiverProfileApp[key][func] = CaregiverProfileApp[key][func].bind(CaregiverProfileApp);
+                }
+            }
+        }
+
         CaregiverProfileApp.init();
     });
 </script>
+
 </body>
 </html>
