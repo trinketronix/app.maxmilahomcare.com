@@ -24,7 +24,7 @@ class CaregiverController extends BaseController {
             'userId' => $this->getUserId(),
             'username' => $this->getUsername(),
             'fullname' => $this->getUserFullname(),
-            'role' => $this->getUserRole(),
+            'role' => $this->getUserRoleText(),
             'photo' => $this->getUserPhoto(),
             'baseUrl' => $this->getApiBaseUrl(),
             'authToken' => $this->getAuthToken()
@@ -67,7 +67,7 @@ class CaregiverController extends BaseController {
             'targetUserId' => $this->targetUserId,
             'username' => $this->getUsername(),
             'fullname' => $this->getUserFullname(),
-            'role' => $this->getUserRoleText(),
+            'role' => $this->getUserRole(),
             'photo' => $this->getUserPhoto(),
             'baseUrl' => $this->getApiBaseUrl(),
             'authToken' => $this->getAuthToken()
