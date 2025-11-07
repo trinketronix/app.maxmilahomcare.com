@@ -118,11 +118,18 @@
 <script>
     $(document).ready(function() {
         const CaregiverProfileApp = {
+            // *** NEW: Add a constants object for better readability ***
+            ROLES: {
+                ADMIN: 0,
+                MANAGER: 1,
+                CAREGIVER: 2,
+            },
+
             state: {
                 targetUserData: {},
                 loggedInUserId: <?= json_encode($userId ?? null) ?>,
                 targetUserId: <?= json_encode($targetUserId ?? null) ?>,
-                userRole: <?= json_encode($role ?? []) ?>,
+                userRole: <?= json_encode($role ?? null) ?>,
                 baseUrl: <?= json_encode($baseUrl ?? '') ?>,
                 authToken: <?= json_encode($authToken ?? '') ?>,
             },
@@ -132,6 +139,8 @@
                 avatarContainer: $('#avatar-container'), photoUploadInput: $('#photo-upload-input'),
                 editBtn: $('#edit-btn'), saveBtn: $('#save-btn'), backBtn: $('#back-button'),
                 addressesBtn: $('#addresses-btn'), patientsBtn: $('#patients-btn'), statusModal: $('#statusModal'),
+                // Cache the status button for easy access
+                statusBtn: $('#status-btn'),
                 statusOptions: $('.status-option'),
                 formFields: [ 'firstname', 'middlename', 'lastname', 'birthdate', 'phone', 'phone2', 'email', 'email2', 'ssn', 'code', 'languages', 'description' ]
             },
@@ -140,6 +149,8 @@
                 if (!this.state.targetUserId) { this.helpers.showAlert('Target user ID is missing.', 'danger'); return; }
                 this.bindEvents();
                 this.api.fetchUserData();
+                // *** NEW: Call the function to set up UI based on role ***
+                this.setupRoleBasedUI();
             },
 
             bindEvents() {
@@ -151,6 +162,14 @@
                 this.elements.statusOptions.on('click', this.handlers.onStatusChange);
                 this.elements.addressesBtn.on('click', () => window.location.href = `/caregiver/addresses/${this.state.targetUserId}`);
                 this.elements.patientsBtn.on('click', () => window.location.href = `/caregiver/patients/${this.state.targetUserId}`);
+            },
+
+            // *** NEW: Centralized function for all role-based logic ***
+            setupRoleBasedUI() {
+                // If the logged-in user's role is CAREGIVER, hide the status button.
+                if (this.state.userRole === this.ROLES.CAREGIVER) {
+                    this.elements.statusBtn.hide();
+                }
             },
 
             handlers: {
@@ -197,13 +216,12 @@
                         CaregiverProfileApp.helpers.showAlert('No changes were made.', 'info');
                         CaregiverProfileApp.setMode('view'); return;
                     }
-
                     const url = `${CaregiverProfileApp.state.baseUrl}/user/${CaregiverProfileApp.state.targetUserData.id}`;
 
                     this._ajax({ url: url, type: 'PUT', data: updatedFields })
                         .done(() => {
                             CaregiverProfileApp.helpers.showAlert('Details updated!', 'success');
-                            CaregiverProfileApp.api.fetchUserData(); // Correctly call fetchUserData
+                            CaregiverProfileApp.api.fetchUserData();
                             CaregiverProfileApp.setMode('view');
                         });
                 },
@@ -211,7 +229,7 @@
                 uploadOrUpdatePhoto(file) {
                     const { targetUserData, loggedInUserId, targetUserId, baseUrl } = CaregiverProfileApp.state;
                     const isDefault = targetUserData.photo?.includes('default.jpg');
-                    const httpMethod = 'POST'; // ALWAYS use POST for multipart uploads
+                    const httpMethod = 'POST';
                     const endpoint = isDefault ? 'upload/photo' : 'update/photo';
                     const finalUrl = (loggedInUserId === targetUserId) ? `${baseUrl}/user/${endpoint}` : `${baseUrl}/user/${targetUserId}/${endpoint}`;
 
@@ -242,13 +260,10 @@
                 view(data) {
                     const app = CaregiverProfileApp;
                     const statusInfo = app.helpers.getStatusInfo(data.status);
-
                     app.elements.currentStatus.text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
                     app.elements.roleText.text(app.helpers.getRoleText(data.role));
-
                     const photoUrl = data.photo ? `${app.state.baseUrl}${data.photo}` : 'https://via.placeholder.com/100';
                     app.elements.photoView.attr('src', photoUrl).fadeIn();
-
                     app.elements.formFields.forEach(key => $(`#${key}-view`).text(data[key] || 'N/A'));
                 },
                 edit(data) { CaregiverProfileApp.elements.formFields.forEach(key => $(`#${key}-edit`).val(data[key] || '')); }
