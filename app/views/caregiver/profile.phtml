@@ -52,6 +52,10 @@
         .status-option { cursor: pointer; color: #333; }
         .status-option i { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; width: 50px; }
         #alert-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px; }
+
+        /* New styles for password form */
+        #password-match-icon { color: #198754; display: none; margin-left: 0.5rem; }
+        #save-password-btn:disabled { background-color: #e9ecef; border-color: #ced4da; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -71,6 +75,7 @@
     <main class="main-content">
         <div id="current-status" class="current-status-banner">Loading status...</div>
         <form id="details-form" onsubmit="return false;">
+            <!-- ... (existing form fields remain unchanged) ... -->
             <input type="file" id="photo-upload-input" style="display:none;" accept="image/*">
             <div class="details-grid">
                 <div class="avatar-section">
@@ -100,9 +105,12 @@
                     <div class="detail-item"><span class="label">Description</span><span class="value" id="description-view"></span><textarea class="form-control" id="description-edit"></textarea></div>
                 </div>
             </div>
+
             <div class="action-buttons">
                 <button type="button" class="btn btn-custom" id="addresses-btn">Addresses</button>
                 <button type="button" class="btn btn-custom" id="patients-btn">Patients</button>
+                <!-- NEW: "Change Password" Button -->
+                <button type="button" class="btn btn-custom" id="change-password-btn">Change Password</button>
                 <button type="button" class="btn btn-custom" id="status-btn" data-bs-toggle="modal" data-bs-target="#statusModal">Status</button>
                 <button type="button" class="btn btn-custom" id="edit-btn">Edit</button>
             </div>
@@ -111,20 +119,43 @@
     </main>
 </div>
 
+<!-- Status Modal (unchanged) -->
 <div class="modal fade" id="statusModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Change Status</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body status-modal-body"><div class="status-option" data-status-action="activate"><i class="fa-solid fa-user-plus"></i>Activate</div><div class="status-option" data-status-action="inactivate"><i class="fa-solid fa-user-slash"></i>Inactivate</div><div class="status-option" data-status-action="archive"><i class="fa-solid fa-user-minus"></i>Archive</div><div class="status-option" data-status-action="delete"><i class="fa-solid fa-folder-closed"></i>Delete</div></div></div></div></div>
+
+<!-- NEW: "Change Password" Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title w-100 text-center">Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="password-form" onsubmit="return false;">
+                    <div class="mb-3">
+                        <label for="new-password" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="new-password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm-password" class="form-label">Confirm New Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="confirm-password" required>
+                            <span class="input-group-text" id="password-match-icon"><i class="fas fa-check"></i></span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mt-3" id="save-password-btn" disabled>Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     $(document).ready(function() {
         const CaregiverProfileApp = {
-            // *** NEW: Add a constants object for better readability ***
-            ROLES: {
-                ADMIN: 0,
-                MANAGER: 1,
-                CAREGIVER: 2,
-            },
-
+            ROLES: { ADMIN: 0, MANAGER: 1, CAREGIVER: 2 },
             state: {
                 targetUserData: {},
                 loggedInUserId: <?= json_encode($userId ?? null) ?>,
@@ -138,18 +169,25 @@
                 currentStatus: $('#current-status'), roleText: $('#role-text'), photoView: $('#photo-view'),
                 avatarContainer: $('#avatar-container'), photoUploadInput: $('#photo-upload-input'),
                 editBtn: $('#edit-btn'), saveBtn: $('#save-btn'), backBtn: $('#back-button'),
-                addressesBtn: $('#addresses-btn'), patientsBtn: $('#patients-btn'), statusModal: $('#statusModal'),
-                // Cache the status button for easy access
-                statusBtn: $('#status-btn'),
+                addressesBtn: $('#addresses-btn'), patientsBtn: $('#patients-btn'), statusBtn: $('#status-btn'),
                 statusOptions: $('.status-option'),
-                formFields: [ 'firstname', 'middlename', 'lastname', 'birthdate', 'phone', 'phone2', 'email', 'email2', 'ssn', 'code', 'languages', 'description' ]
+                formFields: [ 'firstname', 'middlename', 'lastname', 'birthdate', 'phone', 'phone2', 'email', 'email2', 'ssn', 'code', 'languages', 'description' ],
+                // New elements for password change
+                changePasswordBtn: $('#change-password-btn'),
+                passwordForm: $('#password-form'),
+                newPasswordInput: $('#new-password'),
+                confirmPasswordInput: $('#confirm-password'),
+                passwordMatchIcon: $('#password-match-icon'),
+                savePasswordBtn: $('#save-password-btn'),
             },
+            modals: { status: null, changePassword: null },
 
             init() {
                 if (!this.state.targetUserId) { this.helpers.showAlert('Target user ID is missing.', 'danger'); return; }
+                this.modals.status = new bootstrap.Modal('#statusModal');
+                this.modals.changePassword = new bootstrap.Modal('#changePasswordModal');
                 this.bindEvents();
                 this.api.fetchUserData();
-                // *** NEW: Call the function to set up UI based on role ***
                 this.setupRoleBasedUI();
             },
 
@@ -162,11 +200,16 @@
                 this.elements.statusOptions.on('click', this.handlers.onStatusChange);
                 this.elements.addressesBtn.on('click', () => window.location.href = `/caregiver/addresses/${this.state.targetUserId}`);
                 this.elements.patientsBtn.on('click', () => window.location.href = `/caregiver/patients/${this.state.targetUserId}`);
+
+                // New event listeners
+                this.elements.changePasswordBtn.on('click', this.handlers.onOpenPasswordModal);
+                this.elements.passwordForm.on('submit', this.handlers.onChangePasswordSubmit);
+                // Listen to keyup on both fields to trigger validation
+                this.elements.newPasswordInput.add(this.elements.confirmPasswordInput).on('keyup', this.handlers.onPasswordInputChange);
             },
 
-            // *** NEW: Centralized function for all role-based logic ***
             setupRoleBasedUI() {
-                // If the logged-in user's role is CAREGIVER, hide the status button.
+                // Hide status button for caregivers viewing a profile
                 if (this.state.userRole === this.ROLES.CAREGIVER) {
                     this.elements.statusBtn.hide();
                 }
@@ -178,23 +221,43 @@
                 onBackClick(e) { e.preventDefault(); if (CaregiverProfileApp.elements.pageContainer.hasClass('edit-mode')) CaregiverProfileApp.setMode('view'); else window.history.back(); },
                 onAvatarClick() { if (CaregiverProfileApp.elements.pageContainer.hasClass('edit-mode')) CaregiverProfileApp.elements.photoUploadInput.click(); },
                 onFileSelected(e) { const file = e.target.files[0]; if (file) CaregiverProfileApp.api.uploadOrUpdatePhoto(file); },
-                onStatusChange(e) { const action = $(e.currentTarget).data('status-action'); CaregiverProfileApp.api.changeUserStatus(action); }
+                onStatusChange(e) { const action = $(e.currentTarget).data('status-action'); CaregiverProfileApp.api.changeUserStatus(action); },
+                // New handlers
+                onOpenPasswordModal() {
+                    CaregiverProfileApp.elements.passwordForm[0].reset(); // Clear form
+                    CaregiverProfileApp.elements.passwordMatchIcon.hide(); // Hide icon
+                    CaregiverProfileApp.elements.savePasswordBtn.prop('disabled', true); // Disable button
+                    CaregiverProfileApp.modals.changePassword.show();
+                },
+                onPasswordInputChange() {
+                    const newPass = CaregiverProfileApp.elements.newPasswordInput.val();
+                    const confirmPass = CaregiverProfileApp.elements.confirmPasswordInput.val();
+                    const areMatching = newPass && newPass === confirmPass;
+
+                    CaregiverProfileApp.elements.passwordMatchIcon.toggle(areMatching);
+                    CaregiverProfileApp.elements.savePasswordBtn.prop('disabled', !areMatching);
+                },
+                onChangePasswordSubmit(e) {
+                    e.preventDefault();
+                    const username = CaregiverProfileApp.state.targetUserData.email;
+                    const password = CaregiverProfileApp.elements.confirmPasswordInput.val();
+                    if (username && password) {
+                        CaregiverProfileApp.api.changePassword(username, password);
+                    } else {
+                        CaregiverProfileApp.helpers.showAlert('Cannot change password. User data is incomplete.', 'danger');
+                    }
+                }
             },
 
             api: {
-                _ajax(settings) {
+                _ajax(settings) { /* ... (no changes to _ajax helper) ... */
                     const isFormData = settings.data instanceof FormData;
                     return $.ajax({
-                        url: settings.url,
-                        type: settings.type,
-                        headers: { 'Authorization': CaregiverProfileApp.state.authToken },
-                        processData: !isFormData,
-                        contentType: isFormData ? false : 'application/json',
-                        dataType: 'json',
-                        data: (settings.data && !isFormData) ? JSON.stringify(settings.data) : settings.data,
+                        url: settings.url, type: settings.type, headers: { 'Authorization': CaregiverProfileApp.state.authToken },
+                        processData: !isFormData, contentType: isFormData ? false : 'application/json',
+                        dataType: 'json', data: (settings.data && !isFormData) ? JSON.stringify(settings.data) : settings.data,
                     }).fail(err => CaregiverProfileApp.helpers.showAlert(err.responseJSON?.message || 'An error occurred.', 'danger'));
                 },
-
                 fetchUserData() {
                     this._ajax({ url: `${CaregiverProfileApp.state.baseUrl}/account/${CaregiverProfileApp.state.targetUserId}`, type: 'GET' })
                         .done(res => { if (res.status === 'success' && res.data) {
@@ -202,64 +265,64 @@
                             CaregiverProfileApp.render.view(res.data);
                         }});
                 },
-
-                saveUserData() {
+                saveUserData() { /* ... (no changes to saveUserData) ... */
                     const updatedFields = {};
                     CaregiverProfileApp.elements.formFields.forEach(key => {
                         const newVal = $(`#${key}-edit`).val();
-                        if (newVal !== (CaregiverProfileApp.state.targetUserData[key] || '')) {
-                            updatedFields[key] = newVal;
-                        }
+                        if (newVal !== (CaregiverProfileApp.state.targetUserData[key] || '')) updatedFields[key] = newVal;
                     });
-
                     if ($.isEmptyObject(updatedFields)) {
                         CaregiverProfileApp.helpers.showAlert('No changes were made.', 'info');
                         CaregiverProfileApp.setMode('view'); return;
                     }
-                    const url = `${CaregiverProfileApp.state.baseUrl}/user/${CaregiverProfileApp.state.targetUserData.id}`;
-
-                    this._ajax({ url: url, type: 'PUT', data: updatedFields })
+                    this._ajax({ url: `${CaregiverProfileApp.state.baseUrl}/user/${CaregiverProfileApp.state.targetUserData.id}`, type: 'PUT', data: updatedFields })
                         .done(() => {
                             CaregiverProfileApp.helpers.showAlert('Details updated!', 'success');
                             CaregiverProfileApp.api.fetchUserData();
                             CaregiverProfileApp.setMode('view');
                         });
                 },
-
-                uploadOrUpdatePhoto(file) {
+                uploadOrUpdatePhoto(file) { /* ... (no changes to uploadOrUpdatePhoto) ... */
                     const { targetUserData, loggedInUserId, targetUserId, baseUrl } = CaregiverProfileApp.state;
                     const isDefault = targetUserData.photo?.includes('default.jpg');
                     const httpMethod = 'POST';
                     const endpoint = isDefault ? 'upload/photo' : 'update/photo';
                     const finalUrl = (loggedInUserId === targetUserId) ? `${baseUrl}/user/${endpoint}` : `${baseUrl}/user/${targetUserId}/${endpoint}`;
-
                     const formData = new FormData();
                     formData.append('file', file);
                     CaregiverProfileApp.helpers.showAlert('Uploading photo...', 'info');
-
                     this._ajax({ url: finalUrl, type: httpMethod, data: formData })
+                        .done(res => { CaregiverProfileApp.helpers.showAlert(res.message || 'Photo updated!', 'success'); CaregiverProfileApp.api.fetchUserData(); });
+                },
+                changeUserStatus(action) { /* ... (no changes to changeUserStatus) ... */
+                    this._ajax({ url: `${CaregiverProfileApp.state.baseUrl}/auth/${action}/account`, type: 'PUT', data: { id: String(CaregiverProfileApp.state.targetUserId) }})
                         .done(res => {
-                            CaregiverProfileApp.helpers.showAlert(res.message || 'Photo updated!', 'success');
+                            CaregiverProfileApp.helpers.showAlert(res.message || 'Status updated!', 'success');
+                            CaregiverProfileApp.modals.status.hide();
                             CaregiverProfileApp.api.fetchUserData();
                         });
                 },
-
-                changeUserStatus(action) {
+                // *** NEW: API method for changing password ***
+                changePassword(username, password) {
+                    const payload = { username, password };
                     this._ajax({
-                        url: `${CaregiverProfileApp.state.baseUrl}/auth/${action}/account`, type: 'PUT',
-                        data: { id: String(CaregiverProfileApp.state.targetUserId) }
-                    }).done(res => {
-                        CaregiverProfileApp.helpers.showAlert(res.message || 'Status updated!', 'success');
-                        bootstrap.Modal.getInstance(CaregiverProfileApp.elements.statusModal[0])?.hide();
-                        CaregiverProfileApp.api.fetchUserData();
+                        url: `${CaregiverProfileApp.state.baseUrl}/auth/change/password`,
+                        type: 'PUT',
+                        data: payload
+                    }).done(() => {
+                        CaregiverProfileApp.modals.changePassword.hide();
+                        CaregiverProfileApp.helpers.showAlert('Password changed successfully. Please log in again.', 'success');
+                        // Wait 2 seconds for user to read the message, then sign out
+                        setTimeout(() => {
+                            window.location.href = '/signout';
+                        }, 2000);
                     });
                 }
             },
 
-            render: {
+            render: { /* ... (no changes to render object) ... */
                 view(data) {
-                    const app = CaregiverProfileApp;
-                    const statusInfo = app.helpers.getStatusInfo(data.status);
+                    const app = CaregiverProfileApp; const statusInfo = app.helpers.getStatusInfo(data.status);
                     app.elements.currentStatus.text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
                     app.elements.roleText.text(app.helpers.getRoleText(data.role));
                     const photoUrl = data.photo ? `${app.state.baseUrl}${data.photo}` : 'https://via.placeholder.com/100';
@@ -269,15 +332,10 @@
                 edit(data) { CaregiverProfileApp.elements.formFields.forEach(key => $(`#${key}-edit`).val(data[key] || '')); }
             },
 
-            helpers: {
+            helpers: { /* ... (no changes to helpers object) ... */
                 getRoleText: r => ({'0':'Administrator','1':'Manager','2':'Caregiver'}[r] ||'Unknown'),
                 getStatusInfo(status) {
-                    const map = {
-                        '-1':{ text: 'Not Verified', class: 'status-not-verified' },
-                        '0':{ text: 'Inactive', class: 'status-inactive' },
-                        '1':{ text: 'Active', class: 'status-active' },
-                        '2':{ text: 'Archived', class: 'status-archived' },
-                    };
+                    const map = { '-1':{ text: 'Not Verified', class: 'status-not-verified' }, '0':{ text: 'Inactive', class: 'status-inactive' }, '1':{ text: 'Active', class: 'status-active' }, '2':{ text: 'Archived', class: 'status-archived' }, };
                     return map[status] || { text:'Unknown Status', class:'' };
                 },
                 showAlert(message, type = 'success') {
@@ -286,19 +344,16 @@
                 }
             },
 
-            setMode(mode) {
+            setMode(mode) { /* ... (no changes to setMode) ... */
                 if (mode === 'edit') {
                     this.render.edit(this.state.targetUserData);
                     this.elements.pageContainer.removeClass('view-mode').addClass('edit-mode');
-                } else {
-                    this.elements.pageContainer.removeClass('edit-mode').addClass('view-mode');
-                }
+                } else { this.elements.pageContainer.removeClass('edit-mode').addClass('view-mode'); }
             }
         };
 
         CaregiverProfileApp.init();
     });
 </script>
-
 </body>
 </html>
