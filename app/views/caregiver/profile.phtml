@@ -122,6 +122,7 @@
                 targetUserData: {},
                 loggedInUserId: <?= json_encode($userId ?? null) ?>,
                 targetUserId: <?= json_encode($targetUserId ?? null) ?>,
+                userRole: <?= json_encode($role ?? []) ?>,
                 baseUrl: <?= json_encode($baseUrl ?? '') ?>,
                 authToken: <?= json_encode($authToken ?? '') ?>,
             },
