@@ -18,8 +18,6 @@
     <style>
         body { background-color: #f0f2f5; font-family: 'Segoe UI', 'Roboto', sans-serif; }
         .page-container { max-width: 500px; margin: 0 auto; background-color: #ffffff; min-height: 100vh; border-left: 1px solid #dcdcdc; border-right: 1px solid #dcdcdc; }
-
-        /* Header */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; position: relative; }
         .back-button { text-decoration: none; color: #333; font-weight: 500; }
         .header-title-group { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; }
@@ -27,15 +25,12 @@
         .profile-icon { font-size: 1.5rem; border: 2px solid #000; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; margin: 0 auto; overflow: hidden; }
         .profile-icon img { width: 100%; height: 100%; object-fit: cover; }
         .profile-username { font-size: 0.8rem; color: #555; margin-top: 4px; }
-
-        /* Main Content */
         .main-content { padding: 1rem; }
         .current-status-banner { text-align: center; font-weight: 500; margin-bottom: 1.5rem; padding: 0.5rem; border-radius: 8px; }
         .status-active { background-color: #d1e7dd; color: #0f5132; }
         .status-inactive { background-color: #f8d7da; color: #842029; }
         .status-not-verified { background-color: #fff3cd; color: #664d03; }
         .status-archived { background-color: #e2d9f3; color: #49247a; }
-
         .details-grid { display: grid; grid-template-columns: auto 1fr; gap: 1rem 2rem; align-items: center; }
         .avatar-section { grid-column: 1 / 2; text-align: center; }
         .avatar-img { width: 100px; height: 100px; border: 3px solid #000; padding: 0.5rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; border-radius: 50%; overflow: hidden; }
@@ -44,19 +39,14 @@
         .edit-mode .avatar-img:hover { box-shadow: 0 0 10px rgba(0, 123, 255, 0.7); }
         .role-text { font-weight: bold; }
         .name-section { grid-column: 2 / 3; }
-
         .details-section { grid-column: 1 / -1; margin-top: 1rem; }
         .detail-item { margin-bottom: 1.25rem; }
         .detail-item .label { font-weight: bold; display: block; margin-bottom: 0.25rem; }
         .detail-item .value { border: 2px solid transparent; background: transparent; padding: 0.5rem 0; word-break: break-word; }
         .detail-item .form-control { color: #555; border-radius: 8px; border: 2px solid #000; padding: 0.5rem 1rem; width: 100%; background: #f8f9fa; }
         .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-
-        /* Mode Toggling */
         .view-mode .form-control, .view-mode .save-button { display: none; }
         .edit-mode .value, .edit-mode .action-buttons { display: none !important; }
-
-        /* Buttons & Alerts */
         .action-buttons, .save-button { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; }
         .btn-custom { border: 2px solid #000; border-radius: 8px; font-weight: 500; background-color: #fff; }
         .btn-custom.main-action { background-color: #000; color: #fff; width: 100%; padding: 0.75rem; }
@@ -65,8 +55,6 @@
         .status-option:hover { color: #007bff; }
         .status-option i { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; width: 50px; }
         #alert-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px; }
-
-        @media (min-width: 768px) { .page-container { max-width: 720px; } }
     </style>
 </head>
 <body>
@@ -85,12 +73,11 @@
 
     <main class="main-content">
         <div id="current-status" class="current-status-banner">Loading status...</div>
-
         <form id="details-form" onsubmit="return false;">
             <input type="file" id="photo-upload-input" style="display:none;" accept="image/*">
             <div class="details-grid">
                 <div class="avatar-section">
-                    <div class="avatar-img" id="avatar-container"><img id="photo-view" src="https://via.placeholder.com/100" alt="Patient Avatar"></div>
+                    <div class="avatar-img" id="avatar-container"><img id="photo-view" src="" alt="Patient Avatar" style="display:none;"></div>
                     <div class="role-text">Patient</div>
                 </div>
                 <div class="name-section">
@@ -106,41 +93,23 @@
                     </div>
                 </div>
             </div>
-
             <div class="action-buttons">
                 <button type="button" class="btn btn-custom" id="addresses-btn">Addresses</button>
                 <button type="button" class="btn btn-custom" id="caregivers-btn">Caregivers</button>
                 <button type="button" class="btn btn-custom" id="status-btn" data-bs-toggle="modal" data-bs-target="#statusModal">Status</button>
                 <button type="button" class="btn btn-custom" id="edit-btn">Edit</button>
             </div>
-            <div class="save-button">
-                <button type="button" class="btn btn-custom main-action" id="save-btn">Save</button>
-            </div>
+            <div class="save-button"><button type="button" class="btn btn-custom main-action" id="save-btn">Save</button></div>
         </form>
     </main>
 </div>
 
-<div class="modal fade" id="statusModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header"><h5 class="modal-title">Change Status</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body status-modal-body">
-                <div class="status-option" data-status-action="activate"><i class="fa-solid fa-user-plus"></i>Activate</div>
-                <div class="status-option" data-status-action="inactivate"><i class="fa-solid fa-user-slash"></i>Inactivate</div>
-                <div class="status-option" data-status-action="archivate"><i class="fa-solid fa-user-minus"></i>Archive</div>
-                <div class="status-option" data-status-action="delete"><i class="fa-solid fa-folder-closed"></i>Delete</div>
-            </div>
-        </div>
-    </div>
-</div>
+<div class="modal fade" id="statusModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Change Status</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body status-modal-body"><div class="status-option" data-status-action="activate"><i class="fa-solid fa-user-plus"></i>Activate</div><div class="status-option" data-status-action="inactivate"><i class="fa-solid fa-user-slash"></i>Inactivate</div><div class="status-option" data-status-action="archivate"><i class="fa-solid fa-user-minus"></i>Archive</div><div class="status-option" data-status-action="delete"><i class="fa-solid fa-folder-closed"></i>Delete</div></div></div></div></div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     $(document).ready(function() {
-        /**
-         * Encapsulates all functionality for the Patient Profile page.
-         */
         const PatientProfileApp = {
             state: {
                 patientData: {},
@@ -160,60 +129,47 @@
             },
 
             init() {
-                if (!this.state.patientId) {
-                    this.helpers.showAlert('Patient ID is missing.', 'danger');
-                    return;
-                }
+                if (!this.state.patientId) { this.helpers.showAlert('Patient ID is missing.', 'danger'); return; }
                 this.bindEvents();
                 this.api.fetchPatientData();
             },
 
             bindEvents() {
-                this.elements.editBtn.on('click', () => this.setMode('edit'));
-                this.elements.saveBtn.on('click', () => this.api.savePatientData());
+                this.elements.editBtn.on('click', this.handlers.onEditClick);
+                this.elements.saveBtn.on('click', this.handlers.onSaveClick);
                 this.elements.backBtn.on('click', this.handlers.onBackClick);
                 this.elements.avatarContainer.on('click', this.handlers.onAvatarClick);
                 this.elements.photoUploadInput.on('change', this.handlers.onFileSelected);
                 this.elements.statusModal.on('click', '.status-option', this.handlers.onStatusChange);
-
                 this.elements.addressesBtn.on('click', () => window.location.href = `/patient/addresses/${this.state.patientId}`);
                 this.elements.caregiversBtn.on('click', () => window.location.href = `/patient/caregivers/${this.state.patientId}`);
             },
 
             handlers: {
-                onBackClick(e) {
-                    e.preventDefault();
-                    if (PatientProfileApp.elements.pageContainer.hasClass('edit-mode')) {
-                        PatientProfileApp.setMode('view');
-                    } else {
-                        window.history.back();
-                    }
-                },
-                onAvatarClick() {
-                    if (PatientProfileApp.elements.pageContainer.hasClass('edit-mode')) {
-                        PatientProfileApp.elements.photoUploadInput.click();
-                    }
-                },
-                onFileSelected(event) {
-                    const file = event.target.files[0];
-                    if (file) PatientProfileApp.api.uploadOrUpdatePhoto(file);
-                },
-                onStatusChange(e) {
-                    const action = $(e.currentTarget).data('status-action');
-                    PatientProfileApp.api.changePatientStatus(action);
-                }
+                onBackClick(e) { e.preventDefault(); if (PatientProfileApp.elements.pageContainer.hasClass('edit-mode')) PatientProfileApp.setMode('view'); else window.history.back(); },
+                onAvatarClick() { if (PatientProfileApp.elements.pageContainer.hasClass('edit-mode')) PatientProfileApp.elements.photoUploadInput.click(); },
+                onFileSelected(e) { const file = e.target.files[0]; if (file) PatientProfileApp.api.uploadOrUpdatePhoto(file); },
+                onStatusChange(e) { const action = $(e.currentTarget).data('status-action'); PatientProfileApp.api.changePatientStatus(action); },
+                onEditClick() { PatientProfileApp.setMode('edit'); },
+                onSaveClick() { PatientProfileApp.api.savePatientData(); },
             },
 
             api: {
                 _ajax(settings) {
-                    return $.ajax({
-                        ...settings,
+                    const isFormData = settings.data instanceof FormData;
+                    // *** FIX 1 of 2: Robust _ajax helper ***
+                    const baseSettings = {
                         headers: { 'Authorization': PatientProfileApp.state.authToken },
+                        processData: !isFormData,
+                        contentType: isFormData ? false : 'application/json',
                         dataType: 'json',
-                    }).fail(err => PatientProfileApp.helpers.showAlert(err.responseJSON?.message || 'An API error occurred.', 'danger'));
+                        data: (settings.data && !isFormData) ? JSON.stringify(settings.data) : settings.data
+                    };
+                    return $.ajax({ ...baseSettings, ...settings }).fail(err => PatientProfileApp.helpers.showAlert(err.responseJSON?.message || 'An API error occurred.', 'danger'));
                 },
+
                 fetchPatientData() {
-                    this._ajax({ url: `${PatientProfileApp.state.baseUrl}/patient/${PatientProfileApp.state.patientId}` })
+                    this._ajax({ url: `${PatientProfileApp.state.baseUrl}/patient/${PatientProfileApp.state.patientId}`, type: 'GET' })
                         .done(res => {
                             if (res.status === 'success' && res.data) {
                                 PatientProfileApp.state.patientData = res.data;
@@ -221,49 +177,47 @@
                             }
                         });
                 },
+
                 savePatientData() {
                     const updatedFields = {};
                     PatientProfileApp.elements.formFields.forEach(key => {
-                        const newValue = $(`#${key}-edit`).val();
-                        if (newValue !== (PatientProfileApp.state.patientData[key] || '')) {
-                            updatedFields[key] = newValue;
-                        }
+                        const newVal = $(`#${key}-edit`).val();
+                        if (newVal !== (PatientProfileApp.state.patientData[key] || '')) updatedFields[key] = newVal;
                     });
-
                     if ($.isEmptyObject(updatedFields)) {
-                        PatientProfileApp.helpers.showAlert('No changes were made.', 'info');
-                        PatientProfileApp.setMode('view');
-                        return;
+                        PatientProfileApp.helpers.showAlert('No changes made.', 'info');
+                        PatientProfileApp.setMode('view'); return;
                     }
 
-                    this._ajax({
-                        url: `${PatientProfileApp.state.baseUrl}/patient/${PatientProfileApp.state.patientId}`,
-                        type: 'PUT',
-                        contentType: 'application/json',
-                        data: JSON.stringify(updatedFields),
-                    }).done(() => {
-                        PatientProfileApp.helpers.showAlert('Patient details updated successfully!', 'success');
-                        this.fetchPatientData();
-                        PatientProfileApp.setMode('view');
-                    });
+                    this._ajax({ url: `${PatientProfileApp.state.baseUrl}/patient/${PatientProfileApp.state.patientId}`, type: 'PUT', data: updatedFields })
+                        .done(() => {
+                            PatientProfileApp.helpers.showAlert('Patient details updated successfully!', 'success');
+                            PatientProfileApp.api.fetchPatientData();
+                            PatientProfileApp.setMode('view');
+                        });
                 },
+
+                // *** FIX 2 of 2: Explicitly send an empty data object ***
                 changePatientStatus(action) {
                     const endpoints = { activate:'activate', inactivate:'inactivate', archivate:'archivate', delete:'delete' };
                     if (!endpoints[action]) return;
 
-                    this._ajax({ url: `${PatientProfileApp.state.baseUrl}/patient/${PatientProfileApp.state.patientId}/${endpoints[action]}`, type: 'PUT' })
-                        .done(res => {
-                            PatientProfileApp.helpers.showAlert(res.message || 'Status changed successfully.', 'success');
-                            bootstrap.Modal.getInstance(PatientProfileApp.elements.statusModal[0])?.hide();
-                            this.fetchPatientData();
-                        });
+                    this._ajax({
+                        url: `${PatientProfileApp.state.baseUrl}/patient/${PatientProfileApp.state.patientId}/${endpoints[action]}`,
+                        type: 'PUT',
+                        data: {} // Send empty JSON body to ensure Content-Type is set
+                    }).done(res => {
+                        PatientProfileApp.helpers.showAlert(res.message || 'Status changed successfully.', 'success');
+                        bootstrap.Modal.getInstance(PatientProfileApp.elements.statusModal[0])?.hide();
+                        PatientProfileApp.api.fetchPatientData();
+                    });
                 },
-                uploadOrUpdatePhoto(file) {
-                    const { patientData, loggedInUserId, patientId, baseUrl } = PatientProfileApp.state;
-                    const isDefaultPhoto = patientData.photo?.endsWith('default.jpg');
-                    const isEditingSelf = loggedInUserId === patientId; // This condition might be irrelevant for patients
 
-                    const httpMethod = isDefaultPhoto ? 'POST' : 'PUT';
+                uploadOrUpdatePhoto(file) {
+                    const { patientData, patientId, baseUrl } = PatientProfileApp.state;
+                    const isDefaultPhoto = patientData.photo?.includes('default.jpg');
+                    // Always use POST for multipart-form/data to avoid PHP issues with PUT
+                    const httpMethod = 'POST';
                     const endpoint = isDefaultPhoto ? 'upload/photo' : 'update/photo';
                     let finalUrl = `${baseUrl}/patient/${patientId}/${endpoint}`;
 
@@ -271,13 +225,11 @@
                     formData.append('file', file);
                     PatientProfileApp.helpers.showAlert('Uploading photo...', 'info');
 
-                    this._ajax({
-                        url: finalUrl, type: httpMethod, data: formData,
-                        processData: false, contentType: false,
-                    }).done(res => {
-                        PatientProfileApp.helpers.showAlert(res.message || 'Photo updated!', 'success');
-                        this.fetchPatientData();
-                    });
+                    this._ajax({ url: finalUrl, type: httpMethod, data: formData })
+                        .done(res => {
+                            PatientProfileApp.helpers.showAlert(res.message || 'Photo updated!', 'success');
+                            PatientProfileApp.api.fetchPatientData();
+                        });
                 }
             },
 
@@ -287,27 +239,16 @@
                     const statusInfo = h.getStatusInfo(data.status);
 
                     PatientProfileApp.elements.currentStatus.text(statusInfo.text).removeClass().addClass('current-status-banner ' + statusInfo.class);
-                    PatientProfileApp.elements.photoView.attr('src', data.photo ? PatientProfileApp.state.baseUrl + data.photo : 'https://via.placeholder.com/100');
+                    const photoUrl = data.photo ? PatientProfileApp.state.baseUrl + data.photo : 'https://via.placeholder.com/100';
+                    PatientProfileApp.elements.photoView.attr('src', photoUrl).fadeIn();
 
-                    PatientProfileApp.elements.formFields.forEach(key => {
-                        $(`#${key}-view`).text(data[key] || 'N/A');
-                    });
+                    PatientProfileApp.elements.formFields.forEach(key => { $(`#${key}-view`).text(data[key] || 'N/A'); });
                 },
-                edit(data) {
-                    PatientProfileApp.elements.formFields.forEach(key => {
-                        $(`#${key}-edit`).val(data[key] || '');
-                    });
-                }
+                edit(data) { PatientProfileApp.elements.formFields.forEach(key => { $(`#${key}-edit`).val(data[key] || ''); }); }
             },
 
             helpers: {
-                getStatusInfo: status => ({
-                    '-1': { text: 'Not Verified', class: 'status-not-verified' },
-                    '0':  { text: 'Inactive', class: 'status-inactive' },
-                    '1':  { text: 'Active', class: 'status-active' },
-                    '2':  { text: 'Archived', class: 'status-archived' },
-                })[status] || { text: 'Unknown Status', class: '' },
-
+                getStatusInfo: status => ({ '-1':{text:'Not Verified',class:'status-not-verified'},'0':{text:'Inactive',class:'status-inactive'},'1':{text:'Active',class:'status-active'},'2':{text:'Archived',class:'status-archived'} }[status]||{text:'Unknown',class:''}),
                 showAlert(message, type = 'success') {
                     const alertHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
                     PatientProfileApp.elements.alertContainer.html(alertHTML).children().delay(4000).fadeOut();
@@ -318,14 +259,13 @@
                 if (mode === 'edit') {
                     this.render.edit(this.state.patientData);
                     this.elements.pageContainer.removeClass('view-mode').addClass('edit-mode');
-                } else {
-                    this.elements.pageContainer.removeClass('edit-mode').addClass('view-mode');
-                }
+                } else { this.elements.pageContainer.removeClass('edit-mode').addClass('view-mode'); }
             }
         };
 
         PatientProfileApp.init();
     });
 </script>
+
 </body>
 </html>
