@@ -469,7 +469,7 @@
 
                 onDateChange(e) {
                     // When a date is picked, this.state.newVisit is updated
-                    this.state.newVisit.visitDate = e.detail.date;
+                    this.state.newVisit.visitDate = e.originalEvent.detail.date;
                     this.checkFormCompleteness();
                 },
 
