@@ -94,7 +94,7 @@
 
             <ul class="details-list">
                 <li class="view-mode"><div class="list-item-row"><span class="label">Start time:</span> <span class="value" id="start_time-view"></span></div></li>
-                <li class="edit-mode"><div class="list-item-row"><span class="label">Visit Date:</span> <span class="value" id="visit_date-edit"></span></div></li>
+                <li class="view-mode"><div class="list-item-row"><span class="label">Visit Date:</span> <span class="value" id="visit_date-view"></span></div></li>
                 <li class="edit-mode"><div class="list-item-row"><span class="label">Start time:</span> <input type="time" class="form-control editable-field" id="start_time-edit"></div></li>
                 <li class="view-mode"><div class="list-item-row"><span class="label">Total Hours:</span> <span class="value" id="duration-view"></span></div></li>
                 <li class="edit-mode"><div class="list-item-row"><span class="label">Total Hours:</span> <input type="number" class="form-control editable-field" id="total_hours-edit" min="1" max="12" placeholder="e.g., 4"></div></li>
@@ -339,6 +339,7 @@
                     }
 
                     $('#start_time-view').text(h.getFormattedTime(data.start_time));
+                    $('#visit_date-view').text(this.helpers.getFormattedDate(this.state.currentVisitData.start_time));
                     $('#duration-view').text(`${Math.floor(data.duration_minutes / 60)} Hours`);
                     $('#note-view').text(data.note || 'N/A');
 
@@ -371,7 +372,6 @@
             setMode(mode) {
                 if (mode === 'edit') {
                     const startDate = new Date(this.state.currentVisitData.start_time);
-                    $('#visit_date-edit').text(this.helpers.getFormattedDate(this.state.currentVisitData.start_time));
                     $('#start_time-edit').val(String(startDate.getHours()).padStart(2,'0') + ':' + String(startDate.getMinutes()).padStart(2,'0'));
                     $('#total_hours-edit').val(Math.floor(this.state.currentVisitData.duration_minutes / 60));
                     $('#note-edit').val(this.state.currentVisitData.note || '');
