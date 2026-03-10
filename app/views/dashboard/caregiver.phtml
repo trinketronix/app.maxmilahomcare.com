@@ -276,12 +276,7 @@
 
 <script>
     $(document).ready(function() {
-        /**
-         * Encapsulates the entire functionality for the Caregiver Visits page
-         * to improve readability, maintainability, and organization.
-         */
         const DashboardCaregiverApp = {
-            // Configuration and state variables
             state: {
                 baseUrl: <?= json_encode($baseUrl ?? '') ?>,
                 authToken: <?= json_encode($authToken ?? '') ?>,
@@ -294,7 +289,6 @@
                 newVisit: {},
             },
 
-            // Cached jQuery selectors for performance
             elements: {
                 visitList: $('#visit-list'),
                 searchInput: $('#search-input-main'),
@@ -302,7 +296,6 @@
                 filterButtons: $('.filter-btn'),
                 addVisitBtn: $('#add-visit-btn'),
                 alertContainer: $('#alert-container'),
-                // Offcanvas & Modals related elements
                 assignVisitOffcanvas: $('#assignVisitOffcanvas'),
                 createVisitBtn: $('#create-visit-btn'),
                 patientSelectionList: $('#patient-selection-list'),
@@ -315,7 +308,6 @@
                 addressTabBtn: document.getElementById('address-tab-btn'),
                 patientTabBtn: document.getElementById('patient-tab-btn'),
                 visitConfirmationText: $('#visit-confirmation-text'),
-                // Modals
                 actionsModalTitle: $('#actions-modal-title'),
                 actionNavigateBtn: $('#action-navigate-btn'),
                 actionDetailBtn: $('#action-detail-btn'),
@@ -324,15 +316,13 @@
                 confirmCreateVisitBtn: $('#confirm-create-visit-btn'),
             },
 
-            // Bootstrap component instances
             modals: {
                 actions: null,
                 visitConfirmation: null,
                 assignVisit: null,
-                datepicker: null // Property to store the datepicker instance
+                datepicker: null
             },
 
-            // Initialization function
             init() {
                 if (!this.state.caregiverId) {
                     console.error("Caregiver ID is not available.");
@@ -346,50 +336,40 @@
                 this.api.fetchVisits();
             },
 
-            // Initialize Bootstrap and other third-party components
             initComponents() {
                 this.modals.actions = new bootstrap.Modal(document.getElementById('actionsModal'));
                 this.modals.visitConfirmation = new bootstrap.Modal(document.getElementById('visitConfirmationModal'));
                 this.modals.assignVisit = new bootstrap.Offcanvas(this.elements.assignVisitOffcanvas[0]);
-                // Store the created instance in our state
                 this.modals.datepicker = new Datepicker(this.elements.datepickerContainer, { format: 'yyyy-mm-dd', autohide: true, todayHighlight: true });
             },
 
-            // Centralized event listeners
             bindEvents() {
-                // Main page filtering and search
                 this.elements.filterButtons.on('click', this.handlers.onFilterChange.bind(this));
                 this.elements.searchInput.on('keyup', this.handlers.applyFilters.bind(this));
                 this.elements.searchBtn.on('click', this.handlers.applyFilters.bind(this));
 
-                // Visit actions
                 this.elements.visitList.on('click', '.visit-card', this.handlers.onVisitCardClick.bind(this));
                 this.elements.actionCheckinBtn.on('click', this.handlers.onPerformAction.bind(this, 'checkin'));
                 this.elements.actionCheckoutBtn.on('click', this.handlers.onPerformAction.bind(this, 'checkout'));
 
-                // New visit creation flow
                 this.elements.addVisitBtn.on('click', this.handlers.onAddVisitClick.bind(this));
                 this.elements.assignVisitOffcanvas.on('hidden.bs.offcanvas', this.handlers.onOffcanvasClose.bind(this));
                 this.elements.patientSearch.on('keyup', this.handlers.onPatientSearch.bind(this));
                 this.elements.addressSearch.on('keyup', this.handlers.onAddressSearch.bind(this));
 
-                // Form step progression
                 this.elements.patientSelectionList.on('click', '.selection-item', this.handlers.onPatientSelect.bind(this));
                 this.elements.addressSelectionList.on('click', '.selection-item', this.handlers.onAddressSelect.bind(this));
                 $(this.elements.datepickerContainer).on('changeDate', this.handlers.onDateChange.bind(this));
                 this.elements.startTimePicker.on('change', 'select', this.handlers.onTimeChange.bind(this));
                 this.elements.totalHoursSelect.on('change', this.handlers.onDurationChange.bind(this));
 
-                // Form validation & submission
                 $('button[data-bs-toggle="tab"]').on('show.bs.tab', this.handlers.onTabChange.bind(this));
                 this.elements.createVisitBtn.on('click', this.handlers.onCreateVisitClick.bind(this));
                 this.elements.confirmCreateVisitBtn.on('click', this.handlers.onConfirmCreateVisit.bind(this));
 
-                // Profile link navigation
                 $('#profile-link').on('click', () => window.location.href = `/caregiver/profile`);
             },
 
-            // --- HANDLERS: Respond to user interactions ---
             handlers: {
                 applyFilters() {
                     const progress = this.elements.filterButtons.filter('.active').data('filter-value');
@@ -449,15 +429,18 @@
                     this.render.selectionList(filtered, 'address');
                 },
 
+                // FIX 1: Remove 'disabled' from address tab so user can navigate back to it
                 onPatientSelect(e) {
                     const item = $(e.currentTarget);
                     this.state.newVisit.patientId = item.data('id');
                     this.state.newVisit.patientFullname = item.data('name');
                     item.addClass('selected').siblings().removeClass('selected');
+                    $(this.elements.addressTabBtn).removeClass('disabled');
                     bootstrap.Tab.getOrCreateInstance(this.elements.addressTabBtn).show();
                     this.checkFormCompleteness();
                 },
 
+                // FIX 2: Use explicit null check so address id=0 is accepted
                 onAddressSelect(e) {
                     const item = $(e.currentTarget);
                     this.state.newVisit.addressId = item.data('id');
@@ -468,11 +451,9 @@
                 },
 
                 onDateChange(e) {
-                    // When a date is picked, this.state.newVisit is updated
                     this.state.newVisit.visitDate = e.originalEvent.detail.date;
                     this.checkFormCompleteness();
                 },
-
 
                 onTimeChange() {
                     const h = $('#start-time-picker-hour').val();
@@ -496,15 +477,18 @@
 
                 onTabChange(e) {
                     if (e.target.id === 'address-tab-btn') {
-                        if (!this.state.newVisit.patientId) return false; // Prevent tab change
+                        if (!this.state.newVisit.patientId) return false;
                         $('#address-selection-content').show();
                         $('#address-selection-placeholder').hide();
                         this.api.fetchAddresses(this.state.newVisit.patientId).done(response => {
                             this.state.allPatientAddresses = response.data || [];
                             this.render.selectionList(this.state.allPatientAddresses, 'address');
+                            // Re-highlight the previously selected address if returning to this tab
+                            if (this.state.newVisit.addressId != null) {
+                                $(`.selection-item[data-id="${this.state.newVisit.addressId}"]`).addClass('selected');
+                            }
                         });
                     }
-                    // Auto-select today when the date tab opens
                     if (e.target.id === 'date-tab-btn') {
                         if (!this.state.newVisit.visitDate) {
                             const today = new Date();
@@ -551,7 +535,6 @@
                 }
             },
 
-            // --- API: Methods for server communication ---
             api: {
                 _ajax(url, method, data) {
                     const settings = {
@@ -598,7 +581,6 @@
                 }
             },
 
-            // --- RENDER: Functions to update the DOM ---
             render: {
                 visits(visits) {
                     const container = DashboardCaregiverApp.elements.visitList;
@@ -646,7 +628,7 @@
                             name = `${item.firstname || ''} ${item.lastname || ''}`.trim();
                             photo = `${baseUrl}${item.photo}`;
                             iconClass = 'fa-user';
-                        } else { // address
+                        } else {
                             id = item.id;
                             name = `${item.address}, ${item.city}, ${item.state} ${item.zipcode}`;
                             photo = null;
@@ -666,6 +648,7 @@
                     listContainer.html(itemsHTML);
                 },
 
+                // FIX 3: Minutes in 5-minute increments instead of 15
                 timePicker(containerId) {
                     const container = $(`#${containerId}`); container.empty();
                     const hourSelect = $('<select class="form-select me-2"><option value="">--</option></select>').attr('id', `${containerId}-hour`);
@@ -673,7 +656,7 @@
                     const periodSelect = $('<select class="form-select ms-2"><option value="AM">AM</option><option value="PM">PM</option></select>').attr('id', `${containerId}-period`);
 
                     for (let i = 1; i <= 12; i++) hourSelect.append(`<option value="${i}">${String(i).padStart(2, '0')}</option>`);
-                    for (let i = 0; i < 60; i += 15) minuteSelect.append(`<option value="${i}">${String(i).padStart(2, '0')}</option>`);
+                    for (let i = 0; i < 60; i += 5) minuteSelect.append(`<option value="${i}">${String(i).padStart(2, '0')}</option>`);
 
                     container.append(
                         $('<div class="time-picker-wrapper"><label class="form-label me-2">Start Time:</label></div>').append(hourSelect, ':', minuteSelect, periodSelect)
@@ -681,7 +664,6 @@
                 },
             },
 
-            // --- HELPERS: Utility functions ---
             helpers: {
                 showAlert(message, type = 'success') {
                     DashboardCaregiverApp.elements.alertContainer
@@ -708,10 +690,10 @@
                 getProgressText: (p) => ({ '-1': "Canceled", '0': "Scheduled", '1': "Check-in", '2': "Check-out", '3': "Approved" }[p] || 'Unknown'),
             },
 
-            // --- STATE MANAGEMENT ---
+            // FIX 2: Use explicit null/undefined checks so id=0 is valid
             checkFormCompleteness() {
                 const { patientId, addressId, visitDate, totalHours } = this.state.newVisit;
-                if (patientId && addressId && visitDate && totalHours) {
+                if (patientId != null && addressId != null && visitDate && totalHours) {
                     this.elements.createVisitBtn.fadeIn();
                 } else {
                     this.elements.createVisitBtn.fadeOut();
@@ -731,7 +713,6 @@
                 this.elements.totalHoursSelect.val('');
                 this.render.timePicker('start-time-picker');
 
-                // Use the stored instance to clear the date
                 if (this.modals.datepicker) {
                     this.modals.datepicker.setDate({ clear: true });
                 }
