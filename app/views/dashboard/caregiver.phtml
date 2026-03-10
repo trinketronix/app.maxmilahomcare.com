@@ -477,7 +477,16 @@
                 onTimeChange() {
                     const h = $('#start-time-picker-hour').val();
                     const m = $('#start-time-picker-minute').val();
-                    this.state.newVisit.startTime = (h !== "" && m !== "") ? { h: parseInt(h, 10), m: parseInt(m, 10) } : null;
+                    const period = $('#start-time-picker-period').val();
+
+                    if (h !== "" && m !== "") {
+                        let hour24 = parseInt(h, 10);
+                        if (period === 'AM' && hour24 === 12) hour24 = 0;
+                        if (period === 'PM' && hour24 !== 12) hour24 += 12;
+                        this.state.newVisit.startTime = { h: hour24, m: parseInt(m, 10) };
+                    } else {
+                        this.state.newVisit.startTime = null;
+                    }
                 },
 
                 onDurationChange(e) {
@@ -661,10 +670,13 @@
                     const container = $(`#${containerId}`); container.empty();
                     const hourSelect = $('<select class="form-select me-2"><option value="">--</option></select>').attr('id', `${containerId}-hour`);
                     const minuteSelect = $('<select class="form-select"><option value="">--</option></select>').attr('id', `${containerId}-minute`);
-                    for (let i = 0; i < 24; i++) hourSelect.append(`<option value="${i}">${String(i).padStart(2, '0')}</option>`);
+                    const periodSelect = $('<select class="form-select ms-2"><option value="AM">AM</option><option value="PM">PM</option></select>').attr('id', `${containerId}-period`);
+
+                    for (let i = 1; i <= 12; i++) hourSelect.append(`<option value="${i}">${String(i).padStart(2, '0')}</option>`);
                     for (let i = 0; i < 60; i += 15) minuteSelect.append(`<option value="${i}">${String(i).padStart(2, '0')}</option>`);
+
                     container.append(
-                        $('<div class="time-picker-wrapper"><label class="form-label me-2">Start Time:</label></div>').append(hourSelect, ':', minuteSelect)
+                        $('<div class="time-picker-wrapper"><label class="form-label me-2">Start Time:</label></div>').append(hourSelect, ':', minuteSelect, periodSelect)
                     );
                 },
             },
