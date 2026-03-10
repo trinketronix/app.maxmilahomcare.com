@@ -53,6 +53,8 @@
 
         .view-mode .editable-field, .view-mode .save-button { display: none; }
         .edit-mode .read-only-value, .edit-mode .action-buttons { display: none !important; }
+        .view-mode li.edit-mode { display: none; }
+        .edit-mode li.view-mode { display: none; }
 
         .action-buttons, .save-button { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; }
         .btn-custom { border: 2px solid #000; border-radius: 8px; font-weight: 500; background-color: #fff; }
@@ -336,7 +338,7 @@
                         $('#address-icon').attr('class', data.address.type === 'Apartment' ? 'fa-solid fa-building' : 'fa-solid fa-house');
                     }
 
-                    $('#start_time-view').text(h.getFormattedDateTime(data.start_time));
+                    $('#start_time-view').text(h.getFormattedTime(data.start_time));
                     $('#duration-view').text(`${Math.floor(data.duration_minutes / 60)} Hours`);
                     $('#note-view').text(data.note || 'N/A');
 
@@ -361,14 +363,15 @@
             helpers: {
                 showAlert: (message, type = 'success') => VisitDetailApp.elements.alertContainer.html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).fadeIn().delay(4000).fadeOut(),
                 getProgressText: p => ({ '-1': "Canceled", '0': "Scheduled", '1': "Check-in", '2': "Check-out", '3': "Approved" }[p] || 'Unknown'),
-                getFormattedDateTime: dStr => new Date(dStr).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }),
+                getFormattedTime: dStr => new Date(dStr).toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+                getFormattedDate: dStr => new Date(dStr).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
                 getRelativeTime(dStr) { const n=new Date(),v=new Date(dStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/864e5);if(d<0)return"Past";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`;}
             },
 
             setMode(mode) {
                 if (mode === 'edit') {
                     const startDate = new Date(this.state.currentVisitData.start_time);
-                    $('#visit_date-edit').text(startDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'}));
+                    $('#visit_date-edit').text(this.helpers.getFormattedDate(this.state.currentVisitData.start_time));
                     $('#start_time-edit').val(String(startDate.getHours()).padStart(2,'0') + ':' + String(startDate.getMinutes()).padStart(2,'0'));
                     $('#total_hours-edit').val(Math.floor(this.state.currentVisitData.duration_minutes / 60));
                     $('#note-edit').val(this.state.currentVisitData.note || '');
