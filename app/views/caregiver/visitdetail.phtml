@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../../img/fav/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../../img/fav/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../../img/fav/favicon-16x16.png">
-    <link rel="manifest" href="../../site.webmanifest">
+    <link rel="manifest" href="../site.webmanifest">
     <link rel="shortcut icon" href="../../img/fav/favicon.ico">
 
     <!-- Dependencies -->
@@ -53,6 +53,8 @@
 
         .view-mode .editable-field, .view-mode .save-button { display: none; }
         .edit-mode .read-only-value, .edit-mode .action-buttons { display: none !important; }
+        .view-mode li.edit-mode { display: none; }
+        .edit-mode li.view-mode { display: none; }
 
         .action-buttons, .save-button { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; }
         .btn-custom { border: 2px solid #000; border-radius: 8px; font-weight: 500; background-color: #fff; }
@@ -91,11 +93,17 @@
             <div id="address-box" class="address-box"><div class="address-box-header"><i id="address-icon" class="fa-solid"></i> Address</div><div id="address-text" class="address-text"></div></div>
 
             <ul class="details-list">
+                <!-- VIEW MODE: Date, Start Time, Total Hours, Finish Time -->
+                <li class="view-mode"><div class="list-item-row"><span class="label">Visit Date:</span> <span class="value" id="visit_date-view"></span></div></li>
                 <li class="view-mode"><div class="list-item-row"><span class="label">Start time:</span> <span class="value" id="start_time-view"></span></div></li>
-                <li class="edit-mode"><div class="list-item-row"><span class="label">Visit Date:</span> <span class="value" id="visit_date-edit"></span></div></li>
-                <li class="edit-mode"><div class="list-item-row"><span class="label">Start time:</span> <input type="time" class="form-control editable-field" id="start_time-edit"></div></li>
                 <li class="view-mode"><div class="list-item-row"><span class="label">Total Hours:</span> <span class="value" id="duration-view"></span></div></li>
+                <li class="view-mode"><div class="list-item-row"><span class="label">Finish time:</span> <span class="value" id="finish_time-view"></span></div></li>
+
+                <!-- EDIT MODE: Date, Start Time, Total Hours -->
+                <li class="edit-mode"><div class="list-item-row"><span class="label">Visit Date:</span> <input type="date" class="form-control editable-field" id="visit_date-edit"></div></li>
+                <li class="edit-mode"><div class="list-item-row"><span class="label">Start time:</span> <input type="time" class="form-control editable-field" id="start_time-edit"></div></li>
                 <li class="edit-mode"><div class="list-item-row"><span class="label">Total Hours:</span> <input type="number" class="form-control editable-field" id="total_hours-edit" min="1" max="12" placeholder="e.g., 4"></div></li>
+
                 <li><div class="list-item-row"><span class="label">Scheduled by:</span> <span class="value" id="scheduled_by-view"></span></div></li>
                 <li><div class="list-item-row"><span class="label">Check-in by:</span> <span class="value" id="checkin_by-view"></span></div></li>
                 <li><div class="list-item-row"><span class="label">Check-out by:</span> <span class="value" id="checkout_by-view"></span></div></li>
@@ -125,10 +133,7 @@
 
 <script>
     $(document).ready(function() {
-        /**
-         * Encapsulates all functionality for the Visit Detail page.
-         */
-        const CaregiverVisitDetailApp = {
+        const VisitDetailApp = {
             state: {
                 visitId: <?= json_encode($visitId ?? null) ?>,
                 baseUrl: <?= json_encode($baseUrl ?? '') ?>,
@@ -154,7 +159,6 @@
                 confirmAddressYesBtn: $('#confirm-address-yes'),
             },
 
-            // Bootstrap component instances
             modals: {
                 progress: null,
                 status: null,
@@ -195,8 +199,8 @@
             handlers: {
                 onBack(e) {
                     e.preventDefault();
-                    if (CaregiverVisitDetailApp.elements.pageContainer.hasClass('edit-mode')) {
-                        CaregiverVisitDetailApp.setMode('view');
+                    if (VisitDetailApp.elements.pageContainer.hasClass('edit-mode')) {
+                        VisitDetailApp.setMode('view');
                     } else {
                         window.history.back();
                     }
@@ -204,13 +208,18 @@
                 onSave() {
                     const totalHours = parseInt($('#total_hours-edit').val());
                     if (isNaN(totalHours) || totalHours <= 0) {
-                        CaregiverVisitDetailApp.helpers.showAlert('Total Hours must be a number greater than 0.', 'warning');
+                        VisitDetailApp.helpers.showAlert('Total Hours must be a number greater than 0.', 'warning');
                         return;
                     }
 
-                    const visitDate = new Date(CaregiverVisitDetailApp.state.currentVisitData.start_time);
-                    const timeParts = $('#start_time-edit').val().split(':');
-                    visitDate.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), 0, 0);
+                    const dateVal = $('#visit_date-edit').val(); // yyyy-mm-dd
+                    const timeVal = $('#start_time-edit').val(); // HH:mm
+                    if (!dateVal || !timeVal) {
+                        VisitDetailApp.helpers.showAlert('Please select both a date and a start time.', 'warning');
+                        return;
+                    }
+
+                    const visitDate = new Date(dateVal + 'T' + timeVal + ':00');
 
                     const payload = {
                         start_time: visitDate.toISOString().slice(0, 19).replace('T', ' '),
@@ -218,46 +227,46 @@
                         note: $('#note-edit').val()
                     };
 
-                    CaregiverVisitDetailApp.api.updateVisit(payload)
-                        .done(() => CaregiverVisitDetailApp.setMode('view'));
+                    VisitDetailApp.api.updateVisit(payload)
+                        .done(() => VisitDetailApp.setMode('view'));
                 },
                 onProgressAction(e) {
                     const action = $(e.currentTarget).data('action');
                     if (action === 'cancel') {
-                        CaregiverVisitDetailApp.elements.cancelNoteGroup.show();
+                        VisitDetailApp.elements.cancelNoteGroup.show();
                     } else {
-                        CaregiverVisitDetailApp.api.performAction(action).done(() => CaregiverVisitDetailApp.modals.progress.hide());
+                        VisitDetailApp.api.performAction(action).done(() => VisitDetailApp.modals.progress.hide());
                     }
                 },
                 onStatusAction(e) {
                     const action = $(e.currentTarget).data('action');
-                    CaregiverVisitDetailApp.api.performAction(action).done(() => CaregiverVisitDetailApp.modals.status.hide());
+                    VisitDetailApp.api.performAction(action).done(() => VisitDetailApp.modals.status.hide());
                 },
                 onConfirmCancel() {
-                    const note = CaregiverVisitDetailApp.elements.cancelNote.val();
+                    const note = VisitDetailApp.elements.cancelNote.val();
                     if (!note.trim()) {
-                        CaregiverVisitDetailApp.helpers.showAlert('A cancellation note is required.', 'warning');
+                        VisitDetailApp.helpers.showAlert('A cancellation note is required.', 'warning');
                         return;
                     }
-                    CaregiverVisitDetailApp.api.performAction('cancel', { note }).done(() => {
-                        CaregiverVisitDetailApp.modals.progress.hide();
-                        CaregiverVisitDetailApp.elements.cancelNote.val('');
-                        CaregiverVisitDetailApp.elements.cancelNoteGroup.hide();
+                    VisitDetailApp.api.performAction('cancel', { note }).done(() => {
+                        VisitDetailApp.modals.progress.hide();
+                        VisitDetailApp.elements.cancelNote.val('');
+                        VisitDetailApp.elements.cancelNoteGroup.hide();
                     });
                 },
                 onAddressBoxClick() {
-                    if (CaregiverVisitDetailApp.elements.pageContainer.hasClass('edit-mode')) {
-                        CaregiverVisitDetailApp.modals.confirmAddress.show();
+                    if (VisitDetailApp.elements.pageContainer.hasClass('edit-mode')) {
+                        VisitDetailApp.modals.confirmAddress.show();
                     }
                 },
                 onConfirmAddressChange() {
-                    CaregiverVisitDetailApp.modals.confirmAddress.hide();
-                    CaregiverVisitDetailApp.api.fetchPatientAddresses();
+                    VisitDetailApp.modals.confirmAddress.hide();
+                    VisitDetailApp.api.fetchPatientAddresses();
                 },
                 onAddressSelect(e) {
                     const addressId = $(e.currentTarget).data('id');
-                    CaregiverVisitDetailApp.api.updateVisit({ address_id: addressId })
-                        .done(() => CaregiverVisitDetailApp.modals.addressOffcanvas.hide());
+                    VisitDetailApp.api.updateVisit({ address_id: addressId })
+                        .done(() => VisitDetailApp.modals.addressOffcanvas.hide());
                 }
             },
 
@@ -265,50 +274,50 @@
                 _ajax(settings) {
                     return $.ajax({
                         ...settings,
-                        headers: { 'Authorization': CaregiverVisitDetailApp.state.authToken, 'Content-Type': 'application/json' },
+                        headers: { 'Authorization': VisitDetailApp.state.authToken, 'Content-Type': 'application/json' },
                     }).fail(err => {
                         const errorMsg = err.responseJSON?.message || 'An API error occurred.';
-                        CaregiverVisitDetailApp.helpers.showAlert(errorMsg, 'danger');
+                        VisitDetailApp.helpers.showAlert(errorMsg, 'danger');
                     });
                 },
                 fetchVisitDetails() {
-                    this._ajax({ url: `${CaregiverVisitDetailApp.state.baseUrl}/visit/${CaregiverVisitDetailApp.state.visitId}` })
+                    this._ajax({ url: `${VisitDetailApp.state.baseUrl}/visit/${VisitDetailApp.state.visitId}` })
                         .done(res => {
                             if (res.status === 'success') {
-                                CaregiverVisitDetailApp.state.currentVisitData = res.data;
-                                CaregiverVisitDetailApp.render.visitDetails(res.data);
+                                VisitDetailApp.state.currentVisitData = res.data;
+                                VisitDetailApp.render.visitDetails(res.data);
                             }
                         });
                 },
                 updateVisit(payload) {
                     return this._ajax({
-                        url: `${CaregiverVisitDetailApp.state.baseUrl}/visit/${CaregiverVisitDetailApp.state.visitId}`,
+                        url: `${VisitDetailApp.state.baseUrl}/visit/${VisitDetailApp.state.visitId}`,
                         type: 'PUT',
                         data: JSON.stringify(payload)
                     }).done(res => {
-                        CaregiverVisitDetailApp.helpers.showAlert(res.message || 'Visit updated successfully!', 'success');
+                        VisitDetailApp.helpers.showAlert(res.message || 'Visit updated successfully!', 'success');
                         this.fetchVisitDetails();
                     });
                 },
                 performAction(actionEndpoint, payload = null) {
                     return this._ajax({
-                        url: `${CaregiverVisitDetailApp.state.baseUrl}/visit/${CaregiverVisitDetailApp.state.visitId}/${actionEndpoint}`,
+                        url: `${VisitDetailApp.state.baseUrl}/visit/${VisitDetailApp.state.visitId}/${actionEndpoint}`,
                         type: 'PUT',
                         data: payload ? JSON.stringify(payload) : null
                     }).done(res => {
-                        CaregiverVisitDetailApp.helpers.showAlert(res.message || 'Action completed successfully!', 'success');
+                        VisitDetailApp.helpers.showAlert(res.message || 'Action completed successfully!', 'success');
                         this.fetchVisitDetails();
                     });
                 },
                 fetchPatientAddresses() {
-                    this._ajax({ url: `${CaregiverVisitDetailApp.state.baseUrl}/address/person/${CaregiverVisitDetailApp.state.currentVisitData.patient_id}/1` })
+                    this._ajax({ url: `${VisitDetailApp.state.baseUrl}/address/person/${VisitDetailApp.state.currentVisitData.patient_id}/1` })
                         .done(res => {
-                            CaregiverVisitDetailApp.render.addressSelectionList(res.data);
-                            CaregiverVisitDetailApp.modals.addressOffcanvas.show();
+                            VisitDetailApp.render.addressSelectionList(res.data);
+                            VisitDetailApp.modals.addressOffcanvas.show();
                         });
                 },
                 fetchAccountName(userId, elementId) {
-                    this._ajax({ url: `${CaregiverVisitDetailApp.state.baseUrl}/account/${userId}` })
+                    this._ajax({ url: `${VisitDetailApp.state.baseUrl}/account/${userId}` })
                         .done(res => {
                             if (res.status === 'success' && res.data) {
                                 $(`#${elementId}`).text(`${res.data.firstname} ${res.data.lastname}`);
@@ -320,15 +329,15 @@
             render: {
                 visitDetails(data) {
                     if (!data?.user || !data?.patient) { return; }
-                    const h = CaregiverVisitDetailApp.helpers;
+                    const h = VisitDetailApp.helpers;
 
                     $('#visit-progress-text').text(h.getProgressText(data.progress));
                     $('#visit-date-text').text(new Date(data.start_time).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }));
                     $('#visit-duration').text(`${Math.floor(data.duration_minutes / 60)} hrs total`);
                     $('#visit-relative-time').text(h.getRelativeTime(data.start_time));
-                    $('#caregiver-avatar').attr('src', data.user.photo ? CaregiverVisitDetailApp.state.baseUrl + data.user.photo : 'https://via.placeholder.com/70');
+                    $('#caregiver-avatar').attr('src', data.user.photo ? VisitDetailApp.state.baseUrl + data.user.photo : 'https://via.placeholder.com/70');
                     $('#caregiver-name').text(`${data.user.firstname} ${data.user.lastname}`);
-                    $('#patient-avatar').attr('src', data.patient.photo ? CaregiverVisitDetailApp.state.baseUrl + data.patient.photo : 'https://via.placeholder.com/70');
+                    $('#patient-avatar').attr('src', data.patient.photo ? VisitDetailApp.state.baseUrl + data.patient.photo : 'https://via.placeholder.com/70');
                     $('#patient-name').text(`${data.patient.firstname} ${data.patient.lastname}`);
 
                     if (data.address) {
@@ -336,20 +345,23 @@
                         $('#address-icon').attr('class', data.address.type === 'Apartment' ? 'fa-solid fa-building' : 'fa-solid fa-house');
                     }
 
-                    $('#start_time-view').text(h.getFormattedDateTime(data.start_time));
-                    $('#duration-view').text(`${Math.floor(data.duration_minutes / 60)} Hours`);
+                    const totalHours = Math.floor(data.duration_minutes / 60);
+                    $('#visit_date-view').text(h.getFormattedDate(data.start_time));
+                    $('#start_time-view').text(h.getFormattedTime(data.start_time));
+                    $('#duration-view').text(`${totalHours} Hours`);
+                    $('#finish_time-view').text(h.getFinishTime(data.start_time, totalHours));
                     $('#note-view').text(data.note || 'N/A');
 
                     ['scheduled_by', 'checkin_by', 'checkout_by', 'approved_by', 'canceled_by'].forEach(key => {
                         const el = $(`#${key}-view`);
-                        data[key] ? CaregiverVisitDetailApp.api.fetchAccountName(data[key], `${key}-view`, el.text('Loading...')) : el.text('TBD');
+                        data[key] ? VisitDetailApp.api.fetchAccountName(data[key], `${key}-view`, el.text('Loading...')) : el.text('TBD');
                     });
 
-                    CaregiverVisitDetailApp.elements.placeholder.hide();
-                    CaregiverVisitDetailApp.elements.visitContent.show();
+                    VisitDetailApp.elements.placeholder.hide();
+                    VisitDetailApp.elements.visitContent.show();
                 },
                 addressSelectionList(addresses) {
-                    const list = CaregiverVisitDetailApp.elements.addressSelectionList.empty();
+                    const list = VisitDetailApp.elements.addressSelectionList.empty();
                     if (addresses?.length) {
                         addresses.forEach(addr => list.append(`<div class="selection-item" data-id="${addr.id}">${addr.address}, ${addr.city}</div>`));
                     } else {
@@ -359,16 +371,26 @@
             },
 
             helpers: {
-                showAlert: (message, type = 'success') => CaregiverVisitDetailApp.elements.alertContainer.html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).fadeIn().delay(4000).fadeOut(),
+                showAlert: (message, type = 'success') => VisitDetailApp.elements.alertContainer.html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).fadeIn().delay(4000).fadeOut(),
                 getProgressText: p => ({ '-1': "Canceled", '0': "Scheduled", '1': "Check-in", '2': "Check-out", '3': "Approved" }[p] || 'Unknown'),
-                getFormattedDateTime: dStr => new Date(dStr).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }),
+                getFormattedTime: dStr => new Date(dStr).toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+                getFormattedDate: dStr => new Date(dStr).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+                getFinishTime(dStr, totalHours) {
+                    const finish = new Date(dStr);
+                    finish.setHours(finish.getHours() + totalHours);
+                    return finish.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                },
                 getRelativeTime(dStr) { const n=new Date(),v=new Date(dStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/864e5);if(d<0)return"Past";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`;}
             },
 
             setMode(mode) {
                 if (mode === 'edit') {
                     const startDate = new Date(this.state.currentVisitData.start_time);
-                    $('#visit_date-edit').text(startDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'}));
+                    // yyyy-mm-dd for the date input
+                    const year = startDate.getFullYear();
+                    const month = String(startDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(startDate.getDate()).padStart(2, '0');
+                    $('#visit_date-edit').val(`${year}-${month}-${day}`);
                     $('#start_time-edit').val(String(startDate.getHours()).padStart(2,'0') + ':' + String(startDate.getMinutes()).padStart(2,'0'));
                     $('#total_hours-edit').val(Math.floor(this.state.currentVisitData.duration_minutes / 60));
                     $('#note-edit').val(this.state.currentVisitData.note || '');
@@ -379,7 +401,7 @@
             }
         };
 
-        CaregiverVisitDetailApp.init();
+        VisitDetailApp.init();
     });
 </script>
 </body>
