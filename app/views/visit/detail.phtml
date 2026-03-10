@@ -93,11 +93,17 @@
             <div id="address-box" class="address-box"><div class="address-box-header"><i id="address-icon" class="fa-solid"></i> Address</div><div id="address-text" class="address-text"></div></div>
 
             <ul class="details-list">
-                <li class="view-mode"><div class="list-item-row"><span class="label">Start time:</span> <span class="value" id="start_time-view"></span></div></li>
+                <!-- VIEW MODE: Date, Start Time, Total Hours, Finish Time -->
                 <li class="view-mode"><div class="list-item-row"><span class="label">Visit Date:</span> <span class="value" id="visit_date-view"></span></div></li>
-                <li class="edit-mode"><div class="list-item-row"><span class="label">Start time:</span> <input type="time" class="form-control editable-field" id="start_time-edit"></div></li>
+                <li class="view-mode"><div class="list-item-row"><span class="label">Start time:</span> <span class="value" id="start_time-view"></span></div></li>
                 <li class="view-mode"><div class="list-item-row"><span class="label">Total Hours:</span> <span class="value" id="duration-view"></span></div></li>
+                <li class="view-mode"><div class="list-item-row"><span class="label">Finish time:</span> <span class="value" id="finish_time-view"></span></div></li>
+
+                <!-- EDIT MODE: Date, Start Time, Total Hours -->
+                <li class="edit-mode"><div class="list-item-row"><span class="label">Visit Date:</span> <input type="date" class="form-control editable-field" id="visit_date-edit"></div></li>
+                <li class="edit-mode"><div class="list-item-row"><span class="label">Start time:</span> <input type="time" class="form-control editable-field" id="start_time-edit"></div></li>
                 <li class="edit-mode"><div class="list-item-row"><span class="label">Total Hours:</span> <input type="number" class="form-control editable-field" id="total_hours-edit" min="1" max="12" placeholder="e.g., 4"></div></li>
+
                 <li><div class="list-item-row"><span class="label">Scheduled by:</span> <span class="value" id="scheduled_by-view"></span></div></li>
                 <li><div class="list-item-row"><span class="label">Check-in by:</span> <span class="value" id="checkin_by-view"></span></div></li>
                 <li><div class="list-item-row"><span class="label">Check-out by:</span> <span class="value" id="checkout_by-view"></span></div></li>
@@ -127,9 +133,6 @@
 
 <script>
     $(document).ready(function() {
-        /**
-         * Encapsulates all functionality for the Visit Detail page.
-         */
         const VisitDetailApp = {
             state: {
                 visitId: <?= json_encode($visitId ?? null) ?>,
@@ -156,7 +159,6 @@
                 confirmAddressYesBtn: $('#confirm-address-yes'),
             },
 
-            // Bootstrap component instances
             modals: {
                 progress: null,
                 status: null,
@@ -210,9 +212,14 @@
                         return;
                     }
 
-                    const visitDate = new Date(VisitDetailApp.state.currentVisitData.start_time);
-                    const timeParts = $('#start_time-edit').val().split(':');
-                    visitDate.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), 0, 0);
+                    const dateVal = $('#visit_date-edit').val(); // yyyy-mm-dd
+                    const timeVal = $('#start_time-edit').val(); // HH:mm
+                    if (!dateVal || !timeVal) {
+                        VisitDetailApp.helpers.showAlert('Please select both a date and a start time.', 'warning');
+                        return;
+                    }
+
+                    const visitDate = new Date(dateVal + 'T' + timeVal + ':00');
 
                     const payload = {
                         start_time: visitDate.toISOString().slice(0, 19).replace('T', ' '),
@@ -338,9 +345,11 @@
                         $('#address-icon').attr('class', data.address.type === 'Apartment' ? 'fa-solid fa-building' : 'fa-solid fa-house');
                     }
 
-                    $('#start_time-view').text(h.getFormattedTime(data.start_time));
+                    const totalHours = Math.floor(data.duration_minutes / 60);
                     $('#visit_date-view').text(h.getFormattedDate(data.start_time));
-                    $('#duration-view').text(`${Math.floor(data.duration_minutes / 60)} Hours`);
+                    $('#start_time-view').text(h.getFormattedTime(data.start_time));
+                    $('#duration-view').text(`${totalHours} Hours`);
+                    $('#finish_time-view').text(h.getFinishTime(data.start_time, totalHours));
                     $('#note-view').text(data.note || 'N/A');
 
                     ['scheduled_by', 'checkin_by', 'checkout_by', 'approved_by', 'canceled_by'].forEach(key => {
@@ -366,12 +375,22 @@
                 getProgressText: p => ({ '-1': "Canceled", '0': "Scheduled", '1': "Check-in", '2': "Check-out", '3': "Approved" }[p] || 'Unknown'),
                 getFormattedTime: dStr => new Date(dStr).toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
                 getFormattedDate: dStr => new Date(dStr).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+                getFinishTime(dStr, totalHours) {
+                    const finish = new Date(dStr);
+                    finish.setHours(finish.getHours() + totalHours);
+                    return finish.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                },
                 getRelativeTime(dStr) { const n=new Date(),v=new Date(dStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/864e5);if(d<0)return"Past";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`;}
             },
 
             setMode(mode) {
                 if (mode === 'edit') {
                     const startDate = new Date(this.state.currentVisitData.start_time);
+                    // yyyy-mm-dd for the date input
+                    const year = startDate.getFullYear();
+                    const month = String(startDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(startDate.getDate()).padStart(2, '0');
+                    $('#visit_date-edit').val(`${year}-${month}-${day}`);
                     $('#start_time-edit').val(String(startDate.getHours()).padStart(2,'0') + ':' + String(startDate.getMinutes()).padStart(2,'0'));
                     $('#total_hours-edit').val(Math.floor(this.state.currentVisitData.duration_minutes / 60));
                     $('#note-edit').val(this.state.currentVisitData.note || '');
