@@ -339,7 +339,7 @@
                     }
 
                     $('#start_time-view').text(h.getFormattedTime(data.start_time));
-                    $('#visit_date-view').text(this.helpers.getFormattedDate(this.state.currentVisitData.start_time));
+                    $('#visit_date-view').text(h.getFormattedDate(data.start_time));
                     $('#duration-view').text(`${Math.floor(data.duration_minutes / 60)} Hours`);
                     $('#note-view').text(data.note || 'N/A');
 
