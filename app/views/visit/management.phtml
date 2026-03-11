@@ -13,8 +13,6 @@
     <style>
         html, body { height: 100vh; overflow: hidden; background-color: #f0f2f5; font-family: 'Segoe UI', 'Roboto', sans-serif; }
         .page-container { display: flex; flex-direction: column; height: 100vh; max-width: 500px; margin: 0 auto; background-color: #ffffff; border-left: 1px solid #dcdcdc; border-right: 1px solid #dcdcdc; position: relative; }
-
-        /* Header & Controls */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; position: relative; flex-shrink: 0; }
         .back-button { text-decoration: none; color: #333; font-weight: 500; }
         .header-title { font-size: 1.8rem; font-weight: bold; margin: 0; position: absolute; left: 50%; transform: translateX(-50%); }
@@ -28,8 +26,6 @@
         .filter-buttons::-webkit-scrollbar { display: none; }
         .filter-btn { border: 2px solid #000; border-radius: 8px; background-color: #fff; color: #000; font-weight: 500; white-space: nowrap; }
         .filter-btn.active { background-color: #000; color: #fff; }
-
-        /* Visit List */
         .visit-list-container { flex-grow: 1; overflow-y: auto; padding: 1rem; padding-bottom: 120px; }
         .visit-card { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; border: 2px solid #000; border-radius: 15px; padding: 1rem; margin-bottom: 1rem; text-decoration: none; color: inherit; transition: background-color 0.2s; }
         .visit-card:hover { background-color: #f1f1f1; }
@@ -40,8 +36,6 @@
         .visit-details { text-align: center; }
         .visit-date { font-weight: bold; font-size: 1.1rem; }
         .visit-progress-canceled { color: #dc3545; font-weight: bold; }
-
-        /* FAB & Offcanvas */
         .fab { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90px; height: 90px; border-radius: 50%; background-color: #e0e0e0; border: 3px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 500; text-decoration: none; color: #000; z-index: 1040; }
         .offcanvas-body { display: flex; flex-direction: column; }
         .nav-tabs .nav-link { border: 2px solid #000 !important; border-bottom: 0 !important; color: #000; margin-right: 2px; }
@@ -54,7 +48,6 @@
         .item-avatar { width: 45px; height: 45px; }
         #create-visit-btn { border: 2px solid #000; font-weight: bold; margin: 20px 0; }
         .time-picker-wrapper { display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 2rem; }
-
         #alert-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 480px; }
     </style>
 </head>
@@ -79,7 +72,6 @@
 </div>
 <a href="#" class="fab" id="add-visit-btn"><div>+</div><div>Visit</div></a>
 
-<!-- Offcanvas for Add Visit Form -->
 <div class="offcanvas offcanvas-bottom h-100" tabindex="-1" id="assignVisitOffcanvas">
     <div class="offcanvas-header"><h5 class="offcanvas-title w-100 text-center">Schedule Visit</h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button></div>
     <div class="offcanvas-body">
@@ -115,10 +107,7 @@
             state: {
                 baseUrl: <?= json_encode($baseUrl ?? '') ?>,
                 authToken: <?= json_encode($authToken ?? '') ?>,
-                allVisits: [],
-                allCaregivers: [],
-                allAssignedPatients: [],
-                allPatientAddresses: [],
+                allVisits: [], allCaregivers: [], allAssignedPatients: [], allPatientAddresses: [],
                 newVisit: {},
             },
 
@@ -142,7 +131,6 @@
                 this.modals.offcanvas = new bootstrap.Offcanvas('#assignVisitOffcanvas');
                 this.modals.confirmation = new bootstrap.Modal('#visitConfirmationModal');
                 this.modals.datepicker = new Datepicker(document.getElementById('datepicker-container'), { format: 'yyyy-mm-dd', autohide: true, todayHighlight: true });
-
                 this.bindEvents();
                 this.render.timePicker();
                 this.api.fetchAllVisits();
@@ -152,30 +140,24 @@
             bindEvents() {
                 const h = this.handlers;
                 const debouncedFilter = this.helpers.debounce(h.applyFilters.bind(this), 300);
-
                 $('#recordStatus-filters').on('click', '.filter-btn', h.onFilterClick.bind(this));
                 $('#visitProgress-filters').on('click', '.filter-btn', h.onFilterClick.bind(this));
                 this.elements.mainSearchInput.on('keyup', debouncedFilter);
                 this.elements.mainSearchBtn.on('click', h.applyFilters.bind(this));
-
                 this.elements.addVisitBtn.on('click', h.onAddVisitClick.bind(this));
                 $('#assignVisitOffcanvas').on('hidden.bs.offcanvas', () => this.resetFormState());
-
                 this.elements.caregiverList.on('click', '.selection-item', e => h.onSelectItem.call(this, e, 'caregiver'));
                 this.elements.patientList.on('click', '.selection-item', e => h.onSelectItem.call(this, e, 'patient'));
                 this.elements.addressList.on('click', '.selection-item', e => h.onSelectItem.call(this, e, 'address'));
-
                 this.elements.caregiverSearch.on('keyup', this.helpers.debounce(e => h.onSubSearch.call(this, e, 'caregiver'), 300));
                 this.elements.patientSearch.on('keyup', this.helpers.debounce(e => h.onSubSearch.call(this, e, 'patient'), 300));
                 this.elements.addressSearch.on('keyup', this.helpers.debounce(e => h.onSubSearch.call(this, e, 'address'), 300));
-
                 $('#visit-tabs').on('show.bs.tab', h.onTabChange.bind(this));
                 $(document.getElementById('datepicker-container')).on('changeDate', h.onDateChange.bind(this));
                 this.elements.timePicker.on('change', 'select', h.onTimeChange.bind(this));
                 this.elements.hoursSelect.on('change', h.onDurationChange.bind(this));
                 this.elements.createVisitBtn.on('click', h.onCreateVisitClick.bind(this));
                 this.elements.confirmCreateVisitBtn.on('click', h.onConfirmCreateVisit.bind(this));
-
                 window.addEventListener('pageshow', e => { if(e.persisted) this.api.fetchAllVisits(); });
             },
 
@@ -191,32 +173,16 @@
                     );
                     this.render.visitList(filtered);
                 },
-                onFilterClick(e) {
-                    const button = $(e.currentTarget);
-                    button.addClass('active').siblings().removeClass('active');
-                    this.handlers.applyFilters.call(this);
-                },
+                onFilterClick(e) { $(e.currentTarget).addClass('active').siblings().removeClass('active'); this.handlers.applyFilters.call(this); },
                 onAddVisitClick() { this.api.fetchCaregivers().done(res => { this.state.allCaregivers = res.data.users; this.render.selectionList('caregiver', res.data.users); }); this.modals.offcanvas.show(); },
                 onSelectItem(e, type) {
                     const el = $(e.currentTarget);
                     el.addClass('selected').siblings().removeClass('selected');
                     this.state.newVisit[`${type}Id`] = el.data('id');
                     this.state.newVisit[`${type}Fullname`] = el.data('name');
-
-                    // Enable the next tab and auto-advance
-                    if (type === 'caregiver') {
-                        $('#patient-tab-btn').removeClass('disabled');
-                        this.elements.tabs.patient.show();
-                    }
-                    if (type === 'patient') {
-                        $('#address-tab-btn').removeClass('disabled');
-                        this.elements.tabs.address.show();
-                    }
-                    if (type === 'address') {
-                        $('#date-tab-btn').removeClass('disabled');
-                        this.elements.tabs.date.show();
-                    }
-
+                    if (type === 'caregiver') { $('#patient-tab-btn').removeClass('disabled'); this.elements.tabs.patient.show(); }
+                    if (type === 'patient')   { $('#address-tab-btn').removeClass('disabled'); this.elements.tabs.address.show(); }
+                    if (type === 'address')   { $('#date-tab-btn').removeClass('disabled');    this.elements.tabs.date.show(); }
                     this.checkFormCompleteness();
                 },
                 onTabChange(e) {
@@ -226,10 +192,7 @@
                         this.api.fetchAssignedPatients().done(res => {
                             this.state.allAssignedPatients = res.data.patients;
                             this.render.selectionList('patient', res.data.patients);
-                            // Re-highlight previously selected patient
-                            if (this.state.newVisit.patientId != null) {
-                                $(`.selection-item[data-id="${this.state.newVisit.patientId}"]`, '#patient-selection-list').addClass('selected');
-                            }
+                            if (this.state.newVisit.patientId != null) $(`.selection-item[data-id="${this.state.newVisit.patientId}"]`, '#patient-selection-list').addClass('selected');
                         });
                     }
                     if (tabId === 'address-tab-btn' && this.state.newVisit.patientId != null) {
@@ -237,50 +200,30 @@
                         this.api.fetchPatientAddresses().done(res => {
                             this.state.allPatientAddresses = res.data;
                             this.render.selectionList('address', res.data);
-                            // Re-highlight previously selected address
-                            if (this.state.newVisit.addressId != null) {
-                                $(`.selection-item[data-id="${this.state.newVisit.addressId}"]`, '#address-selection-list').addClass('selected');
-                            }
+                            if (this.state.newVisit.addressId != null) $(`.selection-item[data-id="${this.state.newVisit.addressId}"]`, '#address-selection-list').addClass('selected');
                         });
                     }
-                    // Auto-select today when the date tab opens
-                    if (tabId === 'date-tab-btn') {
-                        if (!this.state.newVisit.visitDate) {
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-                            this.modals.datepicker.setDate(today);
-                            this.state.newVisit.visitDate = today;
-                            $('#start-tab-btn').removeClass('disabled');
-                            this.checkFormCompleteness();
-                        }
+                    if (tabId === 'date-tab-btn' && !this.state.newVisit.visitDate) {
+                        const today = new Date(); today.setHours(0, 0, 0, 0);
+                        this.modals.datepicker.setDate(today);
+                        this.state.newVisit.visitDate = today;
+                        $('#start-tab-btn').removeClass('disabled');
+                        this.checkFormCompleteness();
                     }
-                    // Re-highlight previously selected caregiver
                     if (tabId === 'caregiver-tab-btn' && this.state.newVisit.caregiverId != null) {
-                        setTimeout(() => {
-                            $(`.selection-item[data-id="${this.state.newVisit.caregiverId}"]`, '#caregiver-selection-list').addClass('selected');
-                        }, 50);
+                        setTimeout(() => $(`.selection-item[data-id="${this.state.newVisit.caregiverId}"]`, '#caregiver-selection-list').addClass('selected'), 50);
                     }
                 },
-                onDateChange(e) {
-                    this.state.newVisit.visitDate = e.detail.date;
-                    $('#start-tab-btn').removeClass('disabled');
-                    this.checkFormCompleteness();
-                },
+                onDateChange(e) { this.state.newVisit.visitDate = e.detail.date; $('#start-tab-btn').removeClass('disabled'); this.checkFormCompleteness(); },
                 onTimeChange() {
-                    const h = $('#start-time-picker-hour').val();
-                    const m = $('#start-time-picker-minute').val();
-                    const period = $('#start-time-picker-period').val();
-
+                    const h = $('#start-time-picker-hour').val(), m = $('#start-time-picker-minute').val(), period = $('#start-time-picker-period').val();
                     if (h !== "" && m !== "") {
                         let hour24 = parseInt(h, 10);
                         if (period === 'AM' && hour24 === 12) hour24 = 0;
                         if (period === 'PM' && hour24 !== 12) hour24 += 12;
                         this.state.newVisit.startTime = { h: hour24, m: parseInt(m, 10) };
-                    } else {
-                        this.state.newVisit.startTime = null;
-                    }
-                    $('#duration-tab-btn').removeClass('disabled');
-                    this.checkFormCompleteness();
+                    } else { this.state.newVisit.startTime = null; }
+                    $('#duration-tab-btn').removeClass('disabled'); this.checkFormCompleteness();
                 },
                 onDurationChange(e) { this.state.newVisit.totalHours = parseInt($(e.target).val()); this.checkFormCompleteness(); },
                 onCreateVisitClick() { this.render.confirmationText(); this.modals.confirmation.show(); },
@@ -302,8 +245,13 @@
                 fetchPatientAddresses: () => VisitManagementApp.api._ajax({ url: `${VisitManagementApp.state.baseUrl}/address/person/${VisitManagementApp.state.newVisit.patientId}/1` }),
                 createVisit() {
                     const { caregiverId, patientId, addressId, visitDate, startTime, totalHours } = VisitManagementApp.state.newVisit;
-                    const payload = { user_id: caregiverId, patient_id: patientId, address_id: addressId, visit_date: new Date(visitDate).toISOString().slice(0, 10), total_hours: totalHours };
-                    if(startTime){ const dt=new Date(visitDate); dt.setHours(startTime.h,startTime.m,0,0); payload.start_time = dt.toISOString().slice(0,19).replace('T',' '); }
+                    const h = VisitManagementApp.helpers;
+                    const payload = { user_id: caregiverId, patient_id: patientId, address_id: addressId, visit_date: h.formatLocalDate(new Date(visitDate)), total_hours: totalHours };
+                    if (startTime) {
+                        const dt = new Date(visitDate);
+                        dt.setHours(startTime.h, startTime.m, 0, 0);
+                        payload.start_time = h.formatLocalDatetime(dt);
+                    }
                     this._ajax({ url:`${VisitManagementApp.state.baseUrl}/visit`, type:'POST', contentType:'application/json', data: JSON.stringify(payload)})
                         .done(() => { VisitManagementApp.helpers.showAlert('Visit created successfully!','success'); VisitManagementApp.modals.confirmation.hide(); VisitManagementApp.modals.offcanvas.hide(); VisitManagementApp.api.fetchAllVisits(); });
                 }
@@ -320,24 +268,14 @@
                     if(!items?.length){ container.html(`<p class="text-center text-muted mt-3">No ${type}s found.</p>`); return; }
                     items.forEach(item => container.append(VisitManagementApp.helpers.getSelectionItemHTML(type, item)));
                 },
-                // 12-hour AM/PM time picker with 5-minute increments
                 timePicker() {
-                    const hourOpts = Array.from({length: 12}, (_, i) => {
-                        const val = i + 1;
-                        return `<option value="${val}">${String(val).padStart(2, '0')}</option>`;
-                    }).join('');
-                    const minOpts = Array.from({length: 12}, (_, i) => {
-                        const val = i * 5;
-                        return `<option value="${val}">${String(val).padStart(2, '0')}</option>`;
-                    }).join('');
-
+                    const hourOpts = Array.from({length: 12}, (_, i) => { const v = i + 1; return `<option value="${v}">${String(v).padStart(2, '0')}</option>`; }).join('');
+                    const minOpts = Array.from({length: 12}, (_, i) => { const v = i * 5; return `<option value="${v}">${String(v).padStart(2, '0')}</option>`; }).join('');
                     VisitManagementApp.elements.timePicker.html(
-                        `<div class="time-picker-wrapper">` +
-                        `<label class="form-label me-2">Start Time:</label>` +
+                        `<div class="time-picker-wrapper"><label class="form-label me-2">Start Time:</label>` +
                         `<select id="start-time-picker-hour" class="form-select me-2"><option value="">--</option>${hourOpts}</select>` +
                         `:<select id="start-time-picker-minute" class="form-select"><option value="">--</option>${minOpts}</select>` +
-                        `<select id="start-time-picker-period" class="form-select ms-2"><option value="AM">AM</option><option value="PM">PM</option></select>` +
-                        `</div>`
+                        `<select id="start-time-picker-period" class="form-select ms-2"><option value="AM">AM</option><option value="PM">PM</option></select></div>`
                     );
                 },
                 confirmationText() {
@@ -350,15 +288,23 @@
             },
 
             helpers: {
+                parseDate(dStr) {
+                    if (!dStr) return new Date();
+                    return new Date(String(dStr).replace(' ', 'T'));
+                },
+                formatLocalDatetime(date) {
+                    const y = date.getFullYear(), mo = String(date.getMonth() + 1).padStart(2, '0'), d = String(date.getDate()).padStart(2, '0');
+                    const h = String(date.getHours()).padStart(2, '0'), mi = String(date.getMinutes()).padStart(2, '0'), s = String(date.getSeconds()).padStart(2, '0');
+                    return `${y}-${mo}-${d} ${h}:${mi}:${s}`;
+                },
+                formatLocalDate(date) {
+                    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                },
                 getVisitCardHTML(v) {
-                    const h = VisitManagementApp.helpers;
-                    const baseUrl = VisitManagementApp.state.baseUrl;
+                    const h = VisitManagementApp.helpers, baseUrl = VisitManagementApp.state.baseUrl;
                     const cgName=`${v.user.firstname} ${v.user.lastname}`, ptName=`${v.patient.firstname} ${v.patient.lastname}`;
                     const prog = h.getProgressText(v.progress);
-                    return `<a href="/visit/detail/${v.id}" class="visit-card">
-                        <div class="visit-person"><div class="visit-person-avatar"><img src="${baseUrl}${v.user.photo}" alt="CG"></div><div class="visit-person-name">${cgName}</div></div>
-                        <div class="visit-details"><div class="visit-date">${h.getFormattedDate(v.start_time)}</div><div>${h.getRelativeTime(v.start_time)}</div><div class="visit-progress ${prog==='Canceled'?'visit-progress-canceled':''}">${prog}</div></div>
-                        <div class="visit-person"><div class="visit-person-avatar"><img src="${baseUrl}${v.patient.photo}" alt="PT"></div><div class="visit-person-name">${ptName}</div></div></a>`;
+                    return `<a href="/visit/detail/${v.id}" class="visit-card"><div class="visit-person"><div class="visit-person-avatar"><img src="${baseUrl}${v.user.photo}" alt="CG"></div><div class="visit-person-name">${cgName}</div></div><div class="visit-details"><div class="visit-date">${h.getFormattedDate(v.start_time)}</div><div>${h.getRelativeTime(v.start_time)}</div><div class="visit-progress ${prog==='Canceled'?'visit-progress-canceled':''}">${prog}</div></div><div class="visit-person"><div class="visit-person-avatar"><img src="${baseUrl}${v.patient.photo}" alt="PT"></div><div class="visit-person-name">${ptName}</div></div></a>`;
                 },
                 getSelectionItemHTML(type, item) {
                     const baseUrl = VisitManagementApp.state.baseUrl;
@@ -369,20 +315,16 @@
                 },
                 showAlert: (m,t='success')=>VisitManagementApp.elements.alertContainer.html(`<div class="alert alert-${t} a-d fade show" role="alert">${m}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).children().delay(4000).fadeOut(),
                 getProgressText: p => ({'-1':"Canceled",'0':"Scheduled",'1':"Check-in",'2':"Check-out",'3':"Approved"}[p]||'Unknown'),
-                getFormattedDate: d=>new Date(d).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}),
-                getRelativeTime: dStr=>{const n=new Date(),v=new Date(dStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/864e5);if(d<0)return"Past";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`},
+                getFormattedDate(d) { return this.parseDate(d).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}); },
+                getRelativeTime(dStr) { const n=new Date(),v=this.parseDate(dStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/864e5);if(d<0)return"Past";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`; },
                 searchMatcher: (item,term,keys)=>{ if(!term) return true; const fields = Array.isArray(keys) ? keys.map(k=>item[k]||'').join(' ') : item[keys]; return fields.toLowerCase().includes(term); },
                 debounce: (func,delay)=>{ let t; return function(...a){clearTimeout(t); t=setTimeout(()=>func.apply(this,a),delay);}},
             },
 
-            // FIX: Use != null checks so id=0 is valid
             checkFormCompleteness() {
                 const s = this.state.newVisit;
-                if (s.caregiverId != null && s.patientId != null && s.addressId != null && s.visitDate && s.startTime && s.totalHours) {
-                    this.elements.createVisitBtn.fadeIn();
-                } else {
-                    this.elements.createVisitBtn.fadeOut();
-                }
+                if (s.caregiverId != null && s.patientId != null && s.addressId != null && s.visitDate && s.startTime && s.totalHours) { this.elements.createVisitBtn.fadeIn(); }
+                else { this.elements.createVisitBtn.fadeOut(); }
             },
 
             resetFormState() {
