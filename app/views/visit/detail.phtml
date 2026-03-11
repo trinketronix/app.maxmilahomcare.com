@@ -212,17 +212,16 @@
                         return;
                     }
 
-                    const dateVal = $('#visit_date-edit').val(); // yyyy-mm-dd
-                    const timeVal = $('#start_time-edit').val(); // HH:mm
+                    const dateVal = $('#visit_date-edit').val();
+                    const timeVal = $('#start_time-edit').val();
                     if (!dateVal || !timeVal) {
                         VisitDetailApp.helpers.showAlert('Please select both a date and a start time.', 'warning');
                         return;
                     }
 
-                    const visitDate = new Date(dateVal + 'T' + timeVal + ':00');
-
+                    // Build datetime string directly — no timezone conversion
                     const payload = {
-                        start_time: visitDate.toISOString().slice(0, 19).replace('T', ' '),
+                        start_time: dateVal + ' ' + timeVal + ':00',
                         total_hours: totalHours,
                         note: $('#note-edit').val()
                     };
@@ -332,7 +331,7 @@
                     const h = VisitDetailApp.helpers;
 
                     $('#visit-progress-text').text(h.getProgressText(data.progress));
-                    $('#visit-date-text').text(new Date(data.start_time).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }));
+                    $('#visit-date-text').text(h.parseDate(data.start_time).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }));
                     $('#visit-duration').text(`${Math.floor(data.duration_minutes / 60)} hrs total`);
                     $('#visit-relative-time').text(h.getRelativeTime(data.start_time));
                     $('#caregiver-avatar').attr('src', data.user.photo ? VisitDetailApp.state.baseUrl + data.user.photo : 'https://via.placeholder.com/70');
@@ -373,20 +372,60 @@
             helpers: {
                 showAlert: (message, type = 'success') => VisitDetailApp.elements.alertContainer.html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).fadeIn().delay(4000).fadeOut(),
                 getProgressText: p => ({ '-1': "Canceled", '0': "Scheduled", '1': "Check-in", '2': "Check-out", '3': "Approved" }[p] || 'Unknown'),
-                getFormattedTime: dStr => new Date(dStr).toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
-                getFormattedDate: dStr => new Date(dStr).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+
+                /**
+                 * Parses a "YYYY-MM-DD HH:MM:SS" string as LOCAL time.
+                 * Prevents the browser from interpreting it as UTC.
+                 */
+                parseDate(dStr) {
+                    if (!dStr) return new Date();
+                    const str = String(dStr).replace(' ', 'T');
+                    // Appending no 'Z' or offset means the Date constructor treats it as local time
+                    return new Date(str);
+                },
+
+                getFormattedTime(dStr) {
+                    return this.parseDate(dStr).toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                },
+                getFormattedDate(dStr) {
+                    return this.parseDate(dStr).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                },
                 getFinishTime(dStr, totalHours) {
-                    const finish = new Date(dStr);
+                    const finish = this.parseDate(dStr);
                     finish.setHours(finish.getHours() + totalHours);
                     return finish.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
                 },
-                getRelativeTime(dStr) { const n=new Date(),v=new Date(dStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/864e5);if(d<0)return"Past";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`;}
+                getRelativeTime(dStr) {
+                    const n = new Date(), v = this.parseDate(dStr);
+                    n.setHours(0,0,0,0); v.setHours(0,0,0,0);
+                    const d = Math.ceil((v - n) / 864e5);
+                    if (d < 0) return "Past"; if (d === 0) return "Today"; if (d === 1) return "Tomorrow"; return `In ${d} days`;
+                },
+
+                /**
+                 * Formats a Date object as "YYYY-MM-DD HH:MM:SS" using LOCAL components.
+                 * This is the replacement for .toISOString().slice() everywhere.
+                 */
+                formatLocalDatetime(date) {
+                    const y = date.getFullYear();
+                    const mo = String(date.getMonth() + 1).padStart(2, '0');
+                    const d = String(date.getDate()).padStart(2, '0');
+                    const h = String(date.getHours()).padStart(2, '0');
+                    const mi = String(date.getMinutes()).padStart(2, '0');
+                    const s = String(date.getSeconds()).padStart(2, '0');
+                    return `${y}-${mo}-${d} ${h}:${mi}:${s}`;
+                },
+                formatLocalDate(date) {
+                    const y = date.getFullYear();
+                    const mo = String(date.getMonth() + 1).padStart(2, '0');
+                    const d = String(date.getDate()).padStart(2, '0');
+                    return `${y}-${mo}-${d}`;
+                }
             },
 
             setMode(mode) {
                 if (mode === 'edit') {
-                    const startDate = new Date(this.state.currentVisitData.start_time);
-                    // yyyy-mm-dd for the date input
+                    const startDate = this.helpers.parseDate(this.state.currentVisitData.start_time);
                     const year = startDate.getFullYear();
                     const month = String(startDate.getMonth() + 1).padStart(2, '0');
                     const day = String(startDate.getDate()).padStart(2, '0');

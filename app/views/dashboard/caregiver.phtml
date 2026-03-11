@@ -17,159 +17,49 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/css/datepicker-bs5.min.css">
 
     <style>
-        /* General Body and Page Layout */
-        html, body {
-            height: 100vh;
-            overflow: hidden;
-            background-color: #f0f2f5;
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
-        }
-        .page-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            max-width: 500px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            border-left: 1px solid #dcdcdc;
-            border-right: 1px solid #dcdcdc;
-            position: relative;
-        }
-
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            position: relative;
-            flex-shrink: 0;
-        }
+        html, body { height: 100vh; overflow: hidden; background-color: #f0f2f5; font-family: 'Segoe UI', 'Roboto', sans-serif; }
+        .page-container { display: flex; flex-direction: column; height: 100vh; max-width: 500px; margin: 0 auto; background-color: #ffffff; border-left: 1px solid #dcdcdc; border-right: 1px solid #dcdcdc; position: relative; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; position: relative; flex-shrink: 0; }
         .back-button { text-decoration: none; color: #333; font-weight: 500; }
-        .header-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin: 0;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
+        .header-title { font-size: 1.8rem; font-weight: bold; margin: 0; position: absolute; left: 50%; transform: translateX(-50%); }
         .profile { text-align: center; cursor: pointer; }
-        .profile-icon {
-            font-size: 1.5rem; border: 2px solid #000; border-radius: 50%;
-            width: 45px; height: 45px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto; overflow: hidden;
-        }
+        .profile-icon { font-size: 1.5rem; border: 2px solid #000; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; margin: 0 auto; overflow: hidden; }
         .profile-icon img { width: 100%; height: 100%; object-fit: cover; }
         .profile-username { font-size: 0.8rem; color: #555; margin-top: 4px; }
-
-        /* Controls Section (Search & Filter) */
-        .controls-section {
-            padding: 1rem;
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
-            flex-shrink: 0;
-        }
-        .search-bar .form-control, .search-bar .btn {
-            border-radius: 8px;
-            border: 2px solid #000;
-        }
-        .filter-group {
-            border: 2px solid #000;
-            border-radius: 10px;
-            padding: 0.5rem;
-        }
-        .filter-buttons {
-            display: flex;
-            overflow-x: auto;
-            gap: 0.5rem;
-        }
+        .controls-section { padding: 1rem; background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0; flex-shrink: 0; }
+        .search-bar .form-control, .search-bar .btn { border-radius: 8px; border: 2px solid #000; }
+        .filter-group { border: 2px solid #000; border-radius: 10px; padding: 0.5rem; }
+        .filter-buttons { display: flex; overflow-x: auto; gap: 0.5rem; }
         .filter-buttons::-webkit-scrollbar { display: none; }
-        .filter-btn {
-            border: 2px solid #000;
-            border-radius: 8px;
-            background-color: #fff;
-            color: #000;
-            font-weight: 500;
-            white-space: nowrap;
-        }
+        .filter-btn { border: 2px solid #000; border-radius: 8px; background-color: #fff; color: #000; font-weight: 500; white-space: nowrap; }
         .filter-btn.active { background-color: #000; color: #fff; }
-
-        /* Visit List */
-        .visit-list-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            padding-bottom: 120px;
-        }
-        .visit-card {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 1rem;
-            align-items: center;
-            border: 2px solid #000;
-            border-radius: 15px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            cursor: pointer;
-        }
+        .visit-list-container { flex-grow: 1; overflow-y: auto; padding: 1rem; padding-bottom: 120px; }
+        .visit-card { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: center; border: 2px solid #000; border-radius: 15px; padding: 1rem; margin-bottom: 1rem; cursor: pointer; }
         .visit-card:hover { background-color: #f1f1f1; }
         .visit-person { text-align: center; }
-        .visit-person-avatar {
-            width: 60px; height: 60px;
-            border: 3px solid #000; border-radius: 50%;
-            overflow: hidden; margin: 0 auto 0.5rem auto;
-            display:flex; align-items:center; justify-content:center;
-        }
+        .visit-person-avatar { width: 60px; height: 60px; border: 3px solid #000; border-radius: 50%; overflow: hidden; margin: 0 auto 0.5rem auto; display:flex; align-items:center; justify-content:center; }
         .visit-person-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .visit-person-name { font-weight: 500; }
         .visit-details { text-align: right; }
         .visit-date { font-weight: bold; font-size: 1.1rem; }
         .visit-relative-time, .visit-progress { color: #555; }
         .visit-progress-canceled { color: #dc3545; font-weight: bold; }
-
-        /* Floating Action Button (FAB) */
-        .fab {
-            position: absolute; bottom: 20px; left: 50%;
-            transform: translateX(-50%);
-            width: 90px; height: 90px; border-radius: 50%;
-            background-color: #e0e0e0; border: 3px solid #000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-weight: 500; text-decoration: none; color: #000;
-            z-index: 1040;
-        }
-
-        /* Offcanvas & Modals */
+        .fab { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90px; height: 90px; border-radius: 50%; background-color: #e0e0e0; border: 3px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 500; text-decoration: none; color: #000; z-index: 1040; }
         .offcanvas-body { display: flex; flex-direction: column; }
         #assignVisitOffcanvas .nav-tabs .nav-link { border: 2px solid #000 !important; border-bottom: 0 !important; color: #000; margin-right: 2px; }
         #assignVisitOffcanvas .nav-tabs .nav-link.active { background-color: #0d6efd; color: #fff; border-color: #0d6efd !important;}
         #assignVisitOffcanvas .nav-tabs .nav-link.disabled { color: #aaa; border-color: #aaa !important; background-color: #f8f9fa; }
         .tab-pane { padding-top: 1rem; display: flex; flex-direction: column; flex-grow: 1; }
         .selection-list { flex-grow: 1; overflow-y: auto; margin-top: 1rem; padding-bottom: 1rem; }
-        .selection-item {
-            display: flex; align-items: center; gap: 1rem;
-            border: 2px solid #ccc; border-radius: 15px;
-            padding: 0.75rem; margin-bottom: 0.5rem; cursor: pointer;
-        }
+        .selection-item { display: flex; align-items: center; gap: 1rem; border: 2px solid #ccc; border-radius: 15px; padding: 0.75rem; margin-bottom: 0.5rem; cursor: pointer; }
         .selection-item.selected { border-color: #0d6efd; background-color: #eef5ff; }
         #create-visit-btn { border: 2px solid #000; font-weight: bold; margin: 20px 0; }
         .time-picker-wrapper { display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 2rem; }
-
-        /* Actions Modal */
         .actions-modal-body { display: flex; justify-content: space-around; text-align: center; }
         .action-option { cursor: pointer; text-decoration: none; color: #000; font-weight: 500; }
-        .action-option i {
-            font-size: 2.5rem; margin-bottom: 0.5rem; display: block;
-            width: 60px; height: 60px; line-height: 60px; border-radius: 15px;
-            background-color: #000; color: #fff;
-        }
+        .action-option i { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; width: 60px; height: 60px; line-height: 60px; border-radius: 15px; background-color: #000; color: #fff; }
         .action-option .checkout-icon { border: 3px solid #000; background: #fff; color: #000;}
-
-        /* Responsive */
-        @media (min-width: 768px) {
-            .page-container { max-width: 720px; }
-        }
+        @media (min-width: 768px) { .page-container { max-width: 720px; } }
     </style>
 </head>
 <body>
@@ -180,45 +70,21 @@
     <header class="header">
         <a href="/signout" class="back-button"><i class="fas fa-chevron-left"></i> sign out</a>
         <h1 class="header-title">My Visits</h1>
-        <div class="profile" id="profile-link">
-            <div class="profile-icon">
-                <img src="<?=$photo?>" alt="avatar">
-            </div>
-            <span class="profile-username"><?=$fullname?></span>
-        </div>
+        <div class="profile" id="profile-link"><div class="profile-icon"><img src="<?=$photo?>" alt="avatar"></div><span class="profile-username"><?=$fullname?></span></div>
     </header>
 
     <section class="controls-section">
-        <div class="input-group search-bar mb-3">
-            <input type="text" id="search-input-main" class="form-control" placeholder="Search by patient name...">
-            <button class="btn btn-dark" type="button" id="main-search-btn">Search</button>
-        </div>
-        <div class="filter-group">
-            <div class="filter-buttons">
-                <small class="align-self-center me-2">Progress:</small>
-                <button class="btn filter-btn active" data-filter-value="all">All</button>
-                <button class="btn filter-btn" data-filter-value="0">Scheduled</button>
-                <button class="btn filter-btn" data-filter-value="1">Check-in</button>
-                <button class="btn filter-btn" data-filter-value="2">Check-out</button>
-                <button class="btn filter-btn" data-filter-value="3">Approved</button>
-                <button class="btn filter-btn" data-filter-value="-1">Canceled</button>
-            </div>
-        </div>
+        <div class="input-group search-bar mb-3"><input type="text" id="search-input-main" class="form-control" placeholder="Search by patient name..."><button class="btn btn-dark" type="button" id="main-search-btn">Search</button></div>
+        <div class="filter-group"><div class="filter-buttons"><small class="align-self-center me-2">Progress:</small><button class="btn filter-btn active" data-filter-value="all">All</button><button class="btn filter-btn" data-filter-value="0">Scheduled</button><button class="btn filter-btn" data-filter-value="1">Check-in</button><button class="btn filter-btn" data-filter-value="2">Check-out</button><button class="btn filter-btn" data-filter-value="3">Approved</button><button class="btn filter-btn" data-filter-value="-1">Canceled</button></div></div>
     </section>
 
-    <main class="visit-list-container">
-        <div id="visit-list"><div class="text-center p-5"><div class="spinner-border"></div></div></div>
-    </main>
+    <main class="visit-list-container"><div id="visit-list"><div class="text-center p-5"><div class="spinner-border"></div></div></div></main>
 </div>
 
 <button class="fab" id="add-visit-btn"><div class="plus-icon">+</div><div>Visit</div></button>
 
-<!-- Modals and Offcanvas -->
 <div class="offcanvas offcanvas-bottom h-100" tabindex="-1" id="assignVisitOffcanvas">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title w-100 text-center">Schedule Visit</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
-    </div>
+    <div class="offcanvas-header"><h5 class="offcanvas-title w-100 text-center">Schedule Visit</h5><button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button></div>
     <div class="offcanvas-body">
         <ul class="nav nav-tabs" id="visit-tabs" role="tablist">
             <li class="nav-item" role="presentation"><button class="nav-link active" id="patient-tab-btn" data-bs-toggle="tab" data-bs-target="#patient-tab">Patient</button></li>
@@ -228,48 +94,20 @@
             <li class="nav-item" role="presentation"><button class="nav-link" id="duration-tab-btn" data-bs-toggle="tab" data-bs-target="#duration-tab">Duration</button></li>
         </ul>
         <div class="tab-content flex-grow-1" id="visit-tabs-content">
-            <div class="tab-pane fade show active" id="patient-tab">
-                <div class="input-group search-bar"><input type="text" id="patient-search" class="form-control" placeholder="Search my patients..."></div>
-                <div class="selection-list" id="patient-selection-list"></div>
-            </div>
-            <div class="tab-pane fade" id="address-tab">
-                <div id="address-selection-placeholder" class="text-center text-muted mt-5">Please select a patient first.</div>
-                <div id="address-selection-content" style="display:none;">
-                    <div class="input-group search-bar"><input type="text" id="address-search" class="form-control" placeholder="Search address..."></div>
-                    <div class="selection-list" id="address-selection-list"></div>
-                </div>
-            </div>
+            <div class="tab-pane fade show active" id="patient-tab"><div class="input-group search-bar"><input type="text" id="patient-search" class="form-control" placeholder="Search my patients..."></div><div class="selection-list" id="patient-selection-list"></div></div>
+            <div class="tab-pane fade" id="address-tab"><div id="address-selection-placeholder" class="text-center text-muted mt-5">Please select a patient first.</div><div id="address-selection-content" style="display:none;"><div class="input-group search-bar"><input type="text" id="address-search" class="form-control" placeholder="Search address..."></div><div class="selection-list" id="address-selection-list"></div></div></div>
             <div class="tab-pane fade" id="date-tab"><div id="datepicker-container" class="pt-3"></div></div>
             <div class="tab-pane fade d-flex justify-content-center align-items-center" id="start-tab"><div id="start-time-picker"></div></div>
-            <div class="tab-pane fade d-flex justify-content-center align-items-center" id="duration-tab">
-                <div class="w-75">
-                    <label for="total-hours-select" class="form-label fs-5 text-center w-100">Select Total Hours</label>
-                    <select class="form-select form-select-lg" id="total-hours-select">
-                        <option selected disabled value="">Choose duration...</option>
-                        <option value="1">1 Hour</option><option value="2">2 Hours</option><option value="3">3 Hours</option>
-                        <option value="4">4 Hours</option><option value="5">5 Hours</option><option value="6">6 Hours</option>
-                        <option value="7">7 Hours</option><option value="8">8 Hours</option>
-                    </select>
-                </div>
-            </div>
+            <div class="tab-pane fade d-flex justify-content-center align-items-center" id="duration-tab"><div class="w-75"><label for="total-hours-select" class="form-label fs-5 text-center w-100">Select Total Hours</label><select class="form-select form-select-lg" id="total-hours-select"><option selected disabled value="">Choose duration...</option><option value="1">1 Hour</option><option value="2">2 Hours</option><option value="3">3 Hours</option><option value="4">4 Hours</option><option value="5">5 Hours</option><option value="6">6 Hours</option><option value="7">7 Hours</option><option value="8">8 Hours</option></select></div></div>
         </div>
         <button type="button" class="btn btn-primary" id="create-visit-btn" style="display:none;">Create Visit</button>
     </div>
 </div>
 
-<div class="modal fade" id="visitConfirmationModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content"><div class="modal-header"><h5 class="modal-title">Confirm Visit</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="visit-confirmation-text"></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="confirm-create-visit-btn">OK</button></div></div>
-    </div>
-</div>
+<div class="modal fade" id="visitConfirmationModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Confirm Visit</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="visit-confirmation-text"></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="confirm-create-visit-btn">OK</button></div></div></div></div>
 
-<div class="modal fade" id="actionsModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius: 1rem; border: 2px solid #000;"><div class="modal-header"><h5 class="modal-title w-100 text-center" id="actions-modal-title">Actions</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4 actions-modal-body"><a id="action-navigate-btn" href="#" target="_blank" class="action-option"><i><i class="fa-solid fa-route"></i></i>Navigate</a><a href="#" id="action-checkin-btn" class="action-option"><i><i class="fa-solid fa-check"></i></i>Checkin</a><a href="#" id="action-checkout-btn" class="action-option"><i class="checkout-icon"><i class="fa-solid fa-check"></i></i>Checkout</a><a id="action-detail-btn" href="#" class="action-option"><i><i class="fa-solid fa-circle-info"></i></i>Detail</a></div></div>
-    </div>
-</div>
+<div class="modal fade" id="actionsModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content" style="border-radius: 1rem; border: 2px solid #000;"><div class="modal-header"><h5 class="modal-title w-100 text-center" id="actions-modal-title">Actions</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4 actions-modal-body"><a id="action-navigate-btn" href="#" target="_blank" class="action-option"><i><i class="fa-solid fa-route"></i></i>Navigate</a><a href="#" id="action-checkin-btn" class="action-option"><i><i class="fa-solid fa-check"></i></i>Checkin</a><a href="#" id="action-checkout-btn" class="action-option"><i class="checkout-icon"><i class="fa-solid fa-check"></i></i>Checkout</a><a id="action-detail-btn" href="#" class="action-option"><i><i class="fa-solid fa-circle-info"></i></i>Detail</a></div></div></div></div>
 
-<!-- Dependencies -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/datepicker-full.min.js"></script>
@@ -282,91 +120,59 @@
                 authToken: <?= json_encode($authToken ?? '') ?>,
                 caregiverId: <?= json_encode($userId ?? null) ?>,
                 caregiverFullname: <?= json_encode($fullname ?? 'Me') ?>,
-                allVisits: [],
-                allAssignedPatients: [],
-                allPatientAddresses: [],
-                selectedVisitId: null,
-                newVisit: {},
+                allVisits: [], allAssignedPatients: [], allPatientAddresses: [],
+                selectedVisitId: null, newVisit: {},
             },
 
             elements: {
-                visitList: $('#visit-list'),
-                searchInput: $('#search-input-main'),
-                searchBtn: $('#main-search-btn'),
-                filterButtons: $('.filter-btn'),
-                addVisitBtn: $('#add-visit-btn'),
-                alertContainer: $('#alert-container'),
-                assignVisitOffcanvas: $('#assignVisitOffcanvas'),
-                createVisitBtn: $('#create-visit-btn'),
-                patientSelectionList: $('#patient-selection-list'),
-                addressSelectionList: $('#address-selection-list'),
+                visitList: $('#visit-list'), searchInput: $('#search-input-main'), searchBtn: $('#main-search-btn'),
+                filterButtons: $('.filter-btn'), addVisitBtn: $('#add-visit-btn'), alertContainer: $('#alert-container'),
+                assignVisitOffcanvas: $('#assignVisitOffcanvas'), createVisitBtn: $('#create-visit-btn'),
+                patientSelectionList: $('#patient-selection-list'), addressSelectionList: $('#address-selection-list'),
                 datepickerContainer: document.getElementById('datepicker-container'),
-                startTimePicker: $('#start-time-picker'),
-                totalHoursSelect: $('#total-hours-select'),
-                patientSearch: $('#patient-search'),
-                addressSearch: $('#address-search'),
+                startTimePicker: $('#start-time-picker'), totalHoursSelect: $('#total-hours-select'),
+                patientSearch: $('#patient-search'), addressSearch: $('#address-search'),
                 addressTabBtn: document.getElementById('address-tab-btn'),
                 patientTabBtn: document.getElementById('patient-tab-btn'),
                 visitConfirmationText: $('#visit-confirmation-text'),
                 actionsModalTitle: $('#actions-modal-title'),
-                actionNavigateBtn: $('#action-navigate-btn'),
-                actionDetailBtn: $('#action-detail-btn'),
-                actionCheckinBtn: $('#action-checkin-btn'),
-                actionCheckoutBtn: $('#action-checkout-btn'),
+                actionNavigateBtn: $('#action-navigate-btn'), actionDetailBtn: $('#action-detail-btn'),
+                actionCheckinBtn: $('#action-checkin-btn'), actionCheckoutBtn: $('#action-checkout-btn'),
                 confirmCreateVisitBtn: $('#confirm-create-visit-btn'),
             },
 
-            modals: {
-                actions: null,
-                visitConfirmation: null,
-                assignVisit: null,
-                datepicker: null
-            },
+            modals: { actions: null, visitConfirmation: null, assignVisit: null, datepicker: null },
 
             init() {
-                if (!this.state.caregiverId) {
-                    console.error("Caregiver ID is not available.");
-                    return;
-                }
-
-                this.initComponents();
-                this.bindEvents();
-                this.resetNewVisitState();
-
-                this.api.fetchVisits();
-            },
-
-            initComponents() {
+                if (!this.state.caregiverId) { console.error("Caregiver ID is not available."); return; }
                 this.modals.actions = new bootstrap.Modal(document.getElementById('actionsModal'));
                 this.modals.visitConfirmation = new bootstrap.Modal(document.getElementById('visitConfirmationModal'));
                 this.modals.assignVisit = new bootstrap.Offcanvas(this.elements.assignVisitOffcanvas[0]);
                 this.modals.datepicker = new Datepicker(this.elements.datepickerContainer, { format: 'yyyy-mm-dd', autohide: true, todayHighlight: true });
+                this.bindEvents();
+                this.resetNewVisitState();
+                this.api.fetchVisits();
             },
 
             bindEvents() {
                 this.elements.filterButtons.on('click', this.handlers.onFilterChange.bind(this));
                 this.elements.searchInput.on('keyup', this.handlers.applyFilters.bind(this));
                 this.elements.searchBtn.on('click', this.handlers.applyFilters.bind(this));
-
                 this.elements.visitList.on('click', '.visit-card', this.handlers.onVisitCardClick.bind(this));
                 this.elements.actionCheckinBtn.on('click', this.handlers.onPerformAction.bind(this, 'checkin'));
                 this.elements.actionCheckoutBtn.on('click', this.handlers.onPerformAction.bind(this, 'checkout'));
-
                 this.elements.addVisitBtn.on('click', this.handlers.onAddVisitClick.bind(this));
                 this.elements.assignVisitOffcanvas.on('hidden.bs.offcanvas', this.handlers.onOffcanvasClose.bind(this));
                 this.elements.patientSearch.on('keyup', this.handlers.onPatientSearch.bind(this));
                 this.elements.addressSearch.on('keyup', this.handlers.onAddressSearch.bind(this));
-
                 this.elements.patientSelectionList.on('click', '.selection-item', this.handlers.onPatientSelect.bind(this));
                 this.elements.addressSelectionList.on('click', '.selection-item', this.handlers.onAddressSelect.bind(this));
                 $(this.elements.datepickerContainer).on('changeDate', this.handlers.onDateChange.bind(this));
                 this.elements.startTimePicker.on('change', 'select', this.handlers.onTimeChange.bind(this));
                 this.elements.totalHoursSelect.on('change', this.handlers.onDurationChange.bind(this));
-
                 $('button[data-bs-toggle="tab"]').on('show.bs.tab', this.handlers.onTabChange.bind(this));
                 this.elements.createVisitBtn.on('click', this.handlers.onCreateVisitClick.bind(this));
                 this.elements.confirmCreateVisitBtn.on('click', this.handlers.onConfirmCreateVisit.bind(this));
-
                 $('#profile-link').on('click', () => window.location.href = `/caregiver/profile`);
             },
 
@@ -380,56 +186,22 @@
                     );
                     this.render.visits(filteredVisits);
                 },
-
-                onFilterChange(e) {
-                    $(e.currentTarget).addClass('active').siblings().removeClass('active');
-                    this.handlers.applyFilters.call(this);
-                },
-
+                onFilterChange(e) { $(e.currentTarget).addClass('active').siblings().removeClass('active'); this.handlers.applyFilters.call(this); },
                 onVisitCardClick(e) {
                     this.state.selectedVisitId = $(e.currentTarget).data('visit-id');
                     const visit = this.state.allVisits.find(v => v.id == this.state.selectedVisitId);
                     if (!visit) return;
-
                     const addressString = `${visit.address.address}, ${visit.address.city}, ${visit.address.state}`;
                     this.elements.actionsModalTitle.text(`Visit to ${visit.patient.firstname}`);
                     this.elements.actionNavigateBtn.attr('href', `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressString)}`);
                     this.elements.actionDetailBtn.attr('href', `/caregiver/visitdetail/${visit.id}`);
                     this.modals.actions.show();
                 },
-
-                onPerformAction(action) {
-                    if(this.state.selectedVisitId) {
-                        this.api.performAction(action, this.state.selectedVisitId)
-                            .done(() => { this.modals.actions.hide(); });
-                    }
-                },
-
-                onAddVisitClick() {
-                    this.api.fetchPatients().done(response => {
-                        this.state.allAssignedPatients = response.data.patients || [];
-                        this.render.selectionList(this.state.allAssignedPatients, 'patient');
-                    });
-                    this.modals.assignVisit.show();
-                },
-
-                onOffcanvasClose() {
-                    this.resetNewVisitState();
-                },
-
-                onPatientSearch(e) {
-                    const searchTerm = $(e.currentTarget).val().toLowerCase();
-                    const filtered = this.state.allAssignedPatients.filter(p => `${p.firstname} ${p.lastname}`.toLowerCase().includes(searchTerm));
-                    this.render.selectionList(filtered, 'patient');
-                },
-
-                onAddressSearch(e) {
-                    const searchTerm = $(e.currentTarget).val().toLowerCase();
-                    const filtered = this.state.allPatientAddresses.filter(a => a.address.toLowerCase().includes(searchTerm));
-                    this.render.selectionList(filtered, 'address');
-                },
-
-                // FIX 1: Remove 'disabled' from address tab so user can navigate back to it
+                onPerformAction(action) { if(this.state.selectedVisitId) { this.api.performAction(action, this.state.selectedVisitId).done(() => { this.modals.actions.hide(); }); } },
+                onAddVisitClick() { this.api.fetchPatients().done(response => { this.state.allAssignedPatients = response.data.patients || []; this.render.selectionList(this.state.allAssignedPatients, 'patient'); }); this.modals.assignVisit.show(); },
+                onOffcanvasClose() { this.resetNewVisitState(); },
+                onPatientSearch(e) { const t = $(e.currentTarget).val().toLowerCase(); this.render.selectionList(this.state.allAssignedPatients.filter(p => `${p.firstname} ${p.lastname}`.toLowerCase().includes(t)), 'patient'); },
+                onAddressSearch(e) { const t = $(e.currentTarget).val().toLowerCase(); this.render.selectionList(this.state.allPatientAddresses.filter(a => a.address.toLowerCase().includes(t)), 'address'); },
                 onPatientSelect(e) {
                     const item = $(e.currentTarget);
                     this.state.newVisit.patientId = item.data('id');
@@ -439,8 +211,6 @@
                     bootstrap.Tab.getOrCreateInstance(this.elements.addressTabBtn).show();
                     this.checkFormCompleteness();
                 },
-
-                // FIX 2: Use explicit null check so address id=0 is accepted
                 onAddressSelect(e) {
                     const item = $(e.currentTarget);
                     this.state.newVisit.addressId = item.data('id');
@@ -449,83 +219,58 @@
                     bootstrap.Tab.getOrCreateInstance(document.getElementById('date-tab-btn')).show();
                     this.checkFormCompleteness();
                 },
-
-                onDateChange(e) {
-                    this.state.newVisit.visitDate = e.originalEvent.detail.date;
-                    this.checkFormCompleteness();
-                },
-
+                onDateChange(e) { this.state.newVisit.visitDate = e.originalEvent.detail.date; this.checkFormCompleteness(); },
                 onTimeChange() {
-                    const h = $('#start-time-picker-hour').val();
-                    const m = $('#start-time-picker-minute').val();
-                    const period = $('#start-time-picker-period').val();
-
+                    const h = $('#start-time-picker-hour').val(), m = $('#start-time-picker-minute').val(), period = $('#start-time-picker-period').val();
                     if (h !== "" && m !== "") {
                         let hour24 = parseInt(h, 10);
                         if (period === 'AM' && hour24 === 12) hour24 = 0;
                         if (period === 'PM' && hour24 !== 12) hour24 += 12;
                         this.state.newVisit.startTime = { h: hour24, m: parseInt(m, 10) };
-                    } else {
-                        this.state.newVisit.startTime = null;
-                    }
+                    } else { this.state.newVisit.startTime = null; }
                 },
-
-                onDurationChange(e) {
-                    this.state.newVisit.totalHours = parseInt($(e.currentTarget).val(), 10);
-                    this.checkFormCompleteness();
-                },
-
+                onDurationChange(e) { this.state.newVisit.totalHours = parseInt($(e.currentTarget).val(), 10); this.checkFormCompleteness(); },
                 onTabChange(e) {
                     if (e.target.id === 'address-tab-btn') {
                         if (!this.state.newVisit.patientId) return false;
-                        $('#address-selection-content').show();
-                        $('#address-selection-placeholder').hide();
+                        $('#address-selection-content').show(); $('#address-selection-placeholder').hide();
                         this.api.fetchAddresses(this.state.newVisit.patientId).done(response => {
                             this.state.allPatientAddresses = response.data || [];
                             this.render.selectionList(this.state.allPatientAddresses, 'address');
-                            // Re-highlight the previously selected address if returning to this tab
-                            if (this.state.newVisit.addressId != null) {
-                                $(`.selection-item[data-id="${this.state.newVisit.addressId}"]`).addClass('selected');
-                            }
+                            if (this.state.newVisit.addressId != null) $(`.selection-item[data-id="${this.state.newVisit.addressId}"]`).addClass('selected');
                         });
                     }
-                    if (e.target.id === 'date-tab-btn') {
-                        if (!this.state.newVisit.visitDate) {
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-                            this.modals.datepicker.setDate(today);
-                            this.state.newVisit.visitDate = today;
-                            this.checkFormCompleteness();
-                        }
+                    if (e.target.id === 'date-tab-btn' && !this.state.newVisit.visitDate) {
+                        const today = new Date(); today.setHours(0, 0, 0, 0);
+                        this.modals.datepicker.setDate(today);
+                        this.state.newVisit.visitDate = today;
+                        this.checkFormCompleteness();
                     }
                 },
-
                 onCreateVisitClick() {
                     const { patientFullname, visitDate, startTime, totalHours } = this.state.newVisit;
                     const visitDay = new Date(visitDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
                     let timeText = `for ${totalHours} hours.`;
-                    if (startTime) {
-                        const startStr = `${startTime.h % 12 || 12}:${String(startTime.m).padStart(2, '0')} ${startTime.h >= 12 ? 'PM' : 'AM'}`;
-                        timeText = `starting around ${startStr} for ${totalHours} hours.`;
-                    }
+                    if (startTime) { const s = `${startTime.h % 12 || 12}:${String(startTime.m).padStart(2, '0')} ${startTime.h >= 12 ? 'PM' : 'AM'}`; timeText = `starting around ${s} for ${totalHours} hours.`; }
                     this.elements.visitConfirmationText.html(`A visit for <strong>${patientFullname}</strong> will be created on <strong>${visitDay}</strong>, attended by <strong>${this.state.caregiverFullname}</strong> ${timeText}`);
                     this.modals.visitConfirmation.show();
                 },
-
                 onConfirmCreateVisit() {
                     const { patientId, addressId, visitDate, startTime, totalHours } = this.state.newVisit;
+                    const h = DashboardCaregiverApp.helpers;
+
                     const payload = {
                         user_id: this.state.caregiverId,
                         patient_id: patientId,
                         address_id: addressId,
-                        visit_date: new Date(visitDate).toISOString().slice(0, 10),
+                        visit_date: h.formatLocalDate(new Date(visitDate)),
                         total_hours: totalHours
                     };
 
                     if (startTime) {
                         const startDatetime = new Date(visitDate);
                         startDatetime.setHours(startTime.h, startTime.m, 0, 0);
-                        payload.start_time = startDatetime.toISOString().slice(0, 19).replace('T', ' ');
+                        payload.start_time = h.formatLocalDatetime(startDatetime);
                     }
 
                     this.api.scheduleVisit(payload).done(() => {
@@ -537,186 +282,99 @@
 
             api: {
                 _ajax(url, method, data) {
-                    const settings = {
-                        url: `${DashboardCaregiverApp.state.baseUrl}${url}`,
-                        method: method || 'GET',
-                        headers: { 'Authorization': DashboardCaregiverApp.state.authToken, 'Content-Type': 'application/json' },
-                        dataType: 'json'
-                    };
+                    const settings = { url: `${DashboardCaregiverApp.state.baseUrl}${url}`, method: method || 'GET', headers: { 'Authorization': DashboardCaregiverApp.state.authToken, 'Content-Type': 'application/json' }, dataType: 'json' };
                     if (data) settings.data = JSON.stringify(data);
-
-                    return $.ajax(settings)
-                        .fail((xhr) => DashboardCaregiverApp.helpers.showAlert(xhr.responseJSON?.message || `An error occurred.`, 'danger'));
+                    return $.ajax(settings).fail((xhr) => DashboardCaregiverApp.helpers.showAlert(xhr.responseJSON?.message || `An error occurred.`, 'danger'));
                 },
-
-                fetchVisits() {
-                    DashboardCaregiverApp.elements.visitList.html('<div class="text-center p-5"><div class="spinner-border"></div></div>');
-                    this._ajax(`/user/visits/${DashboardCaregiverApp.state.caregiverId}`)
-                        .done(res => {
-                            DashboardCaregiverApp.state.allVisits = (res.status === 'success' && res.data) ? res.data.visits : [];
-                            DashboardCaregiverApp.handlers.applyFilters.call(DashboardCaregiverApp);
-                        }).fail(() => {
-                        DashboardCaregiverApp.state.allVisits = [];
-                        DashboardCaregiverApp.handlers.applyFilters.call(DashboardCaregiverApp);
-                    });
-                },
-
+                fetchVisits() { DashboardCaregiverApp.elements.visitList.html('<div class="text-center p-5"><div class="spinner-border"></div></div>'); this._ajax(`/user/visits/${DashboardCaregiverApp.state.caregiverId}`).done(res => { DashboardCaregiverApp.state.allVisits = (res.status === 'success' && res.data) ? res.data.visits : []; DashboardCaregiverApp.handlers.applyFilters.call(DashboardCaregiverApp); }).fail(() => { DashboardCaregiverApp.state.allVisits = []; DashboardCaregiverApp.handlers.applyFilters.call(DashboardCaregiverApp); }); },
                 fetchPatients() { return this._ajax(`/assigned/patients/${DashboardCaregiverApp.state.caregiverId}`); },
                 fetchAddresses(patientId) { return this._ajax(`/address/person/${patientId}/1`); },
-
-                performAction(action, visitId) {
-                    return this._ajax(`/visit/${visitId}/${action}`, 'PUT')
-                        .done(res => {
-                            DashboardCaregiverApp.helpers.showAlert(res.message || `Visit ${action} successful.`, 'success');
-                            this.fetchVisits();
-                        });
-                },
-
-                scheduleVisit(payload) {
-                    return this._ajax(`/visit/schedule`, 'POST', payload)
-                        .done(() => {
-                            DashboardCaregiverApp.helpers.showAlert('Visit created!', 'success');
-                            this.fetchVisits();
-                        });
-                }
+                performAction(action, visitId) { return this._ajax(`/visit/${visitId}/${action}`, 'PUT').done(res => { DashboardCaregiverApp.helpers.showAlert(res.message || `Visit ${action} successful.`, 'success'); this.fetchVisits(); }); },
+                scheduleVisit(payload) { return this._ajax(`/visit/schedule`, 'POST', payload).done(() => { DashboardCaregiverApp.helpers.showAlert('Visit created!', 'success'); this.fetchVisits(); }); }
             },
 
             render: {
                 visits(visits) {
                     const container = DashboardCaregiverApp.elements.visitList;
-                    if (!visits || visits.length === 0) {
-                        container.html('<p class="text-center text-muted mt-4">No visits found.</p>');
-                        return;
-                    }
-                    const visitCardsHTML = visits.map(v => {
-                        const h = DashboardCaregiverApp.helpers;
+                    if (!visits || visits.length === 0) { container.html('<p class="text-center text-muted mt-4">No visits found.</p>'); return; }
+                    const h = DashboardCaregiverApp.helpers;
+                    container.html(visits.map(v => {
                         const patientName = `${v.patient.firstname} ${v.patient.lastname}`;
                         const patientPhoto = `${DashboardCaregiverApp.state.baseUrl}${v.patient.photo}`;
                         const progressText = h.getProgressText(v.progress);
                         const duration = v.duration_minutes ? Math.floor(v.duration_minutes / 60) : (v.total_hours || 0);
                         const isCanceled = progressText === 'Canceled' ? 'visit-progress-canceled' : '';
-
-                        return `
-                            <div class="visit-card" data-visit-id="${v.id}">
-                                <div class="visit-person">
-                                    <div class="visit-person-avatar"><img src="${patientPhoto}" alt="Patient"></div>
-                                    <div class="visit-person-name">${patientName}</div>
-                                </div>
-                                <div class="visit-details">
-                                    <div class="visit-date">${h.getFormattedDate(v.start_time, duration)}</div>
-                                    <div class="visit-relative-time">${h.getRelativeTime(v.start_time)}</div>
-                                    <div class="visit-progress ${isCanceled}">${progressText}</div>
-                                </div>
-                            </div>`;
-                    }).join('');
-                    container.html(visitCardsHTML);
+                        return `<div class="visit-card" data-visit-id="${v.id}"><div class="visit-person"><div class="visit-person-avatar"><img src="${patientPhoto}" alt="Patient"></div><div class="visit-person-name">${patientName}</div></div><div class="visit-details"><div class="visit-date">${h.getFormattedDate(v.start_time, duration)}</div><div class="visit-relative-time">${h.getRelativeTime(v.start_time)}</div><div class="visit-progress ${isCanceled}">${progressText}</div></div></div>`;
+                    }).join(''));
                 },
-
                 selectionList(items, type) {
                     const containerId = (type === 'patient') ? 'patient-selection-list' : 'address-selection-list';
                     const listContainer = $(`#${containerId}`);
-                    if (!items || items.length === 0) {
-                        listContainer.html(`<p class="text-center text-muted mt-3">No ${type}s found.</p>`);
-                        return;
-                    }
-
+                    if (!items || items.length === 0) { listContainer.html(`<p class="text-center text-muted mt-3">No ${type}s found.</p>`); return; }
                     const baseUrl = DashboardCaregiverApp.state.baseUrl;
-                    const itemsHTML = items.map(item => {
+                    listContainer.html(items.map(item => {
                         let id, name, photo, iconClass;
-                        if (type === 'patient') {
-                            id = item.id;
-                            name = `${item.firstname || ''} ${item.lastname || ''}`.trim();
-                            photo = `${baseUrl}${item.photo}`;
-                            iconClass = 'fa-user';
-                        } else {
-                            id = item.id;
-                            name = `${item.address}, ${item.city}, ${item.state} ${item.zipcode}`;
-                            photo = null;
-                            iconClass = item.type === 'Apartment' ? 'fa-building' : 'fa-house';
-                        }
-
-                        const avatarHTML = photo
-                            ? `<img src="${photo}" class="rounded-circle" style="width:54px; height:54px;object-fit:cover;" alt="Avatar">`
-                            : `<i class="fa-solid ${iconClass} fs-3"></i>`;
-
-                        return `
-                            <div class="selection-item" data-id="${id}" data-name="${name}">
-                                <div class="item-avatar">${avatarHTML}</div>
-                                <div>${name}</div>
-                            </div>`;
-                    }).join('');
-                    listContainer.html(itemsHTML);
+                        if (type === 'patient') { id = item.id; name = `${item.firstname || ''} ${item.lastname || ''}`.trim(); photo = `${baseUrl}${item.photo}`; iconClass = 'fa-user'; }
+                        else { id = item.id; name = `${item.address}, ${item.city}, ${item.state} ${item.zipcode}`; photo = null; iconClass = item.type === 'Apartment' ? 'fa-building' : 'fa-house'; }
+                        const avatarHTML = photo ? `<img src="${photo}" class="rounded-circle" style="width:54px; height:54px;object-fit:cover;" alt="Avatar">` : `<i class="fa-solid ${iconClass} fs-3"></i>`;
+                        return `<div class="selection-item" data-id="${id}" data-name="${name}"><div class="item-avatar">${avatarHTML}</div><div>${name}</div></div>`;
+                    }).join(''));
                 },
-
-                // FIX 3: Minutes in 5-minute increments instead of 15
                 timePicker(containerId) {
                     const container = $(`#${containerId}`); container.empty();
                     const hourSelect = $('<select class="form-select me-2"><option value="">--</option></select>').attr('id', `${containerId}-hour`);
                     const minuteSelect = $('<select class="form-select"><option value="">--</option></select>').attr('id', `${containerId}-minute`);
                     const periodSelect = $('<select class="form-select ms-2"><option value="AM">AM</option><option value="PM">PM</option></select>').attr('id', `${containerId}-period`);
-
                     for (let i = 1; i <= 12; i++) hourSelect.append(`<option value="${i}">${String(i).padStart(2, '0')}</option>`);
                     for (let i = 0; i < 60; i += 5) minuteSelect.append(`<option value="${i}">${String(i).padStart(2, '0')}</option>`);
-
-                    container.append(
-                        $('<div class="time-picker-wrapper"><label class="form-label me-2">Start Time:</label></div>').append(hourSelect, ':', minuteSelect, periodSelect)
-                    );
+                    container.append($('<div class="time-picker-wrapper"><label class="form-label me-2">Start Time:</label></div>').append(hourSelect, ':', minuteSelect, periodSelect));
                 },
             },
 
             helpers: {
-                showAlert(message, type = 'success') {
-                    DashboardCaregiverApp.elements.alertContainer
-                        .html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`)
-                        .show().delay(4000).fadeOut(400);
+                showAlert(message, type = 'success') { DashboardCaregiverApp.elements.alertContainer.html(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).show().delay(4000).fadeOut(400); },
+
+                parseDate(dStr) {
+                    if (!dStr) return new Date();
+                    return new Date(String(dStr).replace(' ', 'T'));
                 },
 
-                getFormattedDate: (dateStr, hours) => {
-                    return new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) + `, ${hours} hrs`;
+                getFormattedDate(dateStr, hours) {
+                    return this.parseDate(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) + `, ${hours} hrs`;
                 },
-
                 getRelativeTime(dateStr) {
-                    const today = new Date();
-                    const visitDate = new Date(dateStr);
-                    today.setHours(0, 0, 0, 0);
-                    visitDate.setHours(0, 0, 0, 0);
+                    const today = new Date(), visitDate = this.parseDate(dateStr);
+                    today.setHours(0, 0, 0, 0); visitDate.setHours(0, 0, 0, 0);
                     const diffDays = Math.ceil((visitDate - today) / (1000 * 60 * 60 * 24));
-                    if (diffDays < 0) return "Past visit";
-                    if (diffDays === 0) return "Today";
-                    if (diffDays === 1) return "Tomorrow";
-                    return `In ${diffDays} days`;
+                    if (diffDays < 0) return "Past visit"; if (diffDays === 0) return "Today"; if (diffDays === 1) return "Tomorrow"; return `In ${diffDays} days`;
                 },
-
                 getProgressText: (p) => ({ '-1': "Canceled", '0': "Scheduled", '1': "Check-in", '2': "Check-out", '3': "Approved" }[p] || 'Unknown'),
-            },
 
-            // FIX 2: Use explicit null/undefined checks so id=0 is valid
-            checkFormCompleteness() {
-                const { patientId, addressId, visitDate, totalHours } = this.state.newVisit;
-                if (patientId != null && addressId != null && visitDate && totalHours) {
-                    this.elements.createVisitBtn.fadeIn();
-                } else {
-                    this.elements.createVisitBtn.fadeOut();
+                formatLocalDatetime(date) {
+                    const y = date.getFullYear(), mo = String(date.getMonth() + 1).padStart(2, '0'), d = String(date.getDate()).padStart(2, '0');
+                    const h = String(date.getHours()).padStart(2, '0'), mi = String(date.getMinutes()).padStart(2, '0'), s = String(date.getSeconds()).padStart(2, '0');
+                    return `${y}-${mo}-${d} ${h}:${mi}:${s}`;
+                },
+                formatLocalDate(date) {
+                    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
                 }
             },
 
-            resetNewVisitState() {
-                this.state.newVisit = {
-                    patientId: null, patientFullname: null, addressId: null,
-                    address: null, visitDate: null, startTime: null, totalHours: null
-                };
+            checkFormCompleteness() {
+                const { patientId, addressId, visitDate, totalHours } = this.state.newVisit;
+                if (patientId != null && addressId != null && visitDate && totalHours) { this.elements.createVisitBtn.fadeIn(); }
+                else { this.elements.createVisitBtn.fadeOut(); }
+            },
 
+            resetNewVisitState() {
+                this.state.newVisit = { patientId: null, patientFullname: null, addressId: null, address: null, visitDate: null, startTime: null, totalHours: null };
                 $('.selection-item.selected').removeClass('selected');
                 $('#address-tab-btn').addClass('disabled');
                 $('#address-selection-content, #create-visit-btn').hide();
                 $('#address-selection-placeholder').show();
                 this.elements.totalHoursSelect.val('');
                 this.render.timePicker('start-time-picker');
-
-                if (this.modals.datepicker) {
-                    this.modals.datepicker.setDate({ clear: true });
-                }
-
+                if (this.modals.datepicker) this.modals.datepicker.setDate({ clear: true });
                 const patientTab = bootstrap.Tab.getOrCreateInstance(this.elements.patientTabBtn);
                 if(patientTab) patientTab.show();
             },
