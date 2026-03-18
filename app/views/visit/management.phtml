@@ -113,11 +113,11 @@
 
             elements: {
                 alertContainer: $('#alert-container'), visitList: $('#visit-list'), mainSearchInput: $('#search-input-main'),
-                mainSearchBtn: $('#main-search-btn'), addVisitBtn: $('#add-visit-btn'), createVisitBtn: $('#create-visit-btn'),
+                mainSearchBtn: $('#main-search-btn'), addVisitBtn: $('#add-visit-btn'), scheduleVisitBtn: $('#create-visit-btn'),
                 caregiverSearch: $('#caregiver-search'), patientSearch: $('#patient-search'), addressSearch: $('#address-search'),
                 caregiverList: $('#caregiver-selection-list'), patientList: $('#patient-selection-list'), addressList: $('#address-selection-list'),
                 timePicker: $('#start-time-picker'), hoursSelect: $('#total-hours-select'), extraMinutesSelect: $('#extra-minutes-select'),
-                visitConfirmationText: $('#visit-confirmation-text'), confirmCreateVisitBtn: $('#confirm-create-visit-btn'),
+                visitConfirmationText: $('#visit-confirmation-text'), confirmScheduleVisitBtn: $('#confirm-create-visit-btn'),
                 tabs: {
                     caregiver: bootstrap.Tab.getOrCreateInstance('#caregiver-tab-btn'), patient: bootstrap.Tab.getOrCreateInstance('#patient-tab-btn'),
                     address: bootstrap.Tab.getOrCreateInstance('#address-tab-btn'), date: bootstrap.Tab.getOrCreateInstance('#date-tab-btn'),
@@ -157,8 +157,8 @@
                 this.elements.timePicker.on('change', 'select', h.onTimeChange.bind(this));
                 this.elements.hoursSelect.on('change', h.onDurationChange.bind(this));
                 this.elements.extraMinutesSelect.on('change', h.onExtraMinutesChange.bind(this));
-                this.elements.createVisitBtn.on('click', h.onCreateVisitClick.bind(this));
-                this.elements.confirmCreateVisitBtn.on('click', h.onConfirmCreateVisit.bind(this));
+                this.elements.scheduleVisitBtn.on('click', h.onScheduleVisitClick.bind(this));
+                this.elements.confirmScheduleVisitBtn.on('click', h.onConfirmScheduleVisit.bind(this));
                 window.addEventListener('pageshow', e => { if(e.persisted) this.api.fetchAllVisits(); });
             },
 
@@ -228,8 +228,8 @@
                 },
                 onDurationChange(e) { this.state.newVisit.totalHours = parseInt($(e.target).val()); this.checkFormCompleteness(); },
                 onExtraMinutesChange(e) { this.state.newVisit.extraMinutes = parseInt($(e.target).val()); },
-                onCreateVisitClick() { this.render.confirmationText(); this.modals.confirmation.show(); },
-                onConfirmCreateVisit() { this.api.createVisit(); },
+                onScheduleVisitClick() { this.render.confirmationText(); this.modals.confirmation.show(); },
+                onConfirmScheduleVisit() { this.api.scheduleVisit(); },
                 onSubSearch(e, type) {
                     const term = $(e.target).val().toLowerCase();
                     const list = `all${type.charAt(0).toUpperCase() + type.slice(1)}s`;
@@ -245,7 +245,7 @@
                 fetchCaregivers: () => VisitManagementApp.api._ajax({ url: `${VisitManagementApp.state.baseUrl}/accounts` }),
                 fetchAssignedPatients: () => VisitManagementApp.api._ajax({ url: `${VisitManagementApp.state.baseUrl}/assigned/patients/${VisitManagementApp.state.newVisit.caregiverId}` }),
                 fetchPatientAddresses: () => VisitManagementApp.api._ajax({ url: `${VisitManagementApp.state.baseUrl}/address/person/${VisitManagementApp.state.newVisit.patientId}/1` }),
-                createVisit() {
+                scheduleVisit() {
                     const { caregiverId, patientId, addressId, visitDate, startTime, totalHours } = VisitManagementApp.state.newVisit;
                     const h = VisitManagementApp.helpers;
                     const payload = { user_id: caregiverId, patient_id: patientId, address_id: addressId, visit_date: h.formatLocalDate(new Date(visitDate)), total_hours: totalHours, extra_minutes: VisitManagementApp.state.newVisit.extraMinutes };
@@ -254,7 +254,7 @@
                         dt.setHours(startTime.h, startTime.m, 0, 0);
                         payload.start_time = h.formatLocalDatetime(dt);
                     }
-                    this._ajax({ url:`${VisitManagementApp.state.baseUrl}/visit`, type:'POST', contentType:'application/json', data: JSON.stringify(payload)})
+                    this._ajax({ url:`${VisitManagementApp.state.baseUrl}/visit/schedule`, type:'POST', contentType:'application/json', data: JSON.stringify(payload)})
                         .done(() => { VisitManagementApp.helpers.showAlert('Visit created successfully!','success'); VisitManagementApp.modals.confirmation.hide(); VisitManagementApp.modals.offcanvas.hide(); VisitManagementApp.api.fetchAllVisits(); });
                 }
             },
@@ -326,8 +326,8 @@
 
             checkFormCompleteness() {
                 const s = this.state.newVisit;
-                if (s.caregiverId != null && s.patientId != null && s.addressId != null && s.visitDate && s.startTime && s.totalHours) { this.elements.createVisitBtn.fadeIn(); }
-                else { this.elements.createVisitBtn.fadeOut(); }
+                if (s.caregiverId != null && s.patientId != null && s.addressId != null && s.visitDate && s.startTime && s.totalHours) { this.elements.scheduleVisitBtn.fadeIn(); }
+                else { this.elements.scheduleVisitBtn.fadeOut(); }
             },
 
             resetFormState() {
