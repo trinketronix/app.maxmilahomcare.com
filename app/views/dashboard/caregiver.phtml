@@ -102,7 +102,7 @@
             <div class="tab-pane fade" id="address-tab"><div id="address-selection-placeholder" class="text-center text-muted mt-5">Please select a patient first.</div><div id="address-selection-content" style="display:none;"><div class="input-group search-bar"><input type="text" id="address-search" class="form-control" placeholder="Search address..."></div><div class="selection-list" id="address-selection-list"></div></div></div>
             <div class="tab-pane fade" id="date-tab"><div id="datepicker-container" class="pt-3"></div></div>
             <div class="tab-pane fade d-flex justify-content-center align-items-center" id="start-tab"><div id="start-time-picker"></div></div>
-            <div class="tab-pane fade d-flex justify-content-center align-items-center" id="duration-tab"><div class="w-75"><label for="total-hours-select" class="form-label fs-5 text-center w-100">Select Total Hours</label><select class="form-select form-select-lg" id="total-hours-select"><option selected disabled value="">Choose duration...</option><option value="1">1 Hour</option><option value="2">2 Hours</option><option value="3">3 Hours</option><option value="4">4 Hours</option><option value="5">5 Hours</option><option value="6">6 Hours</option><option value="7">7 Hours</option><option value="8">8 Hours</option></select></div></div>
+            <div class="tab-pane fade d-flex justify-content-center align-items-center" id="duration-tab"><div class="w-75"><label class="form-label fs-5 text-center w-100 mb-3">Select Duration</label><div class="d-flex gap-3"><div class="flex-fill"><label for="total-hours-select" class="form-label text-center w-100">Hours</label><select class="form-select form-select-lg" id="total-hours-select"><option selected disabled value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></div><div class="flex-fill"><label for="extra-minutes-select" class="form-label text-center w-100">Minutes</label><select class="form-select form-select-lg" id="extra-minutes-select"><option value="0" selected>00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option></select></div></div></div></div>
         </div>
         <button type="button" class="btn btn-primary" id="create-visit-btn" style="display:none;">Create Visit</button>
     </div>
@@ -125,7 +125,7 @@
                 caregiverId: <?= json_encode($userId ?? null) ?>,
                 caregiverFullname: <?= json_encode($fullname ?? 'Me') ?>,
                 allVisits: [], allAssignedPatients: [], allPatientAddresses: [],
-                selectedVisitId: null, newVisit: {},
+                selectedVisitId: null, newVisit: { extraMinutes: 0 },
             },
 
             elements: {
@@ -134,7 +134,7 @@
                 assignVisitOffcanvas: $('#assignVisitOffcanvas'), createVisitBtn: $('#create-visit-btn'),
                 patientSelectionList: $('#patient-selection-list'), addressSelectionList: $('#address-selection-list'),
                 datepickerContainer: document.getElementById('datepicker-container'),
-                startTimePicker: $('#start-time-picker'), totalHoursSelect: $('#total-hours-select'),
+                startTimePicker: $('#start-time-picker'), totalHoursSelect: $('#total-hours-select'), extraMinutesSelect: $('#extra-minutes-select'),
                 patientSearch: $('#patient-search'), addressSearch: $('#address-search'),
                 addressTabBtn: document.getElementById('address-tab-btn'),
                 patientTabBtn: document.getElementById('patient-tab-btn'),
@@ -174,6 +174,7 @@
                 $(this.elements.datepickerContainer).on('changeDate', this.handlers.onDateChange.bind(this));
                 this.elements.startTimePicker.on('change', 'select', this.handlers.onTimeChange.bind(this));
                 this.elements.totalHoursSelect.on('change', this.handlers.onDurationChange.bind(this));
+                this.elements.extraMinutesSelect.on('change', this.handlers.onExtraMinutesChange.bind(this));
                 $('button[data-bs-toggle="tab"]').on('show.bs.tab', this.handlers.onTabChange.bind(this));
                 this.elements.createVisitBtn.on('click', this.handlers.onCreateVisitClick.bind(this));
                 this.elements.confirmCreateVisitBtn.on('click', this.handlers.onConfirmCreateVisit.bind(this));
@@ -234,6 +235,7 @@
                     } else { this.state.newVisit.startTime = null; }
                 },
                 onDurationChange(e) { this.state.newVisit.totalHours = parseInt($(e.currentTarget).val(), 10); this.checkFormCompleteness(); },
+                onExtraMinutesChange(e) { this.state.newVisit.extraMinutes = parseInt($(e.currentTarget).val(), 10); },
                 onTabChange(e) {
                     if (e.target.id === 'address-tab-btn') {
                         if (!this.state.newVisit.patientId) return false;
@@ -252,10 +254,11 @@
                     }
                 },
                 onCreateVisitClick() {
-                    const { patientFullname, visitDate, startTime, totalHours } = this.state.newVisit;
+                    const { patientFullname, visitDate, startTime, totalHours, extraMinutes } = this.state.newVisit;
                     const visitDay = new Date(visitDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-                    let timeText = `for ${totalHours} hours.`;
-                    if (startTime) { const s = `${startTime.h % 12 || 12}:${String(startTime.m).padStart(2, '0')} ${startTime.h >= 12 ? 'PM' : 'AM'}`; timeText = `starting around ${s} for ${totalHours} hours.`; }
+                    const minStr = extraMinutes > 0 ? ` and ${extraMinutes} minutes` : '';
+                    let timeText = `for ${totalHours} hour${totalHours>1?'s':''}${minStr}.`;
+                    if (startTime) { const s = `${startTime.h % 12 || 12}:${String(startTime.m).padStart(2, '0')} ${startTime.h >= 12 ? 'PM' : 'AM'}`; timeText = `starting around ${s} ${timeText}`; }
                     this.elements.visitConfirmationText.html(`A visit for <strong>${patientFullname}</strong> will be created on <strong>${visitDay}</strong>, attended by <strong>${this.state.caregiverFullname}</strong> ${timeText}`);
                     this.modals.visitConfirmation.show();
                 },
@@ -268,7 +271,8 @@
                         patient_id: patientId,
                         address_id: addressId,
                         visit_date: h.formatLocalDate(new Date(visitDate)),
-                        total_hours: totalHours
+                        total_hours: totalHours,
+                        extra_minutes: this.state.newVisit.extraMinutes
                     };
 
                     if (startTime) {
@@ -371,12 +375,13 @@
             },
 
             resetNewVisitState() {
-                this.state.newVisit = { patientId: null, patientFullname: null, addressId: null, address: null, visitDate: null, startTime: null, totalHours: null };
+                this.state.newVisit = { patientId: null, patientFullname: null, addressId: null, address: null, visitDate: null, startTime: null, totalHours: null, extraMinutes: 0 };
                 $('.selection-item.selected').removeClass('selected');
                 $('#address-tab-btn').addClass('disabled');
                 $('#address-selection-content, #create-visit-btn').hide();
                 $('#address-selection-placeholder').show();
                 this.elements.totalHoursSelect.val('');
+                this.elements.extraMinutesSelect.val('0');
                 this.render.timePicker('start-time-picker');
                 if (this.modals.datepicker) this.modals.datepicker.setDate({ clear: true });
                 const patientTab = bootstrap.Tab.getOrCreateInstance(this.elements.patientTabBtn);
