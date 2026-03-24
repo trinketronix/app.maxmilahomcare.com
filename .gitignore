@@ -16,3 +16,5 @@
 .htaccess_local
 http-client.env.json
 .htaccess
+
+fix_pwa_icons.sh
