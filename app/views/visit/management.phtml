@@ -5,16 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?=$pageTitle ?? 'Visits Management'?></title>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/img/fav/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/img/fav/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/img/fav/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="shortcut icon" href="/img/fav/favicon.ico">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Maxmila">
-    <meta name="theme-color" content="#0a041a">
-
     <!-- Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -123,11 +113,11 @@
 
             elements: {
                 alertContainer: $('#alert-container'), visitList: $('#visit-list'), mainSearchInput: $('#search-input-main'),
-                mainSearchBtn: $('#main-search-btn'), addVisitBtn: $('#add-visit-btn'), scheduleVisitBtn: $('#create-visit-btn'),
+                mainSearchBtn: $('#main-search-btn'), addVisitBtn: $('#add-visit-btn'), createVisitBtn: $('#create-visit-btn'),
                 caregiverSearch: $('#caregiver-search'), patientSearch: $('#patient-search'), addressSearch: $('#address-search'),
                 caregiverList: $('#caregiver-selection-list'), patientList: $('#patient-selection-list'), addressList: $('#address-selection-list'),
                 timePicker: $('#start-time-picker'), hoursSelect: $('#total-hours-select'), extraMinutesSelect: $('#extra-minutes-select'),
-                visitConfirmationText: $('#visit-confirmation-text'), confirmScheduleVisitBtn: $('#confirm-create-visit-btn'),
+                visitConfirmationText: $('#visit-confirmation-text'), confirmCreateVisitBtn: $('#confirm-create-visit-btn'),
                 tabs: {
                     caregiver: bootstrap.Tab.getOrCreateInstance('#caregiver-tab-btn'), patient: bootstrap.Tab.getOrCreateInstance('#patient-tab-btn'),
                     address: bootstrap.Tab.getOrCreateInstance('#address-tab-btn'), date: bootstrap.Tab.getOrCreateInstance('#date-tab-btn'),
@@ -167,8 +157,8 @@
                 this.elements.timePicker.on('change', 'select', h.onTimeChange.bind(this));
                 this.elements.hoursSelect.on('change', h.onDurationChange.bind(this));
                 this.elements.extraMinutesSelect.on('change', h.onExtraMinutesChange.bind(this));
-                this.elements.scheduleVisitBtn.on('click', h.onScheduleVisitClick.bind(this));
-                this.elements.confirmScheduleVisitBtn.on('click', h.onConfirmScheduleVisit.bind(this));
+                this.elements.createVisitBtn.on('click', h.onCreateVisitClick.bind(this));
+                this.elements.confirmCreateVisitBtn.on('click', h.onConfirmCreateVisit.bind(this));
                 window.addEventListener('pageshow', e => { if(e.persisted) this.api.fetchAllVisits(); });
             },
 
@@ -238,8 +228,8 @@
                 },
                 onDurationChange(e) { this.state.newVisit.totalHours = parseInt($(e.target).val()); this.checkFormCompleteness(); },
                 onExtraMinutesChange(e) { this.state.newVisit.extraMinutes = parseInt($(e.target).val()); },
-                onScheduleVisitClick() { this.render.confirmationText(); this.modals.confirmation.show(); },
-                onConfirmScheduleVisit() { this.api.scheduleVisit(); },
+                onCreateVisitClick() { this.render.confirmationText(); this.modals.confirmation.show(); },
+                onConfirmCreateVisit() { this.api.createVisit(); },
                 onSubSearch(e, type) {
                     const term = $(e.target).val().toLowerCase();
                     const list = `all${type.charAt(0).toUpperCase() + type.slice(1)}s`;
@@ -255,7 +245,7 @@
                 fetchCaregivers: () => VisitManagementApp.api._ajax({ url: `${VisitManagementApp.state.baseUrl}/accounts` }),
                 fetchAssignedPatients: () => VisitManagementApp.api._ajax({ url: `${VisitManagementApp.state.baseUrl}/assigned/patients/${VisitManagementApp.state.newVisit.caregiverId}` }),
                 fetchPatientAddresses: () => VisitManagementApp.api._ajax({ url: `${VisitManagementApp.state.baseUrl}/address/person/${VisitManagementApp.state.newVisit.patientId}/1` }),
-                scheduleVisit() {
+                createVisit() {
                     const { caregiverId, patientId, addressId, visitDate, startTime, totalHours } = VisitManagementApp.state.newVisit;
                     const h = VisitManagementApp.helpers;
                     const payload = { user_id: caregiverId, patient_id: patientId, address_id: addressId, visit_date: h.formatLocalDate(new Date(visitDate)), total_hours: totalHours, extra_minutes: VisitManagementApp.state.newVisit.extraMinutes };
@@ -264,7 +254,7 @@
                         dt.setHours(startTime.h, startTime.m, 0, 0);
                         payload.start_time = h.formatLocalDatetime(dt);
                     }
-                    this._ajax({ url:`${VisitManagementApp.state.baseUrl}/visit/schedule`, type:'POST', contentType:'application/json', data: JSON.stringify(payload)})
+                    this._ajax({ url:`${VisitManagementApp.state.baseUrl}/visit`, type:'POST', contentType:'application/json', data: JSON.stringify(payload)})
                         .done(() => { VisitManagementApp.helpers.showAlert('Visit created successfully!','success'); VisitManagementApp.modals.confirmation.hide(); VisitManagementApp.modals.offcanvas.hide(); VisitManagementApp.api.fetchAllVisits(); });
                 }
             },
@@ -317,7 +307,9 @@
                     const h = VisitManagementApp.helpers, baseUrl = VisitManagementApp.state.baseUrl;
                     const cgName=`${v.user.firstname} ${v.user.lastname}`, ptName=`${v.patient.firstname} ${v.patient.lastname}`;
                     const prog = h.getProgressText(v.progress);
-                    return `<a href="/visit/detail/${v.id}" class="visit-card"><div class="visit-person"><div class="visit-person-avatar"><img src="${baseUrl}${v.user.photo}" alt="CG"></div><div class="visit-person-name">${cgName}</div></div><div class="visit-details"><div class="visit-date">${h.getFormattedDate(v.start_time)}</div><div>${h.getRelativeTime(v.start_time)}</div><div class="visit-progress ${prog==='Canceled'?'visit-progress-canceled':''}">${prog}</div></div><div class="visit-person"><div class="visit-person-avatar"><img src="${baseUrl}${v.patient.photo}" alt="PT"></div><div class="visit-person-name">${ptName}</div></div></a>`;
+                    const duration = v.duration_minutes ? Math.floor(v.duration_minutes / 60) : (v.total_hours || 0);
+                    const extraMin = v.duration_minutes ? (v.duration_minutes % 60) : (v.extra_minutes || 0);
+                    return `<a href="/visit/detail/${v.id}" class="visit-card"><div class="visit-person"><div class="visit-person-avatar"><img src="${baseUrl}${v.user.photo}" alt="CG"></div><div class="visit-person-name">${cgName}</div></div><div class="visit-details"><div class="visit-date">${h.getFormattedDate(v.start_time, duration, extraMin)}</div><div>${h.getRelativeTime(v.start_time)}</div><div class="visit-progress ${prog==='Canceled'?'visit-progress-canceled':''}">${prog}</div></div><div class="visit-person"><div class="visit-person-avatar"><img src="${baseUrl}${v.patient.photo}" alt="PT"></div><div class="visit-person-name">${ptName}</div></div></a>`;
                 },
                 getSelectionItemHTML(type, item) {
                     const baseUrl = VisitManagementApp.state.baseUrl;
@@ -328,7 +320,7 @@
                 },
                 showAlert: (m,t='success')=>VisitManagementApp.elements.alertContainer.html(`<div class="alert alert-${t} a-d fade show" role="alert">${m}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`).children().delay(4000).fadeOut(),
                 getProgressText: p => ({'-1':"Canceled",'0':"Scheduled",'1':"Check-in",'2':"Check-out",'3':"Approved"}[p]||'Unknown'),
-                getFormattedDate(d) { return this.parseDate(d).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true}); },
+                getFormattedDate(d, hours = 0, minutes = 0) { const minStr = minutes > 0 ? ` ${minutes} min` : ''; return this.parseDate(d).toLocaleDateString('en-US',{month:'short',day:'numeric'}) + `, ${hours} hrs${minStr}`; },
                 getRelativeTime(dStr) { const n=new Date(),v=this.parseDate(dStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/864e5);if(d<0)return"Past";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`; },
                 searchMatcher: (item,term,keys)=>{ if(!term) return true; const fields = Array.isArray(keys) ? keys.map(k=>item[k]||'').join(' ') : item[keys]; return fields.toLowerCase().includes(term); },
                 debounce: (func,delay)=>{ let t; return function(...a){clearTimeout(t); t=setTimeout(()=>func.apply(this,a),delay);}},
@@ -336,8 +328,8 @@
 
             checkFormCompleteness() {
                 const s = this.state.newVisit;
-                if (s.caregiverId != null && s.patientId != null && s.addressId != null && s.visitDate && s.startTime && s.totalHours) { this.elements.scheduleVisitBtn.fadeIn(); }
-                else { this.elements.scheduleVisitBtn.fadeOut(); }
+                if (s.caregiverId != null && s.patientId != null && s.addressId != null && s.visitDate && s.startTime && s.totalHours) { this.elements.createVisitBtn.fadeIn(); }
+                else { this.elements.createVisitBtn.fadeOut(); }
             },
 
             resetFormState() {

@@ -333,10 +333,11 @@
                 visitDetails(data) {
                     if (!data?.user || !data?.patient) { return; }
                     const h = VisitDetailApp.helpers;
+                    const durationHrs = Math.floor(data.duration_minutes / 60);
+                    const durationMin = data.duration_minutes % 60;
 
                     $('#visit-progress-text').text(h.getProgressText(data.progress));
                     $('#visit-date-text').text(h.parseDate(data.start_time).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }));
-                    $('#visit-duration').text(`${Math.floor(data.duration_minutes / 60)} hrs total`);
                     $('#visit-relative-time').text(h.getRelativeTime(data.start_time));
                     $('#caregiver-avatar').attr('src', data.user.photo ? VisitDetailApp.state.baseUrl + data.user.photo : 'https://via.placeholder.com/70');
                     $('#caregiver-name').text(`${data.user.firstname} ${data.user.lastname}`);
@@ -349,10 +350,11 @@
                     }
 
                     const totalHours = Math.floor(data.duration_minutes / 60);
+                    const extraMin = data.duration_minutes % 60;
                     $('#visit_date-view').text(h.getFormattedDate(data.start_time));
                     $('#start_time-view').text(h.getFormattedTime(data.start_time));
-                    $('#duration-view').text(`${totalHours} Hours`);
-                    $('#finish_time-view').text(h.getFinishTime(data.start_time, totalHours));
+                    $('#duration-view').text(`${totalHours} Hours${extraMin > 0 ? ` ${extraMin} min` : ''}`);
+                    $('#finish_time-view').text(h.getFinishTime(data.start_time, totalHours, data.duration_minutes % 60));
                     $('#note-view').text(data.note || 'N/A');
 
                     ['scheduled_by', 'checkin_by', 'checkout_by', 'approved_by', 'canceled_by'].forEach(key => {
@@ -394,9 +396,10 @@
                 getFormattedDate(dStr) {
                     return this.parseDate(dStr).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                 },
-                getFinishTime(dStr, totalHours) {
+                getFinishTime(dStr, totalHours, extraMinutes = 0) {
                     const finish = this.parseDate(dStr);
                     finish.setHours(finish.getHours() + totalHours);
+                    if (extraMinutes > 0) finish.setMinutes(finish.getMinutes() + extraMinutes);
                     return finish.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
                 },
                 getRelativeTime(dStr) {
