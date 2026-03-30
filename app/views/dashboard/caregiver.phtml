@@ -93,9 +93,9 @@
         <ul class="nav nav-tabs" id="visit-tabs" role="tablist">
             <li class="nav-item" role="presentation"><button class="nav-link active" id="patient-tab-btn" data-bs-toggle="tab" data-bs-target="#patient-tab">Patient</button></li>
             <li class="nav-item" role="presentation"><button class="nav-link disabled" id="address-tab-btn" data-bs-toggle="tab" data-bs-target="#address-tab">Address</button></li>
-            <li class="nav-item" role="presentation"><button class="nav-link" id="date-tab-btn" data-bs-toggle="tab" data-bs-target="#date-tab">Date</button></li>
-            <li class="nav-item" role="presentation"><button class="nav-link" id="start-tab-btn" data-bs-toggle="tab" data-bs-target="#start-tab">Start</button></li>
-            <li class="nav-item" role="presentation"><button class="nav-link" id="duration-tab-btn" data-bs-toggle="tab" data-bs-target="#duration-tab">Duration</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link disabled" id="date-tab-btn" data-bs-toggle="tab" data-bs-target="#date-tab">Date</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link disabled" id="start-tab-btn" data-bs-toggle="tab" data-bs-target="#start-tab">Start</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link disabled" id="duration-tab-btn" data-bs-toggle="tab" data-bs-target="#duration-tab">Duration</button></li>
         </ul>
         <div class="tab-content flex-grow-1" id="visit-tabs-content">
             <div class="tab-pane fade show active" id="patient-tab"><div class="input-group search-bar"><input type="text" id="patient-search" class="form-control" placeholder="Search my patients..."></div><div class="selection-list" id="patient-selection-list"></div></div>
@@ -221,10 +221,11 @@
                     this.state.newVisit.addressId = item.data('id');
                     this.state.newVisit.address = item.data('name');
                     item.addClass('selected').siblings().removeClass('selected');
+                    $('#date-tab-btn').removeClass('disabled');
                     bootstrap.Tab.getOrCreateInstance(document.getElementById('date-tab-btn')).show();
                     this.checkFormCompleteness();
                 },
-                onDateChange(e) { this.state.newVisit.visitDate = e.originalEvent.detail.date; this.checkFormCompleteness(); },
+                onDateChange(e) { this.state.newVisit.visitDate = e.originalEvent.detail.date; $('#start-tab-btn').removeClass('disabled'); this.checkFormCompleteness(); },
                 onTimeChange() {
                     const h = $('#start-time-picker-hour').val(), m = $('#start-time-picker-minute').val(), period = $('#start-time-picker-period').val();
                     if (h !== "" && m !== "") {
@@ -233,6 +234,7 @@
                         if (period === 'PM' && hour24 !== 12) hour24 += 12;
                         this.state.newVisit.startTime = { h: hour24, m: parseInt(m, 10) };
                     } else { this.state.newVisit.startTime = null; }
+                    $('#duration-tab-btn').removeClass('disabled'); this.checkFormCompleteness();
                 },
                 onDurationChange(e) { this.state.newVisit.totalHours = parseInt($(e.currentTarget).val(), 10); this.checkFormCompleteness(); },
                 onExtraMinutesChange(e) { this.state.newVisit.extraMinutes = parseInt($(e.currentTarget).val(), 10); },
@@ -250,6 +252,7 @@
                         const today = new Date(); today.setHours(0, 0, 0, 0);
                         this.modals.datepicker.setDate(today);
                         this.state.newVisit.visitDate = today;
+                        $('#start-tab-btn').removeClass('disabled');
                         this.checkFormCompleteness();
                     }
                 },
@@ -371,15 +374,15 @@
             },
 
             checkFormCompleteness() {
-                const { patientId, addressId, visitDate, totalHours } = this.state.newVisit;
-                if (patientId != null && addressId != null && visitDate && totalHours) { this.elements.createVisitBtn.fadeIn(); }
+                const { patientId, addressId, visitDate, startTime, totalHours } = this.state.newVisit;
+                if (patientId != null && addressId != null && visitDate && startTime && totalHours) { this.elements.createVisitBtn.fadeIn(); }
                 else { this.elements.createVisitBtn.fadeOut(); }
             },
 
             resetNewVisitState() {
                 this.state.newVisit = { patientId: null, patientFullname: null, addressId: null, address: null, visitDate: null, startTime: null, totalHours: null, extraMinutes: 0 };
                 $('.selection-item.selected').removeClass('selected');
-                $('#address-tab-btn').addClass('disabled');
+                $('#address-tab-btn, #date-tab-btn, #start-tab-btn, #duration-tab-btn').addClass('disabled');
                 $('#address-selection-content, #create-visit-btn').hide();
                 $('#address-selection-placeholder').show();
                 this.elements.totalHoursSelect.val('');
