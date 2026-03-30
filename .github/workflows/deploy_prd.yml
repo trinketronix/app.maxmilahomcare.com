@@ -1,4 +1,4 @@
-name: Deploy Maxmila Homecare Application (Production)
+name: Deploy Maxmila for Production
 on:
   release:
     types: [published]
@@ -18,11 +18,11 @@ on:
           - staging
 jobs:
   deploy:
-    name: Deploy production
+    name: Deploy Production
     runs-on: ubuntu-latest
     steps:
       - name: Get the latest source code
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
 
@@ -34,7 +34,7 @@ jobs:
           echo "Environment: ${{ github.event.inputs.environment}}"
 
       - name: Sync files for Production
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
           server: ${{ secrets.FTP_MAX_SERVER }}
           username: ${{ secrets.FTP_APP_USERNAME_PROD }}
