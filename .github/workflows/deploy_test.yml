@@ -1,4 +1,4 @@
-name: Deploy Maxmilahomecare Application (production)
+name: Deploy Maxmila for Test
 on:
   pull_request:
     types: [closed]
@@ -6,13 +6,13 @@ on:
 jobs:
   deploy:
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
-    name: Deploy
+    name: Deploy test
     runs-on: ubuntu-latest
     steps:
       - name: Get the latest source code
-        uses: actions/checkout@v3
-      - name: Sync files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        uses: actions/checkout@v6.0.2
+      - name: Sync files for testing
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
           server: ${{ secrets.FTP_MAX_SERVER }}
           username: ${{ secrets.FTP_APP_USERNAME_TEST }}
