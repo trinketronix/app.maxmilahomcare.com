@@ -311,8 +311,9 @@
                         const patientPhoto = `${DashboardCaregiverApp.state.baseUrl}${v.patient.photo}`;
                         const progressText = h.getProgressText(v.progress);
                         const duration = v.duration_minutes ? Math.floor(v.duration_minutes / 60) : (v.total_hours || 0);
+                        const extraMin = v.duration_minutes ? (v.duration_minutes % 60) : (v.extra_minutes || 0);
                         const isCanceled = progressText === 'Canceled' ? 'visit-progress-canceled' : '';
-                        return `<div class="visit-card" data-visit-id="${v.id}"><div class="visit-person"><div class="visit-person-avatar"><img src="${patientPhoto}" alt="Patient"></div><div class="visit-person-name">${patientName}</div></div><div class="visit-details"><div class="visit-date">${h.getFormattedDate(v.start_time, duration)}</div><div class="visit-relative-time">${h.getRelativeTime(v.start_time)}</div><div class="visit-progress ${isCanceled}">${progressText}</div></div></div>`;
+                        return `<div class="visit-card" data-visit-id="${v.id}"><div class="visit-person"><div class="visit-person-avatar"><img src="${patientPhoto}" alt="Patient"></div><div class="visit-person-name">${patientName}</div></div><div class="visit-details"><div class="visit-date">${h.getFormattedDate(v.start_time, duration, extraMin)}</div><div class="visit-relative-time">${h.getRelativeTime(v.start_time)}</div><div class="visit-progress ${isCanceled}">${progressText}</div></div></div>`;
                     }).join(''));
                 },
                 selectionList(items, type) {
@@ -347,8 +348,9 @@
                     return new Date(String(dStr).replace(' ', 'T'));
                 },
 
-                getFormattedDate(dateStr, hours) {
-                    return this.parseDate(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) + `, ${hours} hrs`;
+                getFormattedDate(dateStr, hours, minutes = 0) {
+                    const minStr = minutes > 0 ? ` ${minutes} min` : '';
+                    return this.parseDate(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) + `, ${hours} hrs${minStr}`;
                 },
                 getRelativeTime(dateStr) {
                     const today = new Date(), visitDate = this.parseDate(dateStr);
