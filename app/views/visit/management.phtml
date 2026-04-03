@@ -134,6 +134,7 @@
                 this.bindEvents();
                 this.render.timePicker();
                 this.api.fetchAllVisits();
+
                 this.resetFormState();
             },
 
@@ -254,7 +255,7 @@
                         dt.setHours(startTime.h, startTime.m, 0, 0);
                         payload.start_time = h.formatLocalDatetime(dt);
                     }
-                    this._ajax({ url:`${VisitManagementApp.state.baseUrl}/visit`, type:'POST', contentType:'application/json', data: JSON.stringify(payload)})
+                    this._ajax({ url:`${VisitManagementApp.state.baseUrl}/visit/schedule`, type:'POST', contentType:'application/json', data: JSON.stringify(payload)})
                         .done(() => { VisitManagementApp.helpers.showAlert('Visit created successfully!','success'); VisitManagementApp.modals.confirmation.hide(); VisitManagementApp.modals.offcanvas.hide(); VisitManagementApp.api.fetchAllVisits(); });
                 }
             },
