@@ -301,7 +301,7 @@
                 fetchPatients() { return this._ajax(`/assigned/patients/${DashboardCaregiverApp.state.caregiverId}`); },
                 fetchAddresses(patientId) { return this._ajax(`/address/person/${patientId}/1`); },
                 performAction(action, visitId) { return this._ajax(`/visit/${visitId}/${action}`, 'PUT').done(res => { DashboardCaregiverApp.helpers.showAlert(res.message || `Visit ${action} successful.`, 'success'); this.fetchVisits(); }); },
-                scheduleVisit(payload) { return this._ajax(`/visit/schedule`, 'POST', payload).done(() => { DashboardCaregiverApp.helpers.showAlert('Visit created!', 'success'); this.fetchVisits(); }); }
+                scheduleVisit(payload) { return this._ajax(`/visit/schedule`, 'POST', payload).done(() => { DashboardCaregiverApp.helpers.showAlert('Visit created!', 'success'); DashboardCaregiverApp.api.fetchVisits(); }); }
             },
 
             render: {
