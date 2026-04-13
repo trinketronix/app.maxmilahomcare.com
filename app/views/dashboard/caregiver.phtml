@@ -80,6 +80,7 @@
     <section class="controls-section">
         <div class="input-group search-bar mb-3"><input type="text" id="search-input-main" class="form-control" placeholder="Search by patient name..."><button class="btn btn-dark" type="button" id="main-search-btn">Search</button></div>
         <div class="filter-group"><div class="filter-buttons"><small class="align-self-center me-2">Progress:</small><button class="btn filter-btn active" data-filter-value="all">All</button><button class="btn filter-btn" data-filter-value="0">Scheduled</button><button class="btn filter-btn" data-filter-value="1">Check-in</button><button class="btn filter-btn" data-filter-value="2">Check-out</button><button class="btn filter-btn" data-filter-value="3">Approved</button><button class="btn filter-btn" data-filter-value="-1">Canceled</button></div></div>
+        <div class="filter-group mt-2"><div class="filter-buttons" id="period-filters"><small class="align-self-center me-2">Period:</small><button class="btn filter-btn" data-filter-value="today">Today</button><button class="btn filter-btn active" data-filter-value="week">Week</button><button class="btn filter-btn" data-filter-value="month">Month</button><button class="btn filter-btn" data-filter-value="all">All</button></div></div>
     </section>
 
     <main class="visit-list-container"><div id="visit-list"><div class="text-center p-5"><div class="spinner-border"></div></div></div></main>
@@ -160,6 +161,7 @@
 
             bindEvents() {
                 this.elements.filterButtons.on('click', this.handlers.onFilterChange.bind(this));
+                $('#period-filters').on('click', '.filter-btn', this.handlers.onFilterChange.bind(this));
                 this.elements.searchInput.on('keyup', this.handlers.applyFilters.bind(this));
                 this.elements.searchBtn.on('click', this.handlers.applyFilters.bind(this));
                 this.elements.visitList.on('click', '.visit-card', this.handlers.onVisitCardClick.bind(this));
@@ -184,10 +186,12 @@
             handlers: {
                 applyFilters() {
                     const progress = this.elements.filterButtons.filter('.active').data('filter-value');
+                    const period = $('#period-filters .filter-btn.active').data('filter-value');
                     const searchTerm = this.elements.searchInput.val().toLowerCase();
                     const filteredVisits = this.state.allVisits.filter(v =>
                         (progress === 'all' || v.progress == progress) &&
-                        (searchTerm === '' || `${v.patient.firstname} ${v.patient.lastname}`.toLowerCase().includes(searchTerm))
+                        (searchTerm === '' || `${v.patient.firstname} ${v.patient.lastname}`.toLowerCase().includes(searchTerm)) &&
+                        this.helpers.matchesPeriod(v, period)
                     );
                     this.render.visits(filteredVisits);
                 },
@@ -377,6 +381,30 @@
                 },
                 formatLocalDate(date) {
                     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                },
+
+                matchesPeriod(visit, period) {
+                    if (!period || period === 'all') return true;
+                    const vDate = this.parseDate(visit.start_time || visit.visit_date);
+                    vDate.setHours(0, 0, 0, 0);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    if (period === 'today') {
+                        return vDate.getTime() === today.getTime();
+                    }
+                    if (period === 'week') {
+                        const day = today.getDay();
+                        const monday = new Date(today);
+                        monday.setDate(today.getDate() - (day === 0 ? 6 : day - 1));
+                        const sunday = new Date(monday);
+                        sunday.setDate(monday.getDate() + 6);
+                        return vDate >= monday && vDate <= sunday;
+                    }
+                    if (period === 'month') {
+                        return vDate.getMonth() === today.getMonth() && vDate.getFullYear() === today.getFullYear();
+                    }
+                    return true;
                 }
             },
 
