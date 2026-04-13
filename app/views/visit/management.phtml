@@ -65,7 +65,8 @@
     <section class="controls-section">
         <div class="input-group search-bar mb-3"><input type="text" id="search-input-main" class="form-control" placeholder="Search by name..."><button class="btn btn-dark" type="button" id="main-search-btn">Search</button></div>
         <div class="filter-group mb-2"><div class="filter-buttons" id="recordStatus-filters"><small class="align-self-center me-2">Status:</small><button class="btn filter-btn active" data-filter-value="all">All</button><button class="btn filter-btn" data-filter-value="1">Visible</button><button class="btn filter-btn" data-filter-value="2">Archived</button><button class="btn filter-btn" data-filter-value="3">Deleted</button></div></div>
-        <div class="filter-group"><div class="filter-buttons" id="visitProgress-filters"><small class="align-self-center me-2">Progress:</small><button class="btn filter-btn active" data-filter-value="all">All</button><button class="btn filter-btn" data-filter-value="0">Scheduled</button><button class="btn filter-btn" data-filter-value="1">Check-in</button><button class="btn filter-btn" data-filter-value="2">Check-out</button><button class="btn filter-btn" data-filter-value="3">Approved</button><button class="btn filter-btn" data-filter-value="-1">Canceled</button></div></div>
+        <div class="filter-group mb-2"><div class="filter-buttons" id="visitProgress-filters"><small class="align-self-center me-2">Progress:</small><button class="btn filter-btn active" data-filter-value="all">All</button><button class="btn filter-btn" data-filter-value="0">Scheduled</button><button class="btn filter-btn" data-filter-value="1">Check-in</button><button class="btn filter-btn" data-filter-value="2">Check-out</button><button class="btn filter-btn" data-filter-value="3">Approved</button><button class="btn filter-btn" data-filter-value="-1">Canceled</button></div></div>
+        <div class="filter-group"><div class="filter-buttons" id="period-filters"><small class="align-self-center me-2">Period:</small><button class="btn filter-btn" data-filter-value="today">Today</button><button class="btn filter-btn active" data-filter-value="week">Week</button><button class="btn filter-btn" data-filter-value="month">Month</button><button class="btn filter-btn" data-filter-value="all">All</button></div></div>
     </section>
 
     <main class="visit-list-container"><div id="visit-list"><div class="text-center p-5"><div class="spinner-border"></div></div></div></main>
@@ -143,6 +144,7 @@
                 const debouncedFilter = this.helpers.debounce(h.applyFilters.bind(this), 300);
                 $('#recordStatus-filters').on('click', '.filter-btn', h.onFilterClick.bind(this));
                 $('#visitProgress-filters').on('click', '.filter-btn', h.onFilterClick.bind(this));
+                $('#period-filters').on('click', '.filter-btn', h.onFilterClick.bind(this));
                 this.elements.mainSearchInput.on('keyup', debouncedFilter);
                 this.elements.mainSearchBtn.on('click', h.applyFilters.bind(this));
                 this.elements.addVisitBtn.on('click', h.onAddVisitClick.bind(this));
@@ -167,11 +169,13 @@
                 applyFilters() {
                     const status = $('#recordStatus-filters .active').data('filter-value');
                     const progress = $('#visitProgress-filters .active').data('filter-value');
+                    const period = $('#period-filters .filter-btn.active').data('filter-value');
                     const term = this.elements.mainSearchInput.val().toLowerCase();
                     const filtered = this.state.allVisits.filter(v =>
                         (status === 'all' || v.status == status) &&
                         (progress === 'all' || v.progress == progress) &&
-                        (!term || `${v.user.firstname} ${v.user.lastname}`.toLowerCase().includes(term) || `${v.patient.firstname} ${v.patient.lastname}`.toLowerCase().includes(term))
+                        (!term || `${v.user.firstname} ${v.user.lastname}`.toLowerCase().includes(term) || `${v.patient.firstname} ${v.patient.lastname}`.toLowerCase().includes(term)) &&
+                        this.helpers.matchesPeriod(v, period)
                     );
                     this.render.visitList(filtered);
                 },
@@ -331,6 +335,30 @@
                 getRelativeTime(dStr) { const n=new Date(),v=this.parseDate(dStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/864e5);if(d<0)return"Past";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`; },
                 searchMatcher: (item,term,keys)=>{ if(!term) return true; const fields = Array.isArray(keys) ? keys.map(k=>item[k]||'').join(' ') : item[keys]; return fields.toLowerCase().includes(term); },
                 debounce: (func,delay)=>{ let t; return function(...a){clearTimeout(t); t=setTimeout(()=>func.apply(this,a),delay);}},
+
+                matchesPeriod(visit, period) {
+                    if (!period || period === 'all') return true;
+                    const vDate = this.parseDate(visit.start_time || visit.visit_date);
+                    vDate.setHours(0, 0, 0, 0);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    if (period === 'today') {
+                        return vDate.getTime() === today.getTime();
+                    }
+                    if (period === 'week') {
+                        const day = today.getDay();
+                        const monday = new Date(today);
+                        monday.setDate(today.getDate() - (day === 0 ? 6 : day - 1));
+                        const sunday = new Date(monday);
+                        sunday.setDate(monday.getDate() + 6);
+                        return vDate >= monday && vDate <= sunday;
+                    }
+                    if (period === 'month') {
+                        return vDate.getMonth() === today.getMonth() && vDate.getFullYear() === today.getFullYear();
+                    }
+                    return true;
+                }
             },
 
             checkFormCompleteness() {
