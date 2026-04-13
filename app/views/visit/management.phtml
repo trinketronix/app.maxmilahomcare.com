@@ -230,7 +230,12 @@
                 onDurationChange(e) { this.state.newVisit.totalHours = parseInt($(e.target).val()); this.checkFormCompleteness(); },
                 onExtraMinutesChange(e) { this.state.newVisit.extraMinutes = parseInt($(e.target).val()); },
                 onCreateVisitClick() { this.render.confirmationText(); this.modals.confirmation.show(); },
-                onConfirmCreateVisit() { this.api.createVisit(); },
+                onConfirmCreateVisit() {
+                    const confirmBtn = VisitManagementApp.elements.confirmCreateVisitBtn;
+                    if (confirmBtn.prop('disabled')) return;
+                    confirmBtn.prop('disabled', true).text('Creating...');
+                    this.api.createVisit();
+                },
                 onSubSearch(e, type) {
                     const term = $(e.target).val().toLowerCase();
                     const list = `all${type.charAt(0).toUpperCase() + type.slice(1)}s`;
@@ -256,7 +261,8 @@
                         payload.start_time = h.formatLocalDatetime(dt);
                     }
                     this._ajax({ url:`${VisitManagementApp.state.baseUrl}/visit/schedule`, type:'POST', contentType:'application/json', data: JSON.stringify(payload)})
-                        .done(() => { VisitManagementApp.helpers.showAlert('Visit created successfully!','success'); VisitManagementApp.modals.confirmation.hide(); VisitManagementApp.modals.offcanvas.hide(); VisitManagementApp.api.fetchAllVisits(); });
+                        .done(() => { VisitManagementApp.helpers.showAlert('Visit created successfully!','success'); VisitManagementApp.modals.confirmation.hide(); VisitManagementApp.modals.offcanvas.hide(); VisitManagementApp.api.fetchAllVisits(); })
+                        .always(() => { VisitManagementApp.elements.confirmCreateVisitBtn.prop('disabled', false).text('OK'); });
                 }
             },
 
