@@ -102,7 +102,7 @@
             <div class="tab-pane fade" id="address-tab"><div id="address-selection-placeholder" class="text-center text-muted mt-5">Please select a patient first.</div><div id="address-selection-content" style="display:none;"><div class="input-group search-bar"><input type="text" id="address-search" class="form-control" placeholder="Search address..."></div><div class="selection-list" id="address-selection-list"></div></div></div>
             <div class="tab-pane fade" id="date-tab"><div id="datepicker-container" class="pt-3"></div></div>
             <div class="tab-pane fade d-flex justify-content-center align-items-center" id="start-tab"><div id="start-time-picker"></div></div>
-            <div class="tab-pane fade d-flex justify-content-center align-items-center" id="duration-tab"><div class="w-75"><label class="form-label fs-5 text-center w-100 mb-3">Select Duration</label><div class="d-flex gap-3"><div class="flex-fill"><label for="total-hours-select" class="form-label text-center w-100">Hours</label><select class="form-select form-select-lg" id="total-hours-select"><option selected disabled value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></div><div class="flex-fill"><label for="extra-minutes-select" class="form-label text-center w-100">Minutes</label><select class="form-select form-select-lg" id="extra-minutes-select"><option value="0" selected>00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option></select></div></div></div></div>
+            <div class="tab-pane fade d-flex justify-content-center align-items-center" id="duration-tab"><div class="w-75"><label class="form-label fs-5 text-center w-100 mb-3">Select Duration</label><div class="d-flex gap-3"><div class="flex-fill"><label for="total-hours-select" class="form-label text-center w-100">Hours</label><select class="form-select form-select-lg" id="total-hours-select"><option selected disabled value="">--</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></div><div class="flex-fill"><label for="extra-minutes-select" class="form-label text-center w-100">Minutes</label><select class="form-select form-select-lg" id="extra-minutes-select"><option value="0" selected>00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option></select></div></div></div></div>
         </div>
         <button type="button" class="btn btn-primary" id="create-visit-btn" style="display:none;">Create Visit</button>
     </div>
@@ -239,8 +239,17 @@
                     } else { this.state.newVisit.startTime = null; }
                     $('#duration-tab-btn').removeClass('disabled'); this.checkFormCompleteness();
                 },
-                onDurationChange(e) { this.state.newVisit.totalHours = parseInt($(e.currentTarget).val(), 10); this.checkFormCompleteness(); },
-                onExtraMinutesChange(e) { this.state.newVisit.extraMinutes = parseInt($(e.currentTarget).val(), 10); },
+                onDurationChange(e) {
+                    const v = $(e.currentTarget).val();
+                    // Keep null when the placeholder "--" is selected; otherwise parse (allows 0)
+                    this.state.newVisit.totalHours = v === '' ? null : parseInt(v, 10);
+                    this.checkFormCompleteness();
+                },
+                onExtraMinutesChange(e) {
+                    this.state.newVisit.extraMinutes = parseInt($(e.currentTarget).val(), 10);
+                    // Re-evaluate so 0 hrs + 0 min hides the button and 0 hrs + 15 min shows it
+                    this.checkFormCompleteness();
+                },
                 onTabChange(e) {
                     if (e.target.id === 'address-tab-btn') {
                         if (!this.state.newVisit.patientId) return false;
@@ -262,8 +271,14 @@
                 onCreateVisitClick() {
                     const { patientFullname, visitDate, startTime, totalHours, extraMinutes } = this.state.newVisit;
                     const visitDay = new Date(visitDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-                    const minStr = extraMinutes > 0 ? ` and ${extraMinutes} minutes` : '';
-                    let timeText = `for ${totalHours} hour${totalHours>1?'s':''}${minStr}.`;
+                    // Compose a natural duration phrase that handles 0 hrs gracefully
+                    let timeText;
+                    if (totalHours === 0) {
+                        timeText = `for ${extraMinutes} minutes.`;
+                    } else {
+                        const minStr = extraMinutes > 0 ? ` and ${extraMinutes} minutes` : '';
+                        timeText = `for ${totalHours} hour${totalHours > 1 ? 's' : ''}${minStr}.`;
+                    }
                     if (startTime) { const s = `${startTime.h % 12 || 12}:${String(startTime.m).padStart(2, '0')} ${startTime.h >= 12 ? 'PM' : 'AM'}`; timeText = `starting around ${s} ${timeText}`; }
                     this.elements.visitConfirmationText.html(`A visit for <strong>${patientFullname}</strong> will be created on <strong>${visitDay}</strong>, attended by <strong>${this.state.caregiverFullname}</strong> ${timeText}`);
                     this.modals.visitConfirmation.show();
@@ -408,8 +423,12 @@
             },
 
             checkFormCompleteness() {
-                const { patientId, addressId, visitDate, startTime, totalHours } = this.state.newVisit;
-                if (patientId != null && addressId != null && visitDate && startTime && totalHours) { this.elements.createVisitBtn.fadeIn(); }
+                const s = this.state.newVisit;
+                const hasIdentity = s.patientId != null && s.addressId != null;
+                const hasSchedule = s.visitDate && s.startTime;
+                // Allow 0 hours, but require *some* duration (hrs > 0 OR mins > 0)
+                const hasDuration = s.totalHours != null && (s.totalHours > 0 || s.extraMinutes > 0);
+                if (hasIdentity && hasSchedule && hasDuration) { this.elements.createVisitBtn.fadeIn(); }
                 else { this.elements.createVisitBtn.fadeOut(); }
             },
 
