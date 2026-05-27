@@ -261,8 +261,8 @@
                     return $.ajax({
                         url: settings.url, type: settings.type, headers: { 'Authorization': CaregiverProfileApp.state.authToken },
                         processData: !isFormData, contentType: isFormData ? false : 'application/json',
-                        dataType: 'json', data: (settings.data && !isFormData) ? JSON.stringify(settings.data) : settings.data,
-                    }).fail(err => CaregiverProfileApp.helpers.showAlert(err.responseJSON?.message || 'An error occurred.', 'danger'));
+                        dataType: 'json', data: (settings.data && !isFormData) ? JSON.stringify(settings.data) : settings.data, cache: false
+                }).fail(err => CaregiverProfileApp.helpers.showAlert(err.responseJSON?.message || 'An error occurred.', 'danger'));
                 },
                 fetchUserData() {
                     this._ajax({ url: `${CaregiverProfileApp.state.baseUrl}/account/${CaregiverProfileApp.state.targetUserId}`, type: 'GET' })
