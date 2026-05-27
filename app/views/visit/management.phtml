@@ -251,8 +251,17 @@
                     }
                     this.handlers.applyFilters.call(this);
                 },
-                onDurationChange(e) { this.state.newVisit.totalHours = parseInt($(e.target).val()); this.checkFormCompleteness(); },
-                onExtraMinutesChange(e) { this.state.newVisit.extraMinutes = parseInt($(e.target).val()); },
+                onDurationChange(e) {
+                    const v = $(e.target).val();
+                    // Keep null when the placeholder "--" is selected; otherwise parse (allows 0)
+                    this.state.newVisit.totalHours = v === '' ? null : parseInt(v, 10);
+                    this.checkFormCompleteness();
+                },
+                onExtraMinutesChange(e) {
+                    this.state.newVisit.extraMinutes = parseInt($(e.target).val(), 10);
+                    // Re-evaluate so 0 hrs + 0 min hides the button and 0 hrs + 15 min shows it
+                    this.checkFormCompleteness();
+                },
                 onCreateVisitClick() { this.render.confirmationText(); this.modals.confirmation.show(); },
                 onConfirmCreateVisit() {
                     const confirmBtn = VisitManagementApp.elements.confirmCreateVisitBtn;
@@ -314,8 +323,15 @@
                 confirmationText() {
                     const { patientFullname, caregiverFullname, visitDate, startTime, totalHours, extraMinutes } = VisitManagementApp.state.newVisit;
                     const d = new Date(visitDate).toLocaleDateString('en-US',{month:'long',day:'numeric'});
-                    const minStr = extraMinutes > 0 ? ` and ${extraMinutes} minutes` : '';
-                    let t = `for ${totalHours} hour${totalHours>1?'s':''}${minStr}.`;
+                    // Compose a natural duration phrase that handles 0 hrs gracefully
+                    let durationPhrase;
+                    if (totalHours === 0) {
+                        durationPhrase = `for ${extraMinutes} minutes.`;
+                    } else {
+                        const minStr = extraMinutes > 0 ? ` and ${extraMinutes} minutes` : '';
+                        durationPhrase = `for ${totalHours} hour${totalHours > 1 ? 's' : ''}${minStr}.`;
+                    }
+                    let t = durationPhrase;
                     if (startTime) { const s=`${startTime.h%12||12}:${String(startTime.m).padStart(2,'0')} ${startTime.h>=12?'PM':'AM'}`; t=`starting ~${s} ${t}` }
                     VisitManagementApp.elements.visitConfirmationText.html(`Create a visit for <strong>${patientFullname}</strong> on <strong>${d}</strong>, with <strong>${caregiverFullname}</strong>, ${t}`);
                 }
@@ -388,7 +404,11 @@
 
             checkFormCompleteness() {
                 const s = this.state.newVisit;
-                if (s.caregiverId != null && s.patientId != null && s.addressId != null && s.visitDate && s.startTime && s.totalHours) { this.elements.createVisitBtn.fadeIn(); }
+                const hasIdentity = s.caregiverId != null && s.patientId != null && s.addressId != null;
+                const hasSchedule = s.visitDate && s.startTime;
+                // Allow 0 hours, but require *some* duration (hrs > 0 OR mins > 0)
+                const hasDuration = s.totalHours != null && (s.totalHours > 0 || s.extraMinutes > 0);
+                if (hasIdentity && hasSchedule && hasDuration) { this.elements.createVisitBtn.fadeIn(); }
                 else { this.elements.createVisitBtn.fadeOut(); }
             },
 
