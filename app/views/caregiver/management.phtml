@@ -194,7 +194,7 @@
             },
 
             api: {
-                _ajax: settings => $.ajax({ ...settings, headers: { 'Authorization': CaregiverManagementApp.state.authToken }, dataType: 'json' })
+                _ajax: settings => $.ajax({ ...settings, headers: { 'Authorization': CaregiverManagementApp.state.authToken }, dataType: 'json', cache: false  })
                     .fail(err => CaregiverManagementApp.helpers.showAlert(err.responseJSON?.message || 'An error occurred.', 'danger')),
 
                 fetchUserList() {

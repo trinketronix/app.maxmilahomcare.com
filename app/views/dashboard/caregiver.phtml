@@ -304,7 +304,7 @@
 
             api: {
                 _ajax(url, method, data) {
-                    const settings = { url: `${DashboardCaregiverApp.state.baseUrl}${url}`, method: method || 'GET', headers: { 'Authorization': DashboardCaregiverApp.state.authToken, 'Content-Type': 'application/json' }, dataType: 'json' };
+                    const settings = { url: `${DashboardCaregiverApp.state.baseUrl}${url}`, method: method || 'GET', headers: { 'Authorization': DashboardCaregiverApp.state.authToken, 'Content-Type': 'application/json' }, dataType: 'json', cache: false  };
                     if (data) settings.data = JSON.stringify(data);
                     return $.ajax(settings).fail((xhr) => DashboardCaregiverApp.helpers.showAlert(xhr.responseJSON?.message || `An error occurred.`, 'danger'));
                 },

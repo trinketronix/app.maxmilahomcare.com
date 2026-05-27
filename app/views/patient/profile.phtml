@@ -167,6 +167,7 @@
                         processData: !isFormData,
                         contentType: isFormData ? false : 'application/json',
                         dataType: 'json',
+                        cache: false,
                         data: (settings.data && !isFormData) ? JSON.stringify(settings.data) : settings.data
                     };
                     return $.ajax({ ...baseSettings, ...settings }).fail(err => PatientProfileApp.helpers.showAlert(err.responseJSON?.message || 'An API error occurred.', 'danger'));

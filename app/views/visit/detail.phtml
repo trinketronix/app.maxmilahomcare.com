@@ -277,7 +277,7 @@
                 _ajax(settings) {
                     return $.ajax({
                         ...settings,
-                        headers: { 'Authorization': VisitDetailApp.state.authToken, 'Content-Type': 'application/json' },
+                        headers: { 'Authorization': VisitDetailApp.state.authToken, 'Content-Type': 'application/json', cache: false },
                     }).fail(err => {
                         const errorMsg = err.responseJSON?.message || 'An API error occurred.';
                         VisitDetailApp.helpers.showAlert(errorMsg, 'danger');

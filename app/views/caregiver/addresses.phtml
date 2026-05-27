@@ -165,7 +165,7 @@
             },
 
             api: {
-                _ajax: settings => $.ajax({ ...settings, headers: { 'Authorization': CaregiverAddressesApp.state.authToken }, dataType: 'json' }).fail(err => CaregiverAddressesApp.helpers.showAlert(err.responseJSON?.message || 'API request failed.', 'danger')),
+                _ajax: settings => $.ajax({ ...settings, headers: { 'Authorization': CaregiverAddressesApp.state.authToken }, dataType: 'json', cache: false }).fail(err => CaregiverAddressesApp.helpers.showAlert(err.responseJSON?.message || 'API request failed.', 'danger')),
 
                 fetchInitialData() {
                     $.when(
