@@ -26,6 +26,7 @@
         .filter-buttons::-webkit-scrollbar { display: none; }
         .filter-btn { border: 2px solid #000; border-radius: 8px; background-color: #fff; color: #000; font-weight: 500; white-space: nowrap; }
         .filter-btn.active { background-color: #000; color: #fff; }
+        .filter-month-input { border: 2px solid #000; border-radius: 8px; background-color: #fff; color: #000; font-weight: 500; white-space: nowrap; width: auto; max-width: 175px; padding: 0.375rem 0.75rem; }
         .visit-list-container { flex-grow: 1; overflow-y: auto; padding: 1rem; padding-bottom: 120px; }
         .visit-card { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; border: 2px solid #000; border-radius: 15px; padding: 1rem; margin-bottom: 1rem; text-decoration: none; color: inherit; transition: background-color 0.2s; }
         .visit-card:hover { background-color: #f1f1f1; }
@@ -66,7 +67,7 @@
         <div class="input-group search-bar mb-3"><input type="text" id="search-input-main" class="form-control" placeholder="Search by name..."><button class="btn btn-dark" type="button" id="main-search-btn">Search</button></div>
         <div class="filter-group mb-2"><div class="filter-buttons" id="recordStatus-filters"><small class="align-self-center me-2">Status:</small><button class="btn filter-btn active" data-filter-value="all">All</button><button class="btn filter-btn" data-filter-value="1">Visible</button><button class="btn filter-btn" data-filter-value="2">Archived</button><button class="btn filter-btn" data-filter-value="3">Deleted</button></div></div>
         <div class="filter-group mb-2"><div class="filter-buttons" id="visitProgress-filters"><small class="align-self-center me-2">Progress:</small><button class="btn filter-btn active" data-filter-value="all">All</button><button class="btn filter-btn" data-filter-value="0">Scheduled</button><button class="btn filter-btn" data-filter-value="1">Check-in</button><button class="btn filter-btn" data-filter-value="2">Check-out</button><button class="btn filter-btn" data-filter-value="3">Approved</button><button class="btn filter-btn" data-filter-value="-1">Canceled</button></div></div>
-        <div class="filter-group"><div class="filter-buttons" id="period-filters"><small class="align-self-center me-2">Period:</small><button class="btn filter-btn" data-filter-value="today">Today</button><button class="btn filter-btn active" data-filter-value="week">Week</button><button class="btn filter-btn" data-filter-value="month">Month</button><button class="btn filter-btn" data-filter-value="all">All</button></div></div>
+        <div class="filter-group"><div class="filter-buttons" id="period-filters"><small class="align-self-center me-2">Period:</small><button class="btn filter-btn" data-filter-value="today">Today</button><button class="btn filter-btn active" data-filter-value="week">Week</button><button class="btn filter-btn" data-filter-value="month">Month</button><button class="btn filter-btn" data-filter-value="all">All</button><input type="month" id="period-month-select" class="filter-month-input ms-1" aria-label="Filter by specific month"></div></div>
     </section>
 
     <main class="visit-list-container"><div id="visit-list"><div class="text-center p-5"><div class="spinner-border"></div></div></div></main>
@@ -119,6 +120,7 @@
                 caregiverList: $('#caregiver-selection-list'), patientList: $('#patient-selection-list'), addressList: $('#address-selection-list'),
                 timePicker: $('#start-time-picker'), hoursSelect: $('#total-hours-select'), extraMinutesSelect: $('#extra-minutes-select'),
                 visitConfirmationText: $('#visit-confirmation-text'), confirmCreateVisitBtn: $('#confirm-create-visit-btn'),
+                periodMonthSelect: $('#period-month-select'),
                 tabs: {
                     caregiver: bootstrap.Tab.getOrCreateInstance('#caregiver-tab-btn'), patient: bootstrap.Tab.getOrCreateInstance('#patient-tab-btn'),
                     address: bootstrap.Tab.getOrCreateInstance('#address-tab-btn'), date: bootstrap.Tab.getOrCreateInstance('#date-tab-btn'),
@@ -144,7 +146,8 @@
                 const debouncedFilter = this.helpers.debounce(h.applyFilters.bind(this), 300);
                 $('#recordStatus-filters').on('click', '.filter-btn', h.onFilterClick.bind(this));
                 $('#visitProgress-filters').on('click', '.filter-btn', h.onFilterClick.bind(this));
-                $('#period-filters').on('click', '.filter-btn', h.onFilterClick.bind(this));
+                $('#period-filters').on('click', '.filter-btn', h.onPeriodFilterClick.bind(this));
+                this.elements.periodMonthSelect.on('change', h.onMonthSelect.bind(this));
                 this.elements.mainSearchInput.on('keyup', debouncedFilter);
                 this.elements.mainSearchBtn.on('click', h.applyFilters.bind(this));
                 this.elements.addVisitBtn.on('click', h.onAddVisitClick.bind(this));
@@ -170,12 +173,13 @@
                     const status = $('#recordStatus-filters .active').data('filter-value');
                     const progress = $('#visitProgress-filters .active').data('filter-value');
                     const period = $('#period-filters .filter-btn.active').data('filter-value');
+                    const specificMonth = this.elements.periodMonthSelect.val();   // "YYYY-MM" or ""
                     const term = this.elements.mainSearchInput.val().toLowerCase();
                     const filtered = this.state.allVisits.filter(v =>
                         (status === 'all' || v.status == status) &&
                         (progress === 'all' || v.progress == progress) &&
                         (!term || `${v.user.firstname} ${v.user.lastname}`.toLowerCase().includes(term) || `${v.patient.firstname} ${v.patient.lastname}`.toLowerCase().includes(term)) &&
-                        this.helpers.matchesPeriod(v, period)
+                        (specificMonth ? this.helpers.matchesSpecificMonth(v, specificMonth) : this.helpers.matchesPeriod(v, period))
                     );
                     this.render.visitList(filtered);
                 },
@@ -230,6 +234,22 @@
                         this.state.newVisit.startTime = { h: hour24, m: parseInt(m, 10) };
                     } else { this.state.newVisit.startTime = null; }
                     $('#duration-tab-btn').removeClass('disabled'); this.checkFormCompleteness();
+                },
+                onPeriodFilterClick(e) {
+                    // Choosing a keyword period clears any specific-month selection
+                    this.elements.periodMonthSelect.val('');
+                    $(e.currentTarget).addClass('active').siblings('.filter-btn').removeClass('active');
+                    this.handlers.applyFilters.call(this);
+                },
+                onMonthSelect(e) {
+                    if ($(e.target).val()) {
+                        // A specific month overrides the keyword buttons
+                        $('#period-filters .filter-btn').removeClass('active');
+                    } else {
+                        // Cleared — fall back to "All"
+                        $('#period-filters .filter-btn[data-filter-value="all"]').addClass('active').siblings('.filter-btn').removeClass('active');
+                    }
+                    this.handlers.applyFilters.call(this);
                 },
                 onDurationChange(e) { this.state.newVisit.totalHours = parseInt($(e.target).val()); this.checkFormCompleteness(); },
                 onExtraMinutesChange(e) { this.state.newVisit.extraMinutes = parseInt($(e.target).val()); },
@@ -335,7 +355,12 @@
                 getRelativeTime(dStr) { const n=new Date(),v=this.parseDate(dStr);n.setHours(0,0,0,0);v.setHours(0,0,0,0);const d=Math.ceil((v-n)/864e5);if(d<0)return"Past";if(d===0)return"Today";if(d===1)return"Tomorrow";return`In ${d} days`; },
                 searchMatcher: (item,term,keys)=>{ if(!term) return true; const fields = Array.isArray(keys) ? keys.map(k=>item[k]||'').join(' ') : item[keys]; return fields.toLowerCase().includes(term); },
                 debounce: (func,delay)=>{ let t; return function(...a){clearTimeout(t); t=setTimeout(()=>func.apply(this,a),delay);}},
-
+                matchesSpecificMonth(visit, monthStr) {
+                    if (!monthStr) return true;
+                    const [year, month] = monthStr.split('-').map(Number);   // month is 1-12
+                    const vDate = this.parseDate(visit.start_time || visit.visit_date);
+                    return vDate.getFullYear() === year && (vDate.getMonth() + 1) === month;
+                },
                 matchesPeriod(visit, period) {
                     if (!period || period === 'all') return true;
                     const vDate = this.parseDate(visit.start_time || visit.visit_date);
